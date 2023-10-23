@@ -1,0 +1,4 @@
+#ifndef EKIZU_MENTION_HPP
+#define EKIZU_MENTION_HPP
+
+#endif // EKIZU_MENTION_HPP
