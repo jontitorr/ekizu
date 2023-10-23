@@ -1,6 +1,7 @@
 #ifndef EKIZU_GATEWAY_READY_HPP
 #define EKIZU_GATEWAY_READY_HPP
 
+#include <array>
 #include <ekizu/current_user.hpp>
 #include <ekizu/guild.hpp>
 #include <ekizu/partial_application.hpp>

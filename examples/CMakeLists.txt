@@ -21,8 +21,20 @@ target_include_directories(
                      $<INSTALL_INTERFACE:include>
 )
 
+if(WIN32)
+    # Disable getenv() warning
+    target_compile_definitions(dotenv INTERFACE _CRT_SECURE_NO_WARNINGS)
+endif()
+
 cpmfindpackage(
-    NAME "spdlog" GITHUB_REPOSITORY "gabime/spdlog" GIT_TAG "v1.12.0" OPTIONS "SPDLOG_FMT_EXTERNAL ON"
+    NAME
+    "spdlog"
+    GITHUB_REPOSITORY
+    "gabime/spdlog"
+    GIT_TAG
+    "v1.12.0"
+    OPTIONS
+    "SPDLOG_FMT_EXTERNAL ON"
 )
 
 file(GLOB_RECURSE examples "*.cpp")
