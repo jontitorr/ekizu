@@ -29,36 +29,37 @@ void handle_event(Event ev)
 {
 	const auto &logger = get_logger();
 
-	std::visit(
-		overload{ [&logger](const Ready &payload) {
-				 logger->info(
-					 fmt::format("Logged in as {}",
-						     payload.user.username));
+	std::visit(overload{ [&logger](const Ready &payload) {
+				    logger->info(
+					    fmt::format("Logged in as {}",
+							payload.user.username));
 
-				 logger->info(fmt::format("API version: {}",
-							  payload.v));
-				 logger->info(fmt::format(
-					 "Guilds: {}", payload.guilds.size()));
+				    logger->info(fmt::format("API version: {}",
+							     payload.v));
+				    logger->info(
+					    fmt::format("Guilds: {}",
+							payload.guilds.size()));
 
-				 logger->info(fmt::format(
-					 "Ready object: {}",
-					 nlohmann::json{ payload }.dump()));
-			 },
-			  [&logger](const MessageCreate &payload) {
-				  const auto &[msg] = payload;
+				    logger->info(fmt::format(
+					    "Ready object: {}",
+					    nlohmann::json{ payload }.dump()));
+			    },
+			     [&logger](const MessageCreate &payload) {
+				     const auto &[msg] = payload;
 
-				  logger->info(fmt::format("Message: {}",
-							   msg.content));
-			  },
-			  [&logger](const Log &log) {
-				  logger->debug(
-					  fmt::format("Log: {}", log.message));
-			  },
-			  [&logger](const auto &e) {
-				  logger->info(fmt::format("Unknown event: {}",
-							   typeid(e).name()));
-			  } },
-		ev);
+				     logger->info(fmt::format("Message: {}",
+							      msg.content));
+			     },
+			     [&logger](const Log &log) {
+				     logger->debug(fmt::format("Log: {}",
+							       log.message));
+			     },
+			     [&logger](const auto &e) {
+				     logger->info(fmt::format(
+					     "Uncaught event: {}",
+					     nlohmann::json{ e }.dump()));
+			     } },
+		   ev);
 }
 
 int main()
