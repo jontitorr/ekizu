@@ -75,14 +75,13 @@ struct Shard {
 		bool is_bot{ true };
 	};
 
-	void handle_event(tcb::span<const std::byte> data,
-			  const std::function<void(Event)> &cb);
-	void handle_dispatch(const nlohmann::json &data,
-			     const std::function<void(Event)> &cb);
+	void handle_event(tcb::span<const std::byte> data);
+	void handle_dispatch(const nlohmann::json &data);
 	void handle_reconnect();
 	void handle_invalid_session(const nlohmann::json &data);
 	void handle_hello(const nlohmann::json &data);
 	void handle_heartbeat_ack();
+	void log(std::string_view msg, LogLevel level = LogLevel::Debug);
 
 	void reset_session()
 	{
@@ -92,8 +91,7 @@ struct Shard {
 	}
 
 	[[nodiscard]] Result<void>
-	connect(const std::function<void(tcb::span<const std::byte>)>
-			&on_payload);
+	connect(const std::function<void(Event)> &cb);
 
 	[[nodiscard]] Result<void> reconnect(net::WebSocketCloseCode code,
 					     bool reset);
@@ -111,7 +109,7 @@ struct Shard {
 	uint64_t m_id;
 	Config m_config;
 	std::unique_ptr<std::atomic_bool> m_last_heartbeat_acked{
-		std::make_unique<std::atomic_bool>(false)
+		std::make_unique<std::atomic_bool>(true)
 	};
 	std::unique_ptr<Mutex<std::string> > m_session_id{
 		std::make_unique<Mutex<std::string> >()
@@ -133,7 +131,7 @@ struct Shard {
 
 	/// May or may not be used based on runtime options.
 	std::unique_ptr<Inflater> m_inflater;
-	std::function<void(Event)> m_on_event;
+	std::unique_ptr<Mutex<std::function<void(Event)> > > m_on_event;
 	std::optional<net::WebSocketClient> m_websocket;
 };
 } // namespace ekizu

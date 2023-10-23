@@ -18,6 +18,7 @@
 #include <ekizu/gateway/guild_scheduled_event_user_remove.hpp>
 #include <ekizu/gateway/guild_stickers_update.hpp>
 #include <ekizu/gateway/guild_update.hpp>
+#include <ekizu/gateway/log.hpp>
 #include <ekizu/gateway/message_create.hpp>
 #include <ekizu/gateway/ready.hpp>
 #include <ekizu/gateway/resumed.hpp>
@@ -31,7 +32,7 @@ using Event =
 		     GuildScheduledEventCreate, GuildScheduledEventDelete,
 		     GuildScheduledEventUpdate, GuildScheduledEventUserAdd,
 		     GuildScheduledEventUserRemove, GuildStickersUpdate,
-		     GuildUpdate, MessageCreate, Ready, Resumed>;
+		     GuildUpdate, Log, MessageCreate, Ready, Resumed>;
 } // namespace ekizu
 
 #endif // EKIZU_EVENT_HPP

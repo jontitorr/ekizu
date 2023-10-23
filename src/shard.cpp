@@ -38,6 +38,12 @@ std::optional<ekizu::Event> event_from_str(const nlohmann::json &data)
 	EKIZU_EVENT(MESSAGE_CREATE, MessageCreate)
 	EKIZU_EVENT(READY, Ready)
 
+	if (event_type == "LOG") {
+		const auto &d = data["d"];
+
+		return ekizu::Log{ d["level"], d["message"] };
+	}
+
 	// Special case: Resumed has no data so we return a dumm y object.
 	if (event_type == "RESUMED") {
 		return ekizu::Resumed{};
@@ -57,11 +63,12 @@ Shard::Shard(ShardId id, std::string_view token, Intents intents)
 
 Result<void> Shard::run(const std::function<void(Event)> &cb)
 {
-	if (const auto res =
-		    connect([this, cb](tcb::span<const std::byte> data) {
-			    handle_event(data, cb);
-		    });
-	    !res) {
+	auto &tq = get_timer_queue();
+
+	tq.set_repeat_mode(true);
+	tq.start();
+
+	if (const auto res = connect(cb); !res) {
 		return res;
 	}
 
@@ -74,8 +81,7 @@ TimerQueue &Shard::get_timer_queue()
 	return timer_queue;
 }
 
-void Shard::handle_event(tcb::span<const std::byte> data,
-			 const std::function<void(Event)> &cb)
+void Shard::handle_event(tcb::span<const std::byte> data)
 {
 	const auto json = nlohmann::json::parse(data, nullptr, false);
 
@@ -84,19 +90,16 @@ void Shard::handle_event(tcb::span<const std::byte> data,
 		return;
 	}
 
-	if (json.contains("s") && !json["s"].is_null() &&
-	    json["s"].is_number()) {
+	if (json.contains("s") && json["s"].is_number()) {
 		m_sequence->store(json["s"]);
-	}
-
-	// TODO: Remove debug. Ignore "op: 0" events.
-	if (json["op"] != 0) {
-		fmt::print("\nReceived event: {}\n", json.dump());
 	}
 
 	switch (static_cast<ekizu::GatewayOpcode>(json["op"].get<uint8_t>())) {
 	case ekizu::GatewayOpcode::Dispatch:
-		return handle_dispatch(json, cb);
+		return handle_dispatch(json);
+	case ekizu::GatewayOpcode::Heartbeat:
+		// https://discord.com/developers/docs/topics/gateway#heartbeat-requests
+		return (void)send_heartbeat();
 	case ekizu::GatewayOpcode::Reconnect:
 		return handle_reconnect();
 	case ekizu::GatewayOpcode::InvalidSession:
@@ -110,14 +113,33 @@ void Shard::handle_event(tcb::span<const std::byte> data,
 	}
 }
 
-void Shard::handle_dispatch(const nlohmann::json &data,
-			    const std::function<void(Event)> &cb)
+void Shard::handle_dispatch(const nlohmann::json &data)
 {
+	// std::string type = data["t"];
+	// const auto msg =
+	// 	fmt::format("received dispatch | event_type={}, sequence={}",
+	// 		    type, m_sequence->load());
+
+	// log(msg);
+
+	if (!m_on_event) {
+		return;
+	}
+
+	auto lk = m_on_event->lock();
+	auto &cb = static_cast<std::function<void(Event)> &>(lk);
+
+	if (!cb) {
+		return;
+	}
+
 	const auto event = event_from_str(data);
 
-	if (event) {
-		cb(*event);
+	if (!event) {
+		return;
 	}
+
+	cb(*event);
 }
 
 void Shard::handle_reconnect()
@@ -149,6 +171,8 @@ void Shard::handle_hello(const nlohmann::json &data)
 
 	const uint32_t heartbeat_interval = hello["heartbeat_interval"];
 
+	log(fmt::format("received hello | heartbeat_interval={}",
+			heartbeat_interval));
 	(void)start_heartbeat(get_timer_queue(), heartbeat_interval);
 	(void)send_identify();
 }
@@ -156,6 +180,14 @@ void Shard::handle_hello(const nlohmann::json &data)
 void Shard::handle_heartbeat_ack()
 {
 	m_last_heartbeat_acked->store(true);
+	log("received heartbeat ack");
+}
+
+void Shard::log(std::string_view msg, LogLevel level)
+{
+	handle_dispatch(nlohmann::json{
+		{ "t", "LOG" },
+		{ "d", { { "message", msg }, { "level", level } } } });
 }
 
 Result<void> Shard::set_auto_reconnect(bool auto_reconnect)
@@ -170,8 +202,7 @@ Result<void> Shard::set_auto_reconnect(bool auto_reconnect)
 	return {};
 }
 
-Result<void> Shard::connect(
-	const std::function<void(tcb::span<const std::byte>)> &on_payload)
+Result<void> Shard::connect(const std::function<void(Event)> &cb)
 {
 	if (m_state->load() != ConnectionState::Disconnected) {
 		return tl::make_unexpected(
@@ -185,6 +216,9 @@ Result<void> Shard::connect(
 		}
 	}
 
+	m_on_event = std::make_unique<Mutex<std::function<void(Event)> > >(
+		std::function<void(Event)>{ cb });
+
 	net::WebSocketClientBuilder builder;
 	const auto compression_enabled = m_config.compression;
 
@@ -192,7 +226,7 @@ Result<void> Shard::connect(
 		.with_on_close([this] {
 			m_inflater.reset();
 			m_state->store(ConnectionState::Disconnected);
-			fmt::print("Disconnected\n");
+			log("disconnected from gateway");
 		})
 		.with_on_connect([this, compression_enabled] {
 			if (compression_enabled) {
@@ -208,13 +242,12 @@ Result<void> Shard::connect(
 			}
 
 			m_state->store(ConnectionState::Connected);
-			fmt::print("Connected\n");
+			log("connected to gateway");
 		})
 		.with_url(GATEWAY_URL);
 
 	if (compression_enabled) {
-		builder.with_on_message([&on_payload,
-					 this](net::WebSocketMessage msg) {
+		builder.with_on_message([this](net::WebSocketMessage msg) {
 			const auto is_msg_zlib_compressed =
 				[](tcb::span<const std::byte> m) {
 					const auto last = m.last(4);
@@ -232,7 +265,7 @@ Result<void> Shard::connect(
 				};
 
 			if (!is_msg_zlib_compressed(msg.payload)) {
-				on_payload(msg.payload);
+				handle_event(msg.payload);
 				return;
 			}
 
@@ -242,13 +275,12 @@ Result<void> Shard::connect(
 				return;
 			}
 
-			on_payload(*inflated);
+			handle_event(*inflated);
 		});
 	} else {
-		builder.with_on_message(
-			[&on_payload](net::WebSocketMessage msg) {
-				on_payload(msg.payload);
-			});
+		builder.with_on_message([this](net::WebSocketMessage msg) {
+			handle_event(msg.payload);
+		});
 	}
 
 	auto client = builder.build();
@@ -308,7 +340,7 @@ Result<void> Shard::send_heartbeat()
 	}
 
 	if (!m_last_heartbeat_acked->load()) {
-		fmt::print("Heartbeat not acked\n");
+		log("connection is failed or \"zombied\"");
 		return reconnect(Shard::DISCORD_SESSION_EXPIRED_CODE, true);
 	}
 
@@ -318,6 +350,8 @@ Result<void> Shard::send_heartbeat()
 		{ "op", static_cast<uint8_t>(GatewayOpcode::Heartbeat) },
 		{ "d", m_sequence->load() },
 	};
+
+	log(fmt::format("sending heartbeat | sequence={}", m_sequence->load()));
 
 	return m_websocket->send(payload.dump());
 }

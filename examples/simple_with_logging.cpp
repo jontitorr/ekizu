@@ -50,6 +50,10 @@ void handle_event(Event ev)
 				  logger->info(fmt::format("Message: {}",
 							   msg.content));
 			  },
+			  [&logger](const Log &log) {
+				  logger->debug(
+					  fmt::format("Log: {}", log.message));
+			  },
 			  [&logger](const auto &e) {
 				  logger->info(fmt::format("Unknown event: {}",
 							   typeid(e).name()));
