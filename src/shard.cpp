@@ -222,11 +222,14 @@ Result<void> Shard::connect(const std::function<void(Event)> &cb)
 	net::WebSocketClientBuilder builder;
 	const auto compression_enabled = m_config.compression;
 
-	builder.with_auto_reconnect(true)
-		.with_on_close([this] {
+	builder.with_auto_reconnect(false)
+		.with_on_close([this](net::WebSocketCloseCode code,
+				      std::string_view reason) {
 			m_inflater.reset();
 			m_state->store(ConnectionState::Disconnected);
-			log("disconnected from gateway");
+			log(fmt::format(
+				"received close frame | code={}, reason={}",
+				static_cast<uint16_t>(code), reason));
 		})
 		.with_on_connect([this, compression_enabled] {
 			if (compression_enabled) {
