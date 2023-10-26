@@ -45,15 +45,7 @@ if(BUILD_SHARED_LIBS)
     set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
 endif()
 
-if(NOT EXISTS "${CMAKE_BINARY_DIR}/CPM.cmake")
-    file(
-        DOWNLOAD
-        "https://github.com/cpm-cmake/CPM.cmake/releases/latest/download/get_cpm.cmake"
-        "${CMAKE_BINARY_DIR}/CPM.cmake"
-        TLS_VERIFY ON
-    )
-endif()
-include(${CMAKE_BINARY_DIR}/CPM.cmake)
+include(cmake/CPM.cmake)
 
 cpmfindpackage(NAME "fmt" GITHUB_REPOSITORY "fmtlib/fmt" GIT_TAG "10.1.1")
 
@@ -252,5 +244,5 @@ if(${PROJECT_NAME}_INSTALL)
     include(CPack)
 endif()
 
-target_compile_options(${PROJECT_NAME} PUBLIC -fsanitize=thread)
-target_link_options(${PROJECT_NAME} PUBLIC -fsanitize=thread)
+# target_compile_options(${PROJECT_NAME} PUBLIC -fsanitize=thread)
+# target_link_options(${PROJECT_NAME} PUBLIC -fsanitize=thread)
