@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - main
+      - dev
     paths:
       - "**ci.yml"
       - "**.hpp"
@@ -11,6 +12,7 @@ on:
   pull_request:
     branches:
       - main
+      - dev
     paths:
       - "**ci.yml"
       - "**.hpp"
