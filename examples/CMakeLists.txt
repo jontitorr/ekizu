@@ -46,5 +46,3 @@ foreach(example ${examples})
         ${example_name} PRIVATE ${CMAKE_PROJECT_NAME} dotenv spdlog::spdlog
     )
 endforeach()
-
-file(COPY .env DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
