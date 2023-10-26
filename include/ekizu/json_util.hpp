@@ -1,7 +1,14 @@
 #ifndef EKIZU_JSON_UTIL_HPP
 #define EKIZU_JSON_UTIL_HPP
 
+#ifndef _WIN32
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wnull-dereference"
+#endif
 #include <nlohmann/json.hpp>
+#ifndef _WIN32
+#pragma GCC diagnostic pop
+#endif
 #include <optional>
 #include <variant>
 
