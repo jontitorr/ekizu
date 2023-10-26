@@ -1,0 +1,97 @@
+name: ekizu CI
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "**ci.yml"
+      - "**.hpp"
+      - "**.cpp"
+      - "**CMakeLists.txt"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "**ci.yml"
+      - "**.hpp"
+      - "**.cpp"
+      - "**CMakeLists.txt"
+
+jobs:
+  linux:
+    name: Linux ${{ matrix.arch }} (${{ matrix.gcc-version }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [amd64]
+        gcc-version: ["g++-9", "g++-10", "g++-11", "g++-12"]
+        os: ["ubuntu-22.04"]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: sudo apt update && sudo apt install -y cmake ${{ matrix.gcc-version }} libssl-dev ninja-build rpm zlib1g-dev
+
+      - name: Configure CMake
+        run: cmake -S . -B build -G Ninja
+        env:
+          CXX: ${{ matrix.gcc-version }}
+
+      - name: Build
+        run: cmake --build build --config Release
+
+      - name: Package
+        run: cd build && cpack --verbose
+
+      - name: Upload Binary (DEB)
+        uses: actions/upload-artifact@v3
+        with:
+          name: "libekizu - Debian Package ${{ matrix.arch }}"
+          path: "${{ github.workspace }}/build/*.deb"
+
+      - name: Upload Binary (RPM)
+        uses: actions/upload-artifact@v3
+        with:
+          name: "libekizu - RPM Package ${{ matrix.arch }}"
+          path: "${{ github.workspace }}/build/*.rpm"
+  windows:
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x64, x86]
+        config: [Release, Debug]
+        vs:
+          - { name: 2019, version: 16, os: windows-2019 }
+          - { name: 2022, version: 17, os: windows-2022 }
+
+    name: "Windows ${{ matrix.arch }}-${{ matrix.config }}-vs${{ matrix.vs.name }}"
+    runs-on: ${{ matrix.vs.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@v1.1
+
+      - name: Configure CMake (x64)
+        if: ${{ matrix.arch == 'x64' }}
+        run: cmake -S . -B build -G "Visual Studio ${{ matrix.vs.version }} ${{ matrix.vs.name }}" -A x64 -T host=x64
+
+      - name: Configure CMake (x86)
+        if: ${{ matrix.arch == 'x86' }}
+        run: cmake -S . -B build -G "Visual Studio ${{ matrix.vs.version }} ${{ matrix.vs.name }}" -A Win32 -T host=x86
+
+      - name: Build
+        run: cmake --build build --config ${{ matrix.config }}
+
+      - name: Package
+        run: cd build && cpack -C ${{ matrix.config }} --verbose
+
+      - name: Upload Binary
+        uses: actions/upload-artifact@v3
+        with:
+          name: "libekizu - Windows ${{ matrix.arch }}-${{ matrix.config }}-vs${{ matrix.vs.name }}"
+          path: "${{ github.workspace }}/build/*.zip"
