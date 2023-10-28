@@ -43,7 +43,7 @@ From there you can simply integrate it into your CMake project like so:
 Contributions, issues and feature requests are welcome. After cloning and setting up project locally, you can just submit
 a PR to this repo and it will be deployed once it's accepted.
 
-Take full advantage of the [.clang-format](README.md) file located in the root of the project to ensure that your code is properly formatted.
+Take full advantage of the [.clang-format](.clang-format) file located in the root of the project to ensure that your code is properly formatted.
 
 ## Dependencies
 
