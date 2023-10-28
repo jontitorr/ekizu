@@ -1,6 +1,8 @@
 #ifndef EKIZU_INTERACTION_TYPE_HPP
 #define EKIZU_INTERACTION_TYPE_HPP
 
+#include <cstdint>
+
 namespace ekizu
 {
 enum class InteractionType : uint8_t {
