@@ -9,6 +9,10 @@ A WIP C++ library for Discord applications.
 - Gateway support, with auto-reconnect
 - JSON support, convert and serialize events/structures to/from JSON
 
+## Usage/Examples
+
+See [examples](https://github.com/Xminent/ekizu/tree/dev/examples).
+
 ## Getting Started
 
 ### Prerequisites
@@ -34,15 +38,18 @@ From there you can simply integrate it into your CMake project like so:
     target_link_libraries(${PROJECT_NAME} PRIVATE ekizu::ekizu)
 ```
 
-## Usage/Examples
+## Contributing
 
-See [examples](https://github.com/Xminent/ekizu/tree/dev/examples).
+Contributions, issues and feature requests are welcome. After cloning and setting up project locally, you can just submit
+a PR to this repo and it will be deployed once it's accepted.
+
+Take full advantage of the [.clang-format](README.md) file located in the root of the project to ensure that your code is properly formatted.
 
 ## Dependencies
 
 ### Third party Dependencies
 
-- [fmt](https://github.com/fmtlib) (comes bundled with project)
+- [fmt](https://github.com/fmtlib/fmt) (comes bundled with project)
 - [net](https://github.com/xminent/net) (comes bundled with project)
 - [nlohmann_json](https://github.com/nlohmann/json) (comes bundled with project)
 - [zlib](https://github.com/madler/zlib) (comes bundled with project, unless you have it installed)
