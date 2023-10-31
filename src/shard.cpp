@@ -128,12 +128,8 @@ void Shard::handle_event(tcb::span<const std::byte> data)
 
 void Shard::handle_dispatch(const nlohmann::json &data)
 {
-	// std::string type = data["t"];
-	// const auto msg =
-	// 	fmt::format("received dispatch | event_type={}, sequence={}",
-	// 		    type, m_sequence->load());
-
-	// log(msg);
+	log(fmt::format("received dispatch | event_type={}, sequence={}",
+			data["t"].get<std::string>(), m_sequence->load()));
 
 	if (!m_on_event) {
 		return;
@@ -198,9 +194,26 @@ void Shard::handle_heartbeat_ack()
 
 void Shard::log(std::string_view msg, LogLevel level)
 {
-	handle_dispatch(nlohmann::json{
+	if (!m_on_event) {
+		return;
+	}
+
+	auto lk = m_on_event->lock();
+	auto &cb = static_cast<std::function<void(Event)> &>(lk);
+
+	if (!cb) {
+		return;
+	}
+
+	const auto debug_event = event_from_str(nlohmann::json{
 		{ "t", "LOG" },
 		{ "d", { { "message", msg }, { "level", level } } } });
+
+	if (!debug_event) {
+		return;
+	}
+
+	cb(*debug_event);
 }
 
 Result<void> Shard::set_auto_reconnect(bool auto_reconnect)
