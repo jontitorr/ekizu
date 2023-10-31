@@ -47,7 +47,7 @@ endif()
 
 include(cmake/CPM.cmake)
 
-cpmfindpackage(NAME "fmt" GITHUB_REPOSITORY "fmtlib/fmt" GIT_TAG "10.1.1")
+cpmfindpackage(NAME "fmt" GITHUB_REPOSITORY "fmtlib/fmt" GIT_TAG "10.1.0")
 
 cpmfindpackage(
     NAME
@@ -228,10 +228,10 @@ if(${PROJECT_NAME}_INSTALL)
     )
 
     set(CPACK_PACKAGE_VENDOR Xminent)
-    set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A networking library for C++")
-    set(CPACK_PACKAGE_DESCRIPTION "A networking library for C++")
+    set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A Discord library for C++")
+    set(CPACK_PACKAGE_DESCRIPTION "A Discord library for C++")
     set(CPACK_PACKAGE_CONTACT "mail@xminent.com")
-    set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "A networking library for C++")
+    set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "A Discord library for C++")
 
     if(WIN32)
         set(CPACK_GENERATOR ZIP)
