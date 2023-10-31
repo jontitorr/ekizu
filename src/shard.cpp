@@ -23,10 +23,17 @@ std::optional<ekizu::Event> event_from_str(const nlohmann::json &data)
 	EKIZU_EVENT(CHANNEL_DELETE, ChannelDelete)
 	EKIZU_EVENT(CHANNEL_PINS_UPDATE, ChannelPinsUpdate)
 	EKIZU_EVENT(CHANNEL_UPDATE, ChannelUpdate)
+	EKIZU_EVENT(GUILD_BAN_ADD, GuildBanAdd)
+	EKIZU_EVENT(GUILD_BAN_REMOVE, GuildBanRemove)
 	EKIZU_EVENT(GUILD_CREATE, GuildCreate)
 	EKIZU_EVENT(GUILD_DELETE, GuildDelete)
 	EKIZU_EVENT(GUILD_EMOJIS_UPDATE, GuildEmojisUpdate)
 	EKIZU_EVENT(GUILD_INTEGRATIONS_UPDATE, GuildIntegrationsUpdate)
+	EKIZU_EVENT(GUILD_MEMBER_ADD, GuildMemberAdd)
+	EKIZU_EVENT(GUILD_MEMBER_REMOVE, GuildMemberRemove)
+	EKIZU_EVENT(GUILD_MEMBER_UPDATE, GuildMemberUpdate)
+	EKIZU_EVENT(GUILD_ROLE_DELETE, GuildRoleDelete)
+	EKIZU_EVENT(GUILD_ROLE_UPDATE, GuildRoleUpdate)
 	EKIZU_EVENT(GUILD_SCHEDULED_EVENT_CREATE, GuildScheduledEventCreate)
 	EKIZU_EVENT(GUILD_SCHEDULED_EVENT_DELETE, GuildScheduledEventDelete)
 	EKIZU_EVENT(GUILD_SCHEDULED_EVENT_UPDATE, GuildScheduledEventUpdate)
@@ -40,21 +47,15 @@ std::optional<ekizu::Event> event_from_str(const nlohmann::json &data)
 	EKIZU_EVENT(INTEGRATION_UPDATE, IntegrationUpdate)
 	EKIZU_EVENT(INVITE_CREATE, InviteCreate)
 	EKIZU_EVENT(INVITE_DELETE, InviteDelete)
-	EKIZU_EVENT(GUILD_MEMBER_ADD, GuildMemberAdd)
-	EKIZU_EVENT(GUILD_MEMBER_REMOVE, GuildMemberRemove)
-	EKIZU_EVENT(GUILD_MEMBER_UPDATE, GuildMemberUpdate)
+	EKIZU_EVENT(LOG, Log)
 	EKIZU_EVENT(MESSAGE_CREATE, MessageCreate)
 	EKIZU_EVENT(MESSAGE_DELETE, MessageDelete)
 	EKIZU_EVENT(MESSAGE_DELETE_BULK, MessageDeleteBulk)
+	EKIZU_EVENT(MESSAGE_REACTION_REMOVE_ALL, MessageReactionRemoveAll)
+	EKIZU_EVENT(MESSAGE_REACTION_REMOVE_EMOJI, MessageReactionRemoveEmoji)
 	EKIZU_EVENT(MESSAGE_UPDATE, MessageUpdate)
 	EKIZU_EVENT(PRESENCE_UPDATE, PresenceUpdate)
 	EKIZU_EVENT(READY, Ready)
-
-	if (event_type == "LOG") {
-		const auto &d = data["d"];
-
-		return ekizu::Log{ d["level"], d["message"] };
-	}
 
 	// Special case: Resumed has no data so we return a dumm y object.
 	if (event_type == "RESUMED") {

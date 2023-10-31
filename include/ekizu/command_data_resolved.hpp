@@ -10,7 +10,7 @@ struct InteractionChannel {
 	/// ID of the channel.
 	Snowflake id;
 	/// Type of the channel.
-	ChannelType kind;
+	ChannelType type;
 	/// Name of the channel.
 	std::string name;
 	/// ID of the channel the thread was created in.

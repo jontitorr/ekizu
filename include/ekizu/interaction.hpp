@@ -14,7 +14,7 @@ struct Interaction {
 	/// ID of the application this interaction is for.
 	Snowflake application_id;
 	/// Type of interaction.
-	InteractionType kind;
+	InteractionType type;
 	/// Interaction data payload.
 	std::optional<InteractionData> data;
 	/// Guild that the interaction was sent from.

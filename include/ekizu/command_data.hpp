@@ -25,7 +25,7 @@ struct CommandData {
 	/// Name of the command.
 	std::string name;
 	/// Type of the command.
-	CommandType kind;
+	CommandType type;
 	/// List of options specified by the user.
 	std::vector<CommandDataOption> options;
 	/// Resolved data from the interaction's options.
