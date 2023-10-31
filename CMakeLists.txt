@@ -47,7 +47,7 @@ endif()
 
 include(cmake/CPM.cmake)
 
-cpmfindpackage(NAME "fmt" GITHUB_REPOSITORY "fmtlib/fmt" GIT_TAG "10.1.0")
+cpmfindpackage(NAME "fmt" GITHUB_REPOSITORY "fmtlib/fmt" GIT_TAG "13156e5")
 
 cpmfindpackage(
     NAME
