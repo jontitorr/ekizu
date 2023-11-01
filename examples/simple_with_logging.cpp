@@ -1,4 +1,5 @@
 #include <dotenv/dotenv.h>
+#include <ekizu/http_client.hpp>
 #include <ekizu/shard.hpp>
 #include <nlohmann/json.hpp>
 #include <spdlog/sinks/stdout_color_sinks.h>
@@ -25,43 +26,7 @@ template <typename... Func> struct overload : Func... {
 
 template <typename... Func> overload(Func...) -> overload<Func...>;
 
-void handle_event(Event ev)
-{
-	const auto &logger = get_logger();
-
-	std::visit(overload{ [&logger](const Ready &payload) {
-				    logger->info(
-					    fmt::format("Logged in as {}",
-							payload.user.username));
-
-				    logger->info(fmt::format("API version: {}",
-							     payload.v));
-				    logger->info(
-					    fmt::format("Guilds: {}",
-							payload.guilds.size()));
-
-				    logger->info(fmt::format(
-					    "Ready object: {}",
-					    nlohmann::json{ payload }.dump()));
-			    },
-			     [&logger](const MessageCreate &payload) {
-				     const auto &[msg] = payload;
-
-				     logger->info(fmt::format("Message: {}",
-							      msg.content));
-			     },
-			     [&logger](const Log &log) {
-				     logger->debug(fmt::format("Log: {}",
-							       log.message));
-			     },
-			     [&logger](const auto &e) {
-				     logger->info(fmt::format(
-					     "Uncaught {} event: {}",
-					     typeid(e).name(),
-					     nlohmann::json{ e }.dump()));
-			     } },
-		   ev);
-}
+std::function<void(Event)> handle_event(HttpClient &http);
 
 int main()
 {
@@ -74,12 +39,74 @@ int main()
 		return 1;
 	}
 
+	auto http = HttpClient{ token };
 	const auto intents = Intents::AllIntents;
 	auto shard = Shard{ ShardId::ONE, token, intents };
 
-	if (const auto res = shard.run(handle_event); !res) {
+	if (const auto res = shard.run(handle_event(http)); !res) {
 		get_logger()->error("Failed to run shard: {}",
 				    res.error().message());
 		return 1;
 	}
+}
+
+std::function<void(Event)> handle_event(HttpClient &http)
+{
+	return [&http, bot_id = Snowflake{}](Event ev) mutable {
+		const auto &logger = get_logger();
+
+		std::visit(
+			overload{
+				[&logger, &bot_id](const Ready &payload) {
+					const auto &user = payload.user;
+
+					logger->info("Logged in as {}",
+						     user.username);
+					bot_id = user.id;
+
+					logger->info("API version: {}",
+						     payload.v);
+					logger->info("Guilds: {}",
+						     payload.guilds.size());
+
+					logger->info("Ready object: {}",
+						     nlohmann::json{ payload }
+							     .dump());
+				},
+				[&logger, &http,
+				 &bot_id](const MessageCreate &payload) {
+					const auto &[msg] = payload;
+
+					if (msg.author.id == bot_id) {
+						return;
+					}
+
+					logger->info("Message: {}",
+						     msg.content);
+
+					const auto res =
+						http.create_message(
+							    msg.channel_id)
+							.with_content(fmt::format(
+								"You said: {}",
+								msg.content))
+							.send();
+
+					if (!res) {
+						fmt::println(
+							"Failed to send message: {}",
+							res.error().message());
+					}
+				},
+				[&logger](const Log &log) {
+					logger->debug("Log: {}", log.message);
+				},
+				[&logger](const auto &e) {
+					logger->info(
+						"Uncaught {} event: {}",
+						typeid(e).name(),
+						nlohmann::json{ e }.dump());
+				} },
+			ev);
+	};
 }

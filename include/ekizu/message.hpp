@@ -1,8 +1,8 @@
 #ifndef EKIZU_MESSAGE_HPP
 #define EKIZU_MESSAGE_HPP
 
-#include <ekizu/channel.hpp>
 #include <ekizu/attachment.hpp>
+#include <ekizu/channel.hpp>
 #include <ekizu/embed.hpp>
 #include <ekizu/function_view.hpp>
 #include <ekizu/interaction_type.hpp>
