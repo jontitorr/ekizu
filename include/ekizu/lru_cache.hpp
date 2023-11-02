@@ -177,8 +177,7 @@ struct LruCache {
 	std::unordered_map<K, ListIterator, Hash> m_cache_map;
 };
 
-template <typename T>
-using SnowflakeLruCache = LruCache<Snowflake, T, Snowflake::HashFunction>;
+template <typename T> using SnowflakeLruCache = LruCache<Snowflake, T>;
 } // namespace ekizu
 
 #endif // EKIZU_LRU_CACHE_HPP

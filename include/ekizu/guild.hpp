@@ -2,9 +2,9 @@
 #define EKIZU_GUILD_HPP
 
 #include <ekizu/emoji.hpp>
+#include <ekizu/guild_feature.hpp>
 #include <ekizu/role.hpp>
 #include <ekizu/sticker.hpp>
-#include <ekizu/guild_feature.hpp>
 
 namespace ekizu
 {
@@ -177,9 +177,6 @@ struct Guild {
 	/// Approximate number of non-offline members in this guild, returned
 	/// from the GET /guilds/<id> endpoint when with_counts is true.
 	uint32_t approximate_presence_count{};
-	/// The welcome screen of a Community guild, shown to new members,
-	/// returned in an Invite's guild object
-	// WelcomeScreen welcome_screen {};
 	/// The guild NSFW level.
 	NSFWLevel nsfw_level{};
 	/// Custom guild stickers.

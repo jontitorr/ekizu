@@ -3,6 +3,7 @@
 
 #include <ekizu/guild_member.hpp>
 #include <ekizu/permissions.hpp>
+#include <ekizu/presence.hpp>
 
 namespace ekizu
 {
@@ -100,12 +101,14 @@ struct ThreadMember {
 	std::optional<Snowflake> id;
 	/// ID of the user.
 	std::optional<Snowflake> user_id;
-	/// Time the user last joined the thread.
+	/// Timestamp of when the member joined the thread.
 	std::string join_timestamp;
 	/// Any user-thread settings, currently only used for notifications.
-	int32_t flags{};
-	/// Additional information about the user.
+	uint64_t flags;
+	/// Member associated with the thread.
 	std::optional<GuildMember> member;
+	/// Presence information for the member.
+	std::optional<Presence> presence;
 };
 
 EKIZU_EXPORT void to_json(nlohmann::json &j, const ThreadMember &m);

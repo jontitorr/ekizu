@@ -88,8 +88,14 @@ std::function<void(Event)> handle_event(HttpClient &http)
 						http.create_message(
 							    msg.channel_id)
 							.with_content(fmt::format(
-								"You said: {}",
-								msg.content))
+								"{} said: {}\nAvatar: {}",
+								msg.author
+									.username,
+								msg.content,
+								msg.author.avatar ?
+									*msg.author
+										 .avatar :
+									"null"))
 							.send();
 
 					if (!res) {

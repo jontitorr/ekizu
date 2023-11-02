@@ -31,4 +31,18 @@ void from_json(const nlohmann::json &j, Emoji &e)
 	deserialize(j, "available", e.available);
 	deserialize(j, "user", e.user);
 }
+
+void to_json(nlohmann::json &j, const PartialEmoji &p)
+{
+	serialize(j, "id", p.id);
+	serialize(j, "name", p.name);
+	serialize(j, "animated", p.animated);
+}
+
+void from_json(const nlohmann::json &j, PartialEmoji &p)
+{
+	deserialize(j, "id", p.id);
+	deserialize(j, "name", p.name);
+	deserialize(j, "animated", p.animated);
+}
 } // namespace ekizu

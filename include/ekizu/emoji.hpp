@@ -34,6 +34,15 @@ struct Emoji {
 
 EKIZU_EXPORT void to_json(nlohmann::json &j, const Emoji &e);
 EKIZU_EXPORT void from_json(const nlohmann::json &j, Emoji &e);
+
+struct EKIZU_EXPORT PartialEmoji {
+	Snowflake id{};
+	std::string name;
+	std::optional<bool> animated;
+};
+
+EKIZU_EXPORT void to_json(nlohmann::json &j, const PartialEmoji &p);
+EKIZU_EXPORT void from_json(const nlohmann::json &j, PartialEmoji &p);
 } // namespace ekizu
 
 #endif // EKIZU_EMOJI_HPP

@@ -32,6 +32,8 @@ std::optional<ekizu::Event> event_from_str(const nlohmann::json &data)
 	EKIZU_EVENT(GUILD_MEMBER_ADD, GuildMemberAdd)
 	EKIZU_EVENT(GUILD_MEMBER_REMOVE, GuildMemberRemove)
 	EKIZU_EVENT(GUILD_MEMBER_UPDATE, GuildMemberUpdate)
+	EKIZU_EVENT(GUILD_MEMBERS_CHUNK, GuildMembersChunk)
+	EKIZU_EVENT(GUILD_ROLE_CREATE, GuildRoleCreate)
 	EKIZU_EVENT(GUILD_ROLE_DELETE, GuildRoleDelete)
 	EKIZU_EVENT(GUILD_ROLE_UPDATE, GuildRoleUpdate)
 	EKIZU_EVENT(GUILD_SCHEDULED_EVENT_CREATE, GuildScheduledEventCreate)
@@ -45,22 +47,40 @@ std::optional<ekizu::Event> event_from_str(const nlohmann::json &data)
 	EKIZU_EVENT(INTEGRATION_CREATE, IntegrationCreate)
 	EKIZU_EVENT(INTEGRATION_DELETE, IntegrationDelete)
 	EKIZU_EVENT(INTEGRATION_UPDATE, IntegrationUpdate)
+	EKIZU_EVENT(INTERACTION_CREATE, InteractionCreate)
 	EKIZU_EVENT(INVITE_CREATE, InviteCreate)
 	EKIZU_EVENT(INVITE_DELETE, InviteDelete)
 	EKIZU_EVENT(LOG, Log)
 	EKIZU_EVENT(MESSAGE_CREATE, MessageCreate)
 	EKIZU_EVENT(MESSAGE_DELETE, MessageDelete)
 	EKIZU_EVENT(MESSAGE_DELETE_BULK, MessageDeleteBulk)
+	EKIZU_EVENT(MESSAGE_REACTION_ADD, MessageReactionAdd)
+	EKIZU_EVENT(MESSAGE_REACTION_REMOVE, MessageReactionRemove)
 	EKIZU_EVENT(MESSAGE_REACTION_REMOVE_ALL, MessageReactionRemoveAll)
 	EKIZU_EVENT(MESSAGE_REACTION_REMOVE_EMOJI, MessageReactionRemoveEmoji)
 	EKIZU_EVENT(MESSAGE_UPDATE, MessageUpdate)
 	EKIZU_EVENT(PRESENCE_UPDATE, PresenceUpdate)
 	EKIZU_EVENT(READY, Ready)
 
-	// Special case: Resumed has no data so we return a dumm y object.
+	// Special case: Resumed has no data so we return a dummy object.
 	if (event_type == "RESUMED") {
 		return ekizu::Resumed{};
 	}
+
+	EKIZU_EVENT(STAGE_INSTANCE_CREATE, StageInstanceCreate)
+	EKIZU_EVENT(STAGE_INSTANCE_DELETE, StageInstanceDelete)
+	EKIZU_EVENT(STAGE_INSTANCE_UPDATE, StageInstanceUpdate)
+	EKIZU_EVENT(THREAD_CREATE, ThreadCreate)
+	EKIZU_EVENT(THREAD_DELETE, ThreadDelete)
+	EKIZU_EVENT(THREAD_LIST_SYNC, ThreadListSync)
+	EKIZU_EVENT(THREAD_MEMBER_UPDATE, ThreadMemberUpdate)
+	EKIZU_EVENT(THREAD_MEMBERS_UPDATE, ThreadMembersUpdate)
+	EKIZU_EVENT(THREAD_UPDATE, ThreadUpdate)
+	EKIZU_EVENT(TYPING_START, TypingStart)
+	EKIZU_EVENT(USER_UPDATE, UserUpdate)
+	EKIZU_EVENT(VOICE_SERVER_UPDATE, VoiceServerUpdate)
+	EKIZU_EVENT(VOICE_STATE_UPDATE, VoiceStateUpdate)
+	EKIZU_EVENT(WEBHOOKS_UPDATE, WebhooksUpdate)
 
 	return std::nullopt;
 }
@@ -128,8 +148,9 @@ void Shard::handle_event(tcb::span<const std::byte> data)
 
 void Shard::handle_dispatch(const nlohmann::json &data)
 {
-	log(fmt::format("received dispatch | event_type={}, sequence={}",
-			data["t"].get<std::string>(), m_sequence->load()));
+	log(fmt::format(
+		"received dispatch | event_type={}, sequence={}, data={}",
+		data["t"].get<std::string>(), m_sequence->load(), data.dump()));
 
 	if (!m_on_event) {
 		return;

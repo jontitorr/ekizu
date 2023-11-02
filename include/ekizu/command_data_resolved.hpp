@@ -1,5 +1,5 @@
-#ifndef EKIZU_MODELS_COMMAND_INTERACTION_DATA_RESOLVED_HPP
-#define EKIZU_MODELS_COMMAND_INTERACTION_DATA_RESOLVED_HPP
+#ifndef EKIZU_COMMAND_DATA_RESOLVED_HPP
+#define EKIZU_COMMAND_DATA_RESOLVED_HPP
 
 #include <ekizu/member_flags.hpp>
 #include <ekizu/message.hpp>
@@ -21,6 +21,9 @@ struct InteractionChannel {
 	std::optional<ThreadMetadata> thread_metadata;
 };
 
+EKIZU_EXPORT void to_json(nlohmann::json &j, const InteractionChannel &c);
+EKIZU_EXPORT void from_json(const nlohmann::json &j, InteractionChannel &c);
+
 struct InteractionMember {
 	/// Member's guild avatar.
 	std::optional<std::string> avatar;
@@ -40,6 +43,9 @@ struct InteractionMember {
 	/// Member roles.
 	std::vector<Snowflake> roles;
 };
+
+EKIZU_EXPORT void to_json(nlohmann::json &j, const InteractionMember &m);
+EKIZU_EXPORT void from_json(const nlohmann::json &j, InteractionMember &m);
 
 struct CommandInteractionDataResolved {
 	/// Map of resolved attachments.
@@ -64,4 +70,4 @@ EKIZU_EXPORT void from_json(const nlohmann::json &j,
 			    CommandInteractionDataResolved &r);
 } // namespace ekizu
 
-#endif // EKIZU_MODELS_COMMAND_INTERACTION_DATA_RESOLVED_HPP
+#endif // EKIZU_COMMAND_DATA_RESOLVED_HPP

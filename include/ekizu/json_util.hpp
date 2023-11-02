@@ -9,7 +9,9 @@
 #ifndef _WIN32
 #pragma GCC diagnostic pop
 #endif
+
 #include <optional>
+#include <type_traits>
 #include <variant>
 
 namespace ekizu::json_util
@@ -35,6 +37,61 @@ template <typename T> struct IsVector<std::vector<T> > : std::true_type {};
 
 template <typename T> constexpr bool IS_VECTOR_V = IsVector<T>::value;
 
+template <typename... Types, std::size_t... I>
+std::optional<std::variant<Types...> >
+variant_from_json_impl(const nlohmann::json &j, std::index_sequence<I...>)
+{
+	std::variant<Types...> result;
+
+	// Helper function to attempt deserialization into a variant type. Why is there no exception-less way to do this?
+	auto try_deserialize = [&result, &j](auto type) {
+		try {
+			std::get<decltype(type)>(result) =
+				j.get<decltype(type)>();
+			return true;
+		} catch (const nlohmann::json::exception &) {
+			return false;
+		}
+	};
+
+	// Use fold expression to try deserialization for each type
+	bool worked =
+		((try_deserialize(std::get<I>(std::tuple<Types...>{})) || ...));
+
+	if (!worked) {
+		return std::nullopt;
+	}
+
+	return result;
+}
+
+template <typename... Types>
+std::optional<std::variant<Types...> >
+variant_from_json(const nlohmann::json &j)
+{
+	return variant_from_json_impl<Types...>(
+		j, std::index_sequence_for<Types...>{});
+}
+
+template <typename... Types>
+void deserialize_variant_impl(const nlohmann::json &data,
+			      std::optional<std::variant<Types...> > &v)
+{
+	v = variant_from_json<Types...>(data);
+}
+
+template <typename T> void deserialize_int(const std::string &str, T &value)
+{
+	try {
+		if constexpr (std::is_signed_v<T>) {
+			value = std::stoi(str);
+		} else if constexpr (std::is_unsigned_v<T>) {
+			value = static_cast<T>(std::stoul(str));
+		}
+	} catch (...) {
+	}
+}
+
 template <typename T, typename ToDeserialize = T>
 void deserialize_impl(const nlohmann::json &value, T &dest)
 {
@@ -42,32 +99,26 @@ void deserialize_impl(const nlohmann::json &value, T &dest)
 		return;
 	}
 
-	if constexpr (std::is_same_v<ToDeserialize, bool>) {
-		if (!value.is_boolean()) {
-			return;
+	// Unique case.
+	if constexpr (std::is_integral_v<ToDeserialize>) {
+		if (value.is_string()) {
+			return deserialize_int(value.get<std::string>(), dest);
 		}
-	} else if constexpr (std::is_same_v<ToDeserialize, std::string> ||
-			     std::is_same_v<ToDeserialize, std::string_view>) {
-		if (!value.is_string()) {
-			return;
-		}
-	} else if constexpr (std::is_integral_v<ToDeserialize> ||
-			     std::is_enum_v<ToDeserialize>) {
-		if (!value.is_number_integer()) {
-			return;
-		}
-	} else if constexpr (std::is_floating_point_v<ToDeserialize>) {
-		if (!value.is_number_float()) {
-			return;
-		}
-	} else if constexpr (IS_VECTOR_V<ToDeserialize>) {
-		if (!value.is_array()) {
-			return;
-		}
-	}
 
-	// We have checked all possible cases.
-	dest = value.get<ToDeserialize>();
+		dest = value.get<ToDeserialize>();
+	} else if constexpr (IS_VARIANT_V<ToDeserialize>) {
+		std::optional<ToDeserialize> temp;
+		deserialize_variant_impl(value, temp);
+
+		if (temp) {
+			dest = std::move(*temp);
+		}
+
+		return;
+	} else {
+		// We have checked all possible cases.
+		dest = value.get<ToDeserialize>();
+	}
 }
 } // namespace detail
 
@@ -137,8 +188,8 @@ void serialize(nlohmann::json &data, std::string_view key, const T &value)
 		return serialize(data, key, *value);
 	} else if constexpr (detail::IS_VARIANT_V<T>) {
 		return std::visit(
-			[&data, &key](auto &&v) {
-				return serialize(data, key, std::forward(v));
+			[&data, &key](const auto &v) {
+				return serialize(data, key, v);
 			},
 			value);
 	} else {

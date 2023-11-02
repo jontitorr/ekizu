@@ -13,13 +13,6 @@ namespace ekizu
  * resources.
  */
 struct Snowflake {
-	struct HashFunction {
-		size_t operator()(Snowflake s) const
-		{
-			return std::hash<uint64_t>{}(s.id);
-		}
-	};
-
 	bool operator==(Snowflake other) const
 	{
 		return id == other.id;
@@ -53,6 +46,13 @@ template <> class fmt::formatter<ekizu::Snowflake> {
 	constexpr auto format(ekizu::Snowflake const &s, Context &ctx) const
 	{
 		return format_to(ctx.out(), "{}", s.id);
+	}
+};
+
+template <> struct std::hash<ekizu::Snowflake> {
+	size_t operator()(const ekizu::Snowflake &s) const
+	{
+		return std::hash<uint64_t>{}(s.id);
 	}
 };
 

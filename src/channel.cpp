@@ -79,6 +79,7 @@ void to_json(nlohmann::json &j, const ThreadMember &m)
 	serialize(j, "join_timestamp", m.join_timestamp);
 	serialize(j, "flags", m.flags);
 	serialize(j, "member", m.member);
+	serialize(j, "presence", m.presence);
 }
 
 void from_json(const nlohmann::json &j, ThreadMember &m)
@@ -88,6 +89,7 @@ void from_json(const nlohmann::json &j, ThreadMember &m)
 	deserialize(j, "join_timestamp", m.join_timestamp);
 	deserialize(j, "flags", m.flags);
 	deserialize(j, "member", m.member);
+	deserialize(j, "presence", m.presence);
 }
 
 void to_json(nlohmann::json &j, const Channel &c)
