@@ -106,21 +106,23 @@ void deserialize_impl(const nlohmann::json &value, T &dest)
 		}
 
 		dest = value.get<ToDeserialize>();
-	} else if constexpr (IS_VARIANT_V<ToDeserialize>) {
-		std::optional<ToDeserialize> temp;
-		deserialize_variant_impl(value, temp);
-
-		if (temp) {
-			dest = std::move(*temp);
-		}
-
-		return;
 	} else {
 		// We have checked all possible cases.
 		dest = value.get<ToDeserialize>();
 	}
 }
 } // namespace detail
+
+template <typename... Types>
+void from_json(const nlohmann::json &j, std::variant<Types...> &v)
+{
+	std::optional<std::variant<Types...> > temp;
+	deserialize_variant_impl(j, temp);
+
+	if (temp) {
+		v = std::move(*temp);
+	}
+}
 
 /**
  * @brief Checks if all the keys are present in the JSON data.

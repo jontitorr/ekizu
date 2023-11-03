@@ -2,6 +2,7 @@
 #define EKIZU_ATTACHMENT_HPP
 
 #include <ekizu/snowflake.hpp>
+#include <optional>
 
 namespace ekizu
 {
@@ -42,6 +43,21 @@ struct Attachment {
 
 EKIZU_EXPORT void to_json(nlohmann::json &j, const Attachment &a);
 EKIZU_EXPORT void from_json(const nlohmann::json &j, Attachment &a);
+
+/**
+ * @brief Represents a partial attachment.
+ */
+struct PartialAttachment {
+	/// ID of the attachment.
+	std::optional<Snowflake> id;
+	/// Name of the file attached.
+	std::optional<std::string> filename;
+	/// Description for the file (max 1024 characters).
+	std::optional<std::string> description;
+};
+
+EKIZU_EXPORT void to_json(nlohmann::json &j, const PartialAttachment &a);
+EKIZU_EXPORT void from_json(const nlohmann::json &j, PartialAttachment &a);
 } // namespace ekizu
 
 #endif // EKIZU_ATTACHMENT_HPP

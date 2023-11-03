@@ -12,8 +12,12 @@
 
 namespace ekizu
 {
-/// This structure represents a form of controlling mentions in a Message
-/// object.
+/**
+ * This structure represents a form of controlling mentions in a Message
+ * object.
+ *
+ * @see https://discord.com/developers/docs/resources/channel#allowed-mentions-object
+ */
 struct AllowedMentions {
 	/// List of allowed mention types to parse from the content.
 	std::vector<std::string> parse;
@@ -25,6 +29,9 @@ struct AllowedMentions {
 	/// false).
 	bool replied_user{};
 };
+
+EKIZU_EXPORT void to_json(nlohmann::json &j, const AllowedMentions &m);
+EKIZU_EXPORT void from_json(const nlohmann::json &j, AllowedMentions &m);
 
 struct ChannelMention {
 	Snowflake id;
@@ -123,6 +130,9 @@ struct MessageReference {
 	/// instead of sending as a normal (non-reply) message, default true.
 	std::optional<bool> fail_if_not_exists;
 };
+
+EKIZU_EXPORT void to_json(nlohmann::json &j, const MessageReference &r);
+EKIZU_EXPORT void from_json(const nlohmann::json &j, MessageReference &r);
 
 /// Represents the parameters you send to the API when creating a message.
 struct MessagePayload {

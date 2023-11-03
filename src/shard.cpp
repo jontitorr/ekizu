@@ -195,7 +195,8 @@ void Shard::handle_hello(const nlohmann::json &data)
 
 	const auto &hello = data["d"];
 
-	if (!hello.contains("heartbeat_interval")) {
+	if (!hello.contains("heartbeat_interval") ||
+	    !hello["heartbeat_interval"].is_number_unsigned()) {
 		return;
 	}
 

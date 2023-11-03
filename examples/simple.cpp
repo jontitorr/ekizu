@@ -43,7 +43,7 @@ std::function<void(Event)> handle_event(HttpClient &http)
 					const auto res =
 						http.create_message(
 							    msg.channel_id)
-							.with_content(fmt::format(
+							.content(fmt::format(
 								"{} said: {}\nAvatar: {}",
 								msg.author
 									.username,

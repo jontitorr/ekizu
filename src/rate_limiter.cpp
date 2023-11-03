@@ -1,39 +1,17 @@
-#include <ekizu/discord_request_manager.hpp>
 #include <ekizu/json_util.hpp>
-#include <fmt/format.h>
+#include <ekizu/rate_limiter.hpp>
 #include <thread>
-
-namespace
-{
-constexpr const char *DISCORD_BASE_URL = "https://discord.com";
-
-nlohmann::json to_json(const ekizu::DiscordApiRequest &req)
-{
-	using ekizu::json_util::serialize;
-
-	nlohmann::json j;
-
-	serialize(j, "method", net::method_name(req.inner.method));
-	serialize(j, "path", req.inner.path);
-	serialize(j, "body", req.inner.body);
-	serialize(j, "headers", req.inner.headers);
-	serialize(j, "bot", req.bot);
-
-	return j;
-}
-} // namespace
 
 namespace ekizu
 {
-DiscordRequestManager::DiscordRequestManager(
-	std::optional<std::function<void(LogLevel, std::string_view)> > log_fn)
-	: m_log_fn{ std::move(log_fn) }
+RateLimiter::RateLimiter(
+	std::function<Result<net::HttpResponse>(net::HttpRequest)> send_fn)
+	: m_send_fn{ std::move(send_fn) }
 
 {
 }
 
-Result<net::HttpResponse>
-DiscordRequestManager::send_request(const DiscordApiRequest &req)
+Result<net::HttpResponse> RateLimiter::send(const DiscordApiRequest &req)
 {
 	static constexpr uint8_t max_retries{ 5 };
 
@@ -54,26 +32,14 @@ DiscordRequestManager::send_request(const DiscordApiRequest &req)
 			}
 		}
 
-		auto conn = net::HttpConnection::connect(DISCORD_BASE_URL);
-
-		if (!conn) {
-			return tl::make_unexpected(conn.error());
+		if (!m_send_fn) {
+			return tl::make_unexpected(std::make_error_code(
+				std::errc::operation_not_permitted));
 		}
 
-		if (!m_http_connection) {
-			m_http_connection = std::move(*conn);
-		}
-
-		log(LogLevel::Debug,
-		    fmt::format("Sending request: {}", to_json(req).dump()));
-
-		auto res = m_http_connection->request(req.inner);
+		auto res = m_send_fn(req.inner);
 
 		if (!res) {
-			log(LogLevel::Error,
-			    fmt::format("Failed to send request to {}: {}",
-					req.inner.path, res.error().message()));
-
 			return tl::make_unexpected(res.error());
 		}
 
@@ -106,30 +72,13 @@ DiscordRequestManager::send_request(const DiscordApiRequest &req)
 
 		if (res->status_code == net::HttpStatus::TooManyRequests) {
 			m_rate_limited = true;
-
-			log(LogLevel::Warn,
-			    fmt::format("Rate limited, retrying request to {}",
-					req.inner.path));
-
 			continue;
 		}
-
-		log(LogLevel::Debug,
-		    fmt::format("Failed to send request to {}: {}",
-				req.inner.path,
-				static_cast<uint16_t>(res->status_code)));
 
 		break;
 	}
 
 	return tl::make_unexpected(
 		std::make_error_code(std::errc::protocol_error));
-}
-
-void DiscordRequestManager::log(LogLevel level, std::string_view message)
-{
-	if (m_log_fn) {
-		(*m_log_fn)(level, message);
-	}
 }
 } // namespace ekizu

@@ -1,5 +1,5 @@
-#ifndef EKIZU_GATEWAY_INTERACTION_HPP
-#define EKIZU_GATEWAY_INTERACTION_HPP
+#ifndef EKIZU_INTERACTION_HPP
+#define EKIZU_INTERACTION_HPP
 
 #include <ekizu/command_data.hpp>
 #include <ekizu/message.hpp>
@@ -7,6 +7,9 @@
 namespace ekizu
 {
 using InteractionData = std::variant<CommandData>;
+
+EKIZU_EXPORT void to_json(nlohmann::json &j, const InteractionData &i);
+EKIZU_EXPORT void from_json(const nlohmann::json &j, InteractionData &i);
 
 struct Interaction {
 	/// ID of the interaction.
@@ -45,4 +48,4 @@ EKIZU_EXPORT void to_json(nlohmann::json &j, const Interaction &i);
 EKIZU_EXPORT void from_json(const nlohmann::json &j, Interaction &i);
 } // namespace ekizu
 
-#endif // EKIZU_GATEWAY_INTERACTION_HPP
+#endif // EKIZU_INTERACTION_HPP

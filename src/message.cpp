@@ -6,6 +6,22 @@ namespace ekizu
 using json_util::deserialize;
 using json_util::serialize;
 
+void to_json(nlohmann::json &j, const AllowedMentions &m)
+{
+	serialize(j, "parse", m.parse);
+	serialize(j, "roles", m.roles);
+	serialize(j, "users", m.users);
+	serialize(j, "replied_user", m.replied_user);
+}
+
+void from_json(const nlohmann::json &j, AllowedMentions &m)
+{
+	deserialize(j, "parse", m.parse);
+	deserialize(j, "roles", m.roles);
+	deserialize(j, "users", m.users);
+	deserialize(j, "replied_user", m.replied_user);
+}
+
 void to_json(nlohmann::json &j, const ChannelMention &m)
 {
 	serialize(j, "id", m.id);
@@ -32,6 +48,22 @@ void from_json(const nlohmann::json &j, MessageActivity &a)
 {
 	deserialize(j, "type", a.type);
 	deserialize(j, "party_id", a.party_id);
+}
+
+void to_json(nlohmann::json &j, const MessageReference &r)
+{
+	serialize(j, "message_id", r.message_id);
+	serialize(j, "channel_id", r.channel_id);
+	serialize(j, "guild_id", r.guild_id);
+	serialize(j, "fail_if_not_exists", r.fail_if_not_exists);
+}
+
+void from_json(const nlohmann::json &j, MessageReference &r)
+{
+	deserialize(j, "message_id", r.message_id);
+	deserialize(j, "channel_id", r.channel_id);
+	deserialize(j, "guild_id", r.guild_id);
+	deserialize(j, "fail_if_not_exists", r.fail_if_not_exists);
 }
 
 void to_json(nlohmann::json &j, const Message &m)

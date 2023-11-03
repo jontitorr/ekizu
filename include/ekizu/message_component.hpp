@@ -13,65 +13,31 @@ enum class ComponentType : uint8_t {
 	TextInput = 4,
 };
 
-struct EKIZU_EXPORT Button {
+struct Button {
 	ComponentType type{ ComponentType::Button };
 	uint8_t style{};
 	std::optional<std::string> label;
 	std::optional<PartialEmoji> emoji;
 	std::optional<std::string> custom_id;
 	std::optional<std::string> url;
-	std::optional<bool> disabled;
+	bool disabled{};
 };
 
-struct EKIZU_EXPORT SelectMenu {
-	SelectMenu &set_custom_id(std::string custom_id_)
-	{
-		custom_id = std::move(custom_id_);
-		return *this;
-	}
+EKIZU_EXPORT void to_json(nlohmann::json &j, const Button &b);
+EKIZU_EXPORT void from_json(const nlohmann::json &j, Button &b);
 
-	SelectMenu &set_options(const std::vector<SelectOptions> &options_)
-	{
-		options = options_;
-		return *this;
-	}
+struct SelectOptions {
+	std::string label;
+	std::string value;
+	std::optional<std::string> description;
+	std::optional<PartialEmoji> emoji;
+	std::optional<bool> default_;
+};
 
-	SelectMenu &set_placeholder(std::string placeholder_)
-	{
-		placeholder = std::move(placeholder_);
-		return *this;
-	}
+EKIZU_EXPORT void to_json(nlohmann::json &j, const SelectOptions &o);
+EKIZU_EXPORT void from_json(const nlohmann::json &j, SelectOptions &o);
 
-	SelectMenu &set_min_values(uint8_t min_values_)
-	{
-		min_values = min_values_;
-		return *this;
-	}
-
-	SelectMenu &set_max_values(uint8_t max_values_)
-	{
-		max_values = max_values_;
-		return *this;
-	}
-
-	SelectMenu &set_disabled(bool disabled_)
-	{
-		disabled = disabled_;
-		return *this;
-	}
-
-	SelectMenu &add_option(const SelectOptions &option_)
-	{
-		options.push_back(option_);
-		return *this;
-	}
-
-	SelectMenu &add_options(const std::vector<SelectOptions> &options_)
-	{
-		options.insert(options.end(), options_.begin(), options_.end());
-		return *this;
-	}
-
+struct SelectMenu {
 	/// The type of the component.
 	ComponentType type{ ComponentType::SelectMenu };
 	/// A unique identifier for the component (max 100 characters).
@@ -89,7 +55,13 @@ struct EKIZU_EXPORT SelectMenu {
 	std::optional<bool> disabled;
 };
 
+EKIZU_EXPORT void to_json(nlohmann::json &j, const SelectMenu &s);
+EKIZU_EXPORT void from_json(const nlohmann::json &j, SelectMenu &s);
+
 using ActionRowComponent = std::variant<Button, SelectMenu>;
+
+EKIZU_EXPORT void to_json(nlohmann::json &j, const ActionRowComponent &c);
+EKIZU_EXPORT void from_json(const nlohmann::json &j, ActionRowComponent &c);
 
 /**
  * @brief A non-interactive container for component that holds other types of
@@ -102,16 +74,19 @@ using ActionRowComponent = std::variant<Button, SelectMenu>;
  * @param client The client that created this Action Row.
  * @param data The JSON data to create this Action Row with.
  */
-struct EKIZU_EXPORT ActionRow {
-	ActionRow &add_component(const ActionRowComponent &component);
-	ActionRow &
-	add_components(const std::vector<ActionRowComponent> &components);
-
+struct ActionRow {
 	ComponentType type{ ComponentType::ActionRow };
 	std::vector<ActionRowComponent> components{};
 };
 
+EKIZU_EXPORT void to_json(nlohmann::json &j, const ActionRow &a);
+EKIZU_EXPORT void from_json(const nlohmann::json &j, ActionRow &a);
+
 using MessageComponent = std::variant<ActionRow, Button, SelectMenu>;
+
+EKIZU_EXPORT void to_json(nlohmann::json &j, const MessageComponent &c);
+// TODO: Not how it works.
+EKIZU_EXPORT void from_json(const nlohmann::json &j, MessageComponent &c);
 } // namespace ekizu
 
 #endif // EKIZU_MESSAGE_COMPONENT_HPP

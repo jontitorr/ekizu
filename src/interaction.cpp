@@ -6,6 +6,16 @@ namespace ekizu
 using json_util::deserialize;
 using json_util::serialize;
 
+void to_json(nlohmann::json &j, const InteractionData &i)
+{
+	std::visit([&j](auto &v) { to_json(j, v); }, i);
+}
+
+void from_json(const nlohmann::json &j, InteractionData &i)
+{
+	json_util::detail::deserialize_impl(j, i);
+}
+
 void to_json(nlohmann::json &j, const Interaction &i)
 {
 	serialize(j, "id", i.id);

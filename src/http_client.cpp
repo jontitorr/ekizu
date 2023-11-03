@@ -9,14 +9,18 @@ constexpr uint8_t API_VERSION{ 10 };
 namespace ekizu
 {
 HttpClient::HttpClient(std::string_view token)
-	: m_token{ token }
+	: m_rate_limiter{ [this](net::HttpRequest req) {
+		return send(std::move(req));
+	} }
+	, m_token{ token }
 {
 }
 
 CreateMessage HttpClient::create_message(Snowflake channel_id)
 {
 	return CreateMessage{ [this](net::HttpRequest req) {
-				     return send(std::move(req));
+				     return m_rate_limiter.send(
+					     { std::move(req) });
 			     },
 			      channel_id };
 }

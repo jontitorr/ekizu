@@ -4,6 +4,9 @@
 
 namespace ekizu
 {
+using json_util::deserialize;
+using json_util::serialize;
+
 Result<std::string> Attachment::download() const
 {
 	const auto res = net::http::get(url);
@@ -17,8 +20,6 @@ Result<std::string> Attachment::download() const
 
 void to_json(nlohmann::json &j, const Attachment &a)
 {
-	using json_util::serialize;
-
 	serialize(j, "id", a.id);
 	serialize(j, "filename", a.filename);
 	serialize(j, "description", a.description);
@@ -33,8 +34,6 @@ void to_json(nlohmann::json &j, const Attachment &a)
 
 void from_json(const nlohmann::json &j, Attachment &a)
 {
-	using json_util::deserialize;
-
 	deserialize(j, "id", a.id);
 	deserialize(j, "filename", a.filename);
 	deserialize(j, "description", a.description);
@@ -45,5 +44,19 @@ void from_json(const nlohmann::json &j, Attachment &a)
 	deserialize(j, "height", a.height);
 	deserialize(j, "width", a.width);
 	deserialize(j, "ephemeral", a.ephemeral);
+}
+
+void to_json(nlohmann::json &j, const PartialAttachment &a)
+{
+	serialize(j, "id", a.id);
+	serialize(j, "filename", a.filename);
+	serialize(j, "description", a.description);
+}
+
+void from_json(const nlohmann::json &j, PartialAttachment &attachment)
+{
+	deserialize(j, "id", attachment.id);
+	deserialize(j, "filename", attachment.filename);
+	deserialize(j, "description", attachment.description);
 }
 } // namespace ekizu
