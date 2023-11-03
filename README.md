@@ -57,9 +57,15 @@ std::function<void(Event)> handle_event(HttpClient &http)
 					const auto res =
 						http.create_message(
 							    msg.channel_id)
-							.with_content(fmt::format(
-								"You said: {}",
-								msg.content))
+							.content(fmt::format(
+								"{} said: {}\nAvatar: {}",
+								msg.author
+									.username,
+								msg.content,
+								msg.author.avatar ?
+									*msg.author
+										 .avatar :
+									"null"))
 							.send();
 
 					if (!res) {
