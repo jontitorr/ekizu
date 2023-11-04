@@ -35,8 +35,10 @@ EKIZU_EXPORT void to_json(nlohmann::json &j, const CreateMessageFields &f);
 EKIZU_EXPORT void from_json(const nlohmann::json &j, CreateMessageFields &f);
 
 struct CreateMessage {
-	CreateMessage(std::function<Result<net::HttpResponse>(net::HttpRequest)>,
-		      Snowflake channel_id);
+	CreateMessage(
+		const std::function<Result<net::HttpResponse>(net::HttpRequest)>
+			&make_request,
+		Snowflake channel_id);
 
 	operator net::HttpRequest() const;
 

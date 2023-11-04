@@ -37,10 +37,11 @@ void from_json(const nlohmann::json &j, CreateMessageFields &f)
 }
 
 CreateMessage::CreateMessage(
-	std::function<Result<net::HttpResponse>(net::HttpRequest)> make_request,
+	const std::function<Result<net::HttpResponse>(net::HttpRequest)>
+		&make_request,
 	Snowflake channel_id)
 	: m_channel_id{ channel_id }
-	, m_make_request{ std::move(make_request) }
+	, m_make_request{ make_request }
 {
 }
 

@@ -12,17 +12,31 @@ HttpClient::HttpClient(std::string_view token)
 	: m_rate_limiter{ [this](net::HttpRequest req) {
 		return send(std::move(req));
 	} }
+	, m_rate_limiter_make_request{ [this](net::HttpRequest req) {
+		return m_rate_limiter.send({ std::move(req) });
+	} }
 	, m_token{ token }
 {
 }
 
 CreateMessage HttpClient::create_message(Snowflake channel_id)
 {
-	return CreateMessage{ [this](net::HttpRequest req) {
-				     return m_rate_limiter.send(
-					     { std::move(req) });
-			     },
-			      channel_id };
+	return CreateMessage{ m_rate_limiter_make_request, channel_id };
+}
+
+DeleteMessage HttpClient::delete_message(Snowflake channel_id,
+					 Snowflake message_id)
+{
+	return DeleteMessage{ m_rate_limiter_make_request, channel_id,
+			      message_id };
+}
+
+BulkDeleteMessages
+HttpClient::bulk_delete_messages(Snowflake channel_id,
+				 const std::vector<Snowflake> &message_ids)
+{
+	return BulkDeleteMessages{ m_rate_limiter_make_request, channel_id,
+				   message_ids };
 }
 
 Result<net::HttpResponse> HttpClient::send(net::HttpRequest req)

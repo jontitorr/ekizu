@@ -1,5 +1,5 @@
-#include "ekizu/embed_builder.hpp"
 #include <dotenv/dotenv.h>
+#include <ekizu/embed_builder.hpp>
 #include <ekizu/http_client.hpp>
 #include <ekizu/shard.hpp>
 #include <nlohmann/json.hpp>
@@ -104,7 +104,7 @@ std::function<void(Event)> handle_event(HttpClient &http)
 								{ "https://avatars.githubusercontent.com/u/59069386?v=4" })
 							.build();
 
-					const auto res =
+					auto res =
 						http.create_message(
 							    msg.channel_id)
 							.content(fmt::format(
@@ -120,9 +120,23 @@ std::function<void(Event)> handle_event(HttpClient &http)
 							.send();
 
 					if (!res) {
-						fmt::println(
+						logger->error(
 							"Failed to send message: {}",
 							res.error().message());
+					}
+
+					if (msg.content == "delete me") {
+						res = http.delete_message(
+								  msg.channel_id,
+								  msg.id)
+							      .send();
+
+						if (!res) {
+							logger->error(
+								"Failed to delete message: {}",
+								res.error()
+									.message());
+						}
 					}
 				},
 				[&logger](const Log &log) {

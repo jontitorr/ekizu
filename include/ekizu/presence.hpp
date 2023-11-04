@@ -66,9 +66,9 @@ EKIZU_EXPORT void from_json(const nlohmann::json &j, ActivityEmoji &e);
 
 struct ActivityParty {
 	/// Party id
-	std::optional<Snowflake> id;
+	std::optional<std::string> id;
 	/// Party size
-	std::optional<uint32_t> size;
+	std::optional<std::array<uint64_t, 2> > size;
 };
 
 EKIZU_EXPORT void to_json(nlohmann::json &j, const ActivityParty &p);
