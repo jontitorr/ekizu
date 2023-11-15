@@ -1,6 +1,7 @@
 #ifndef EKIZU_PRESENCE_HPP
 #define EKIZU_PRESENCE_HPP
 
+#include <array>
 #include <ekizu/activity_flags.hpp>
 #include <ekizu/snowflake.hpp>
 #include <optional>

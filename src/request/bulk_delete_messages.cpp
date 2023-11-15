@@ -23,7 +23,7 @@ BulkDeleteMessages::operator net::HttpRequest() const
 	};
 }
 
-Result<net::HttpResponse> BulkDeleteMessages::send()
+Result<net::HttpResponse> BulkDeleteMessages::send() const
 {
 	if (!m_make_request) {
 		return tl::make_unexpected(std::make_error_code(

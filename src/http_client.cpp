@@ -24,6 +24,19 @@ CreateMessage HttpClient::create_message(Snowflake channel_id)
 	return CreateMessage{ m_rate_limiter_make_request, channel_id };
 }
 
+CrosspostMessage HttpClient::crosspost_message(Snowflake channel_id,
+					       Snowflake message_id)
+{
+	return CrosspostMessage{ m_rate_limiter_make_request, channel_id,
+				 message_id };
+}
+
+EditMessage HttpClient::edit_message(Snowflake channel_id, Snowflake message_id)
+{
+	return EditMessage{ m_rate_limiter_make_request, channel_id,
+			    message_id };
+}
+
 DeleteMessage HttpClient::delete_message(Snowflake channel_id,
 					 Snowflake message_id)
 {
@@ -37,6 +50,19 @@ HttpClient::bulk_delete_messages(Snowflake channel_id,
 {
 	return BulkDeleteMessages{ m_rate_limiter_make_request, channel_id,
 				   message_ids };
+}
+
+PinMessage HttpClient::pin_message(Snowflake channel_id, Snowflake message_id)
+{
+	return PinMessage{ m_rate_limiter_make_request, channel_id,
+			   message_id };
+}
+
+UnpinMessage HttpClient::unpin_message(Snowflake channel_id,
+				       Snowflake message_id)
+{
+	return UnpinMessage{ m_rate_limiter_make_request, channel_id,
+			     message_id };
 }
 
 Result<net::HttpResponse> HttpClient::send(net::HttpRequest req)

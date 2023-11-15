@@ -15,7 +15,7 @@ struct BulkDeleteMessages {
 
 	operator net::HttpRequest() const;
 
-	[[nodiscard]] Result<net::HttpResponse> send();
+	[[nodiscard]] Result<net::HttpResponse> send() const;
 
     private:
 	Snowflake m_channel_id;

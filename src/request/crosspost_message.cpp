@@ -1,8 +1,8 @@
-#include <ekizu/request/delete_message.hpp>
+#include <ekizu/request/crosspost_message.hpp>
 
 namespace ekizu
 {
-DeleteMessage::DeleteMessage(
+CrosspostMessage::CrosspostMessage(
 	const std::function<Result<net::HttpResponse>(net::HttpRequest)>
 		&make_request,
 	Snowflake channel_id, Snowflake message_id)
@@ -12,18 +12,18 @@ DeleteMessage::DeleteMessage(
 {
 }
 
-DeleteMessage::operator net::HttpRequest() const
+CrosspostMessage::operator net::HttpRequest() const
 {
 	return {
-		net::HttpMethod::Delete,
-		fmt::format("/channels/{}/messages/{}", m_channel_id,
+		net::HttpMethod::Post,
+		fmt::format("/channels/{}/messages/{}/crosspost", m_channel_id,
 			    m_message_id),
 		{},
 		{},
 	};
 }
 
-Result<net::HttpResponse> DeleteMessage::send() const
+Result<net::HttpResponse> CrosspostMessage::send() const
 {
 	if (!m_make_request) {
 		return tl::make_unexpected(std::make_error_code(

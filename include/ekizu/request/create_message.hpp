@@ -92,7 +92,7 @@ struct CreateMessage {
 		return *this;
 	}
 
-	[[nodiscard]] Result<net::HttpResponse> send();
+	[[nodiscard]] Result<Message> send() const;
 
     private:
 	Snowflake m_channel_id;

@@ -10,6 +10,7 @@
 #pragma GCC diagnostic pop
 #endif
 
+#include <ekizu/util.hpp>
 #include <optional>
 #include <type_traits>
 #include <variant>
@@ -250,6 +251,24 @@ T get_or_default(const nlohmann::json &data, std::string_view key)
 	}
 
 	return T{};
+}
+
+template <typename T> Result<T> deserialize(std::string_view str)
+{
+	const auto json = nlohmann::json::parse(str, nullptr, false);
+
+	if (json.is_discarded()) {
+		return tl::make_unexpected(
+			std::make_error_code(std::errc::invalid_argument));
+	}
+
+	// I don't like exceptions but oh well.
+	try {
+		return json.get<T>();
+	} catch (const nlohmann::json::exception &) {
+		return tl::make_unexpected(
+			std::make_error_code(std::errc::invalid_argument));
+	}
 }
 } // namespace ekizu::json_util
 

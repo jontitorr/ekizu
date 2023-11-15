@@ -104,39 +104,56 @@ std::function<void(Event)> handle_event(HttpClient &http)
 								{ "https://avatars.githubusercontent.com/u/59069386?v=4" })
 							.build();
 
-					auto res =
-						http.create_message(
-							    msg.channel_id)
-							.content(fmt::format(
-								"{} said: {}\nAvatar: {}",
-								msg.author
-									.username,
-								msg.content,
-								msg.author.avatar ?
-									*msg.author
-										 .avatar :
-									"null"))
-							.embeds({ embed })
-							.send();
-
-					if (!res) {
-						logger->error(
-							"Failed to send message: {}",
-							res.error().message());
-					}
+					http.create_message(msg.channel_id)
+						.content(fmt::format(
+							"{} said: {}\nAvatar: {}",
+							msg.author.username,
+							msg.content,
+							msg.author.avatar ?
+								*msg.author
+									 .avatar :
+								"null"))
+						.embeds({ embed })
+						.send()
+						.map([&logger](
+							     const auto
+								     &new_msg) {
+							logger->info(
+								"Sent message: {}",
+								new_msg.id);
+						})
+						.map_error([&logger](
+								   const auto &
+									   err) {
+							logger->error(
+								"Failed to send message: {}",
+								err.message());
+						});
 
 					if (msg.content == "delete me") {
-						res = http.delete_message(
-								  msg.channel_id,
-								  msg.id)
-							      .send();
-
-						if (!res) {
-							logger->error(
-								"Failed to delete message: {}",
-								res.error()
-									.message());
-						}
+						http.delete_message(
+							    msg.channel_id,
+							    msg.id)
+							.send()
+							.map([&logger,
+							      msg_id = msg.id](
+								     const auto &
+									     res) {
+								if (res.status_code ==
+								    net::HttpStatus::
+									    NoContent) {
+									logger->info(
+										"Deleted message: {}",
+										msg_id);
+								}
+							})
+							.map_error([&logger](
+									   const auto
+										   &err) {
+								logger->error(
+									"Failed to delete message: {}",
+									err.message());
+							});
 					}
 				},
 				[&logger](const Log &log) {

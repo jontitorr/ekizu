@@ -9,13 +9,7 @@ using json_util::serialize;
 
 Result<std::string> Attachment::download() const
 {
-	const auto res = net::http::get(url);
-
-	if (!res) {
-		return tl::make_unexpected(res.error());
-	}
-
-	return res->body;
+	return net::http::get(url).map([](auto res) { return res.body; });
 }
 
 void to_json(nlohmann::json &j, const Attachment &a)

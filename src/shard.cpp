@@ -101,11 +101,7 @@ Result<void> Shard::run(const std::function<void(Event)> &cb)
 	tq.set_repeat_mode(true);
 	tq.start();
 
-	if (const auto res = connect(cb); !res) {
-		return res;
-	}
-
-	return {};
+	return connect(cb);
 }
 
 TimerQueue &Shard::get_timer_queue()
@@ -270,10 +266,12 @@ Result<void> Shard::connect(const std::function<void(Event)> &cb)
 	net::WebSocketClientBuilder builder;
 	const auto compression_enabled = m_config.compression;
 
-	builder.with_auto_reconnect(false)
+	builder.with_auto_reconnect(true)
 		.with_on_close([this](net::WebSocketCloseCode code,
 				      std::string_view reason) {
 			m_inflater.reset();
+			get_timer_queue().remove_task(m_heartbeat_id);
+			m_heartbeat_id = 0;
 			m_state->store(ConnectionState::Disconnected);
 			log(fmt::format(
 				"received close frame | code={}, reason={}",
@@ -352,18 +350,14 @@ Result<void> Shard::connect(const std::function<void(Event)> &cb)
 
 Result<void> Shard::reconnect(net::WebSocketCloseCode code, bool reset)
 {
-	if (const auto res = disconnect(code); !res) {
-		return tl::make_unexpected(res.error());
-	}
+	return disconnect(code).map([this, reset] {
+		if (reset) {
+			reset_session();
+		}
 
-	if (reset) {
-		reset_session();
-	}
-
-	m_last_heartbeat_acked->store(false);
-
-	// Websocket will be reconnected automatically, if enabled.
-	return {};
+		m_last_heartbeat_acked->store(false);
+		// Websocket will be reconnected automatically, if enabled.
+	});
 }
 
 Result<void> Shard::start_heartbeat(TimerQueue &timer_queue,

@@ -1,8 +1,8 @@
-#include <ekizu/request/delete_message.hpp>
+#include <ekizu/request/pin_message.hpp>
 
 namespace ekizu
 {
-DeleteMessage::DeleteMessage(
+PinMessage::PinMessage(
 	const std::function<Result<net::HttpResponse>(net::HttpRequest)>
 		&make_request,
 	Snowflake channel_id, Snowflake message_id)
@@ -12,18 +12,17 @@ DeleteMessage::DeleteMessage(
 {
 }
 
-DeleteMessage::operator net::HttpRequest() const
+PinMessage::operator net::HttpRequest() const
 {
 	return {
-		net::HttpMethod::Delete,
-		fmt::format("/channels/{}/messages/{}", m_channel_id,
-			    m_message_id),
+		net::HttpMethod::Put,
+		fmt::format("/channels/{}/pins/{}", m_channel_id, m_message_id),
 		{},
 		{},
 	};
 }
 
-Result<net::HttpResponse> DeleteMessage::send() const
+Result<net::HttpResponse> PinMessage::send() const
 {
 	if (!m_make_request) {
 		return tl::make_unexpected(std::make_error_code(
