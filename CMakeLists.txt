@@ -49,6 +49,12 @@ include(cmake/CPM.cmake)
 
 cpmfindpackage(NAME "fmt" GITHUB_REPOSITORY "fmtlib/fmt" GIT_TAG "13156e5")
 
+if(WIN32)
+    target_compile_definitions(
+        fmt PUBLIC _SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING
+    )
+endif()
+
 cpmfindpackage(
     NAME
     "net"
