@@ -4,8 +4,7 @@
 #include <ekizu/select_options.hpp>
 #include <variant>
 
-namespace ekizu
-{
+namespace ekizu {
 enum class ComponentType : uint8_t {
 	ActionRow = 1,
 	Button = 2,
@@ -14,7 +13,7 @@ enum class ComponentType : uint8_t {
 };
 
 struct Button {
-	ComponentType type{ ComponentType::Button };
+	ComponentType type{ComponentType::Button};
 	uint8_t style{};
 	std::optional<std::string> label;
 	std::optional<PartialEmoji> emoji;
@@ -39,7 +38,7 @@ EKIZU_EXPORT void from_json(const nlohmann::json &j, SelectOptions &o);
 
 struct SelectMenu {
 	/// The type of the component.
-	ComponentType type{ ComponentType::SelectMenu };
+	ComponentType type{ComponentType::SelectMenu};
 	/// A unique identifier for the component (max 100 characters).
 	std::string custom_id;
 	/// The options for the select menu (max 25).
@@ -75,7 +74,7 @@ EKIZU_EXPORT void from_json(const nlohmann::json &j, ActionRowComponent &c);
  * @param data The JSON data to create this Action Row with.
  */
 struct ActionRow {
-	ComponentType type{ ComponentType::ActionRow };
+	ComponentType type{ComponentType::ActionRow};
 	std::vector<ActionRowComponent> components{};
 };
 
@@ -87,6 +86,6 @@ using MessageComponent = std::variant<ActionRow, Button, SelectMenu>;
 EKIZU_EXPORT void to_json(nlohmann::json &j, const MessageComponent &c);
 // TODO: Not how it works.
 EKIZU_EXPORT void from_json(const nlohmann::json &j, MessageComponent &c);
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_MESSAGE_COMPONENT_HPP
+#endif	// EKIZU_MESSAGE_COMPONENT_HPP

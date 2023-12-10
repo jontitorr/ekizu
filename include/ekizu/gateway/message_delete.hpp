@@ -4,8 +4,7 @@
 #include <ekizu/snowflake.hpp>
 #include <optional>
 
-namespace ekizu
-{
+namespace ekizu {
 struct MessageDelete {
 	/// ID of the message.
 	Snowflake id;
@@ -17,6 +16,6 @@ struct MessageDelete {
 
 EKIZU_EXPORT void to_json(nlohmann::json &j, const MessageDelete &m);
 EKIZU_EXPORT void from_json(const nlohmann::json &j, MessageDelete &m);
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_GATEWAY_MESSAGE_DELETE_HPP
+#endif	// EKIZU_GATEWAY_MESSAGE_DELETE_HPP

@@ -15,90 +15,85 @@
 #include <type_traits>
 #include <variant>
 
-namespace ekizu::json_util
-{
-namespace detail
-{
-template <typename T> struct IsOptional : std::false_type {};
+namespace ekizu::json_util {
+namespace detail {
+template <typename T>
+struct IsOptional : std::false_type {};
 
-template <typename T> struct IsOptional<std::optional<T> > : std::true_type {};
+template <typename T>
+struct IsOptional<std::optional<T> > : std::true_type {};
 
-template <typename T> constexpr bool IS_OPTIONAL_V = IsOptional<T>::value;
+template <typename T>
+constexpr bool IS_OPTIONAL_V = IsOptional<T>::value;
 
-template <typename T> struct IsVariant : std::false_type {};
+template <typename T>
+struct IsVariant : std::false_type {};
 
 template <typename... Ts>
 struct IsVariant<std::variant<Ts...> > : std::true_type {};
 
-template <typename T> constexpr bool IS_VARIANT_V = IsVariant<T>::value;
+template <typename T>
+constexpr bool IS_VARIANT_V = IsVariant<T>::value;
 
-template <typename T> struct IsVector : std::false_type {};
+template <typename T>
+struct IsVector : std::false_type {};
 
-template <typename T> struct IsVector<std::vector<T> > : std::true_type {};
+template <typename T>
+struct IsVector<std::vector<T> > : std::true_type {};
 
-template <typename T> constexpr bool IS_VECTOR_V = IsVector<T>::value;
+template <typename T>
+constexpr bool IS_VECTOR_V = IsVector<T>::value;
 
 template <typename... Types, std::size_t... I>
-std::optional<std::variant<Types...> >
-variant_from_json_impl(const nlohmann::json &j, std::index_sequence<I...>)
-{
+std::optional<std::variant<Types...> > variant_from_json_impl(
+	const nlohmann::json &j, std::index_sequence<I...>) {
 	std::variant<Types...> result;
 
-	// Helper function to attempt deserialization into a variant type. Why is there no exception-less way to do this?
+	// Helper function to attempt deserialization into a variant type. Why is
+	// there no exception-less way to do this?
 	auto try_deserialize = [&result, &j](auto type) {
 		try {
-			std::get<decltype(type)>(result) =
-				j.get<decltype(type)>();
+			std::get<decltype(type)>(result) = j.get<decltype(type)>();
 			return true;
-		} catch (const nlohmann::json::exception &) {
-			return false;
-		}
+		} catch (const nlohmann::json::exception &) { return false; }
 	};
 
 	// Use fold expression to try deserialization for each type
 	bool worked =
 		((try_deserialize(std::get<I>(std::tuple<Types...>{})) || ...));
 
-	if (!worked) {
-		return std::nullopt;
-	}
+	if (!worked) { return std::nullopt; }
 
 	return result;
 }
 
 template <typename... Types>
-std::optional<std::variant<Types...> >
-variant_from_json(const nlohmann::json &j)
-{
+std::optional<std::variant<Types...> > variant_from_json(
+	const nlohmann::json &j) {
 	return variant_from_json_impl<Types...>(
 		j, std::index_sequence_for<Types...>{});
 }
 
 template <typename... Types>
 void deserialize_variant_impl(const nlohmann::json &data,
-			      std::optional<std::variant<Types...> > &v)
-{
+							  std::optional<std::variant<Types...> > &v) {
 	v = variant_from_json<Types...>(data);
 }
 
-template <typename T> void deserialize_int(const std::string &str, T &value)
-{
+template <typename T>
+void deserialize_int(const std::string &str, T &value) {
 	try {
 		if constexpr (std::is_signed_v<T>) {
 			value = std::stoi(str);
 		} else if constexpr (std::is_unsigned_v<T>) {
 			value = static_cast<T>(std::stoul(str));
 		}
-	} catch (...) {
-	}
+	} catch (...) {}
 }
 
 template <typename T, typename ToDeserialize = T>
-void deserialize_impl(const nlohmann::json &value, T &dest)
-{
-	if (value.is_discarded() || value.is_null()) {
-		return;
-	}
+void deserialize_impl(const nlohmann::json &value, T &dest) {
+	if (value.is_discarded() || value.is_null()) { return; }
 
 	// Unique case.
 	if constexpr (std::is_integral_v<ToDeserialize>) {
@@ -112,17 +107,14 @@ void deserialize_impl(const nlohmann::json &value, T &dest)
 		dest = value.get<ToDeserialize>();
 	}
 }
-} // namespace detail
+}  // namespace detail
 
 template <typename... Types>
-void from_json(const nlohmann::json &j, std::variant<Types...> &v)
-{
+void from_json(const nlohmann::json &j, std::variant<Types...> &v) {
 	std::optional<std::variant<Types...> > temp;
 	deserialize_variant_impl(j, temp);
 
-	if (temp) {
-		v = std::move(*temp);
-	}
+	if (temp) { v = std::move(*temp); }
 }
 
 /**
@@ -136,10 +128,9 @@ void from_json(const nlohmann::json &j, std::variant<Types...> &v)
  * @return true if all keys are present, false otherwise.
  */
 template <typename T, typename... Ts>
-bool not_null_all(const nlohmann::json &data, T &&key, Ts &&...keys)
-{
+bool not_null_all(const nlohmann::json &data, T &&key, Ts &&...keys) {
 	return ((data.contains(key) && !data[key].is_null()) && ... &&
-		(data.contains(keys) && !data[keys].is_null()));
+			(data.contains(keys) && !data[keys].is_null()));
 }
 
 /**
@@ -157,11 +148,8 @@ bool not_null_all(const nlohmann::json &data, T &&key, Ts &&...keys)
  */
 template <typename T, typename... Ts>
 inline bool not_null_recursive(const nlohmann::json &data, T &&key,
-			       Ts &&...keys)
-{
-	if (!not_null_all(data, key)) {
-		return false;
-	}
+							   Ts &&...keys) {
+	if (!not_null_all(data, key)) { return false; }
 
 	if constexpr (sizeof...(keys) == 0) {
 		return true;
@@ -179,21 +167,16 @@ inline bool not_null_recursive(const nlohmann::json &data, T &&key,
  * @param value The value to serialize.
  */
 template <typename T>
-void serialize(nlohmann::json &data, std::string_view key, const T &value)
-{
+void serialize(nlohmann::json &data, std::string_view key, const T &value) {
 	if constexpr (std::is_enum_v<T>) {
 		data[key] = static_cast<std::underlying_type_t<T> >(value);
 	} else if constexpr (detail::IS_OPTIONAL_V<T>) {
-		if (!value) {
-			return;
-		}
+		if (!value) { return; }
 
 		return serialize(data, key, *value);
 	} else if constexpr (detail::IS_VARIANT_V<T>) {
 		return std::visit(
-			[&data, &key](const auto &v) {
-				return serialize(data, key, v);
-			},
+			[&data, &key](const auto &v) { return serialize(data, key, v); },
 			value);
 	} else {
 		data[key] = value;
@@ -211,15 +194,11 @@ void serialize(nlohmann::json &data, std::string_view key, const T &value)
  * @return true if the value was set, false otherwise.
  */
 template <typename T>
-bool deserialize(const nlohmann::json &data, std::string_view key, T &value)
-{
-	if (!not_null_all(data, key)) {
-		return false;
-	}
+bool deserialize(const nlohmann::json &data, std::string_view key, T &value) {
+	if (!not_null_all(data, key)) { return false; }
 
 	if constexpr (detail::IS_OPTIONAL_V<T>) {
-		detail::deserialize_impl<T, typename T::value_type>(data[key],
-								    value);
+		detail::deserialize_impl<T, typename T::value_type>(data[key], value);
 	} else if constexpr (detail::IS_VARIANT_V<T>) {
 		std::visit(
 			[&data, &key](auto &v) {
@@ -244,17 +223,14 @@ bool deserialize(const nlohmann::json &data, std::string_view key, T &value)
  * @return T The value, or a default value if it does not exist.
  */
 template <typename T>
-T get_or_default(const nlohmann::json &data, std::string_view key)
-{
-	if (not_null_all(data, key)) {
-		return data[key].get<T>();
-	}
+T get_or_default(const nlohmann::json &data, std::string_view key) {
+	if (not_null_all(data, key)) { return data[key].get<T>(); }
 
 	return T{};
 }
 
-template <typename T> Result<T> deserialize(std::string_view str)
-{
+template <typename T>
+Result<T> deserialize(std::string_view str) {
 	const auto json = nlohmann::json::parse(str, nullptr, false);
 
 	if (json.is_discarded()) {
@@ -270,6 +246,6 @@ template <typename T> Result<T> deserialize(std::string_view str)
 			std::make_error_code(std::errc::invalid_argument));
 	}
 }
-} // namespace ekizu::json_util
+}  // namespace ekizu::json_util
 
-#endif // EKIZU_JSON_UTIL_HPP
+#endif	// EKIZU_JSON_UTIL_HPP

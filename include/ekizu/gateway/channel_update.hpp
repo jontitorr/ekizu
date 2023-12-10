@@ -3,14 +3,13 @@
 
 #include <ekizu/channel.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 struct ChannelUpdate {
 	Channel channel;
 };
 
 EKIZU_EXPORT void to_json(nlohmann::json &j, const ChannelUpdate &payload);
 EKIZU_EXPORT void from_json(const nlohmann::json &j, ChannelUpdate &payload);
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_GATEWAY_CHANNEL_UPDATE_HPP
+#endif	// EKIZU_GATEWAY_CHANNEL_UPDATE_HPP

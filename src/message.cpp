@@ -1,73 +1,63 @@
 #include <ekizu/json_util.hpp>
 #include <ekizu/message.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 using json_util::deserialize;
 using json_util::serialize;
 
-void to_json(nlohmann::json &j, const AllowedMentions &m)
-{
+void to_json(nlohmann::json &j, const AllowedMentions &m) {
 	serialize(j, "parse", m.parse);
 	serialize(j, "roles", m.roles);
 	serialize(j, "users", m.users);
 	serialize(j, "replied_user", m.replied_user);
 }
 
-void from_json(const nlohmann::json &j, AllowedMentions &m)
-{
+void from_json(const nlohmann::json &j, AllowedMentions &m) {
 	deserialize(j, "parse", m.parse);
 	deserialize(j, "roles", m.roles);
 	deserialize(j, "users", m.users);
 	deserialize(j, "replied_user", m.replied_user);
 }
 
-void to_json(nlohmann::json &j, const ChannelMention &m)
-{
+void to_json(nlohmann::json &j, const ChannelMention &m) {
 	serialize(j, "id", m.id);
 	serialize(j, "guild_id", m.guild_id);
 	serialize(j, "type", m.type);
 	serialize(j, "name", m.name);
 }
 
-void from_json(const nlohmann::json &j, ChannelMention &m)
-{
+void from_json(const nlohmann::json &j, ChannelMention &m) {
 	deserialize(j, "id", m.id);
 	deserialize(j, "guild_id", m.guild_id);
 	deserialize(j, "type", m.type);
 	deserialize(j, "name", m.name);
 }
 
-void to_json(nlohmann::json &j, const MessageActivity &a)
-{
+void to_json(nlohmann::json &j, const MessageActivity &a) {
 	serialize(j, "type", a.type);
 	serialize(j, "party_id", a.party_id);
 }
 
-void from_json(const nlohmann::json &j, MessageActivity &a)
-{
+void from_json(const nlohmann::json &j, MessageActivity &a) {
 	deserialize(j, "type", a.type);
 	deserialize(j, "party_id", a.party_id);
 }
 
-void to_json(nlohmann::json &j, const MessageReference &r)
-{
+void to_json(nlohmann::json &j, const MessageReference &r) {
 	serialize(j, "message_id", r.message_id);
 	serialize(j, "channel_id", r.channel_id);
 	serialize(j, "guild_id", r.guild_id);
 	serialize(j, "fail_if_not_exists", r.fail_if_not_exists);
 }
 
-void from_json(const nlohmann::json &j, MessageReference &r)
-{
+void from_json(const nlohmann::json &j, MessageReference &r) {
 	deserialize(j, "message_id", r.message_id);
 	deserialize(j, "channel_id", r.channel_id);
 	deserialize(j, "guild_id", r.guild_id);
 	deserialize(j, "fail_if_not_exists", r.fail_if_not_exists);
 }
 
-void to_json(nlohmann::json &j, const Message &m)
-{
+void to_json(nlohmann::json &j, const Message &m) {
 	serialize(j, "id", m.id);
 	serialize(j, "channel_id", m.channel_id);
 	serialize(j, "guild_id", m.guild_id);
@@ -89,8 +79,7 @@ void to_json(nlohmann::json &j, const Message &m)
 	serialize(j, "activity", m.activity);
 }
 
-void from_json(const nlohmann::json &j, Message &m)
-{
+void from_json(const nlohmann::json &j, Message &m) {
 	deserialize(j, "id", m.id);
 	deserialize(j, "channel_id", m.channel_id);
 	deserialize(j, "guild_id", m.guild_id);
@@ -111,4 +100,4 @@ void from_json(const nlohmann::json &j, Message &m)
 	deserialize(j, "type", m.type);
 	deserialize(j, "activity", m.activity);
 }
-} // namespace ekizu
+}  // namespace ekizu

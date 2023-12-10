@@ -3,50 +3,36 @@
 
 #include <mutex>
 
-namespace ekizu
-{
-template <class T> struct MutexGuard {
-	MutexGuard(T &inner, std::mutex &mtx)
-		: m_inner{ inner }
-		, m_mtx{ mtx }
-	{
+namespace ekizu {
+template <class T>
+struct MutexGuard {
+	MutexGuard(T &inner, std::mutex &mtx) : m_inner{inner}, m_mtx{mtx} {
 		mtx.lock();
 	}
 
-	operator T &() &
-	{
-		return m_inner;
-	}
+	operator T &() & { return m_inner; }
 
-	~MutexGuard()
-	{
-		m_mtx.unlock();
-	}
+	~MutexGuard() { m_mtx.unlock(); }
 
-    private:
+   private:
 	T &m_inner;
 	std::mutex &m_mtx;
 };
 
-template <class T> struct Mutex {
+template <class T>
+struct Mutex {
 	Mutex() = default;
 
-	Mutex(T &&inner)
-		: m_inner{ std::move(inner) }
-	{
-	}
+	Mutex(T &&inner) : m_inner{std::move(inner)} {}
 
 	Mutex(const T &) = delete;
 
-	MutexGuard<T> lock()
-	{
-		return MutexGuard<T>(m_inner, m_mtx);
-	}
+	MutexGuard<T> lock() { return MutexGuard<T>(m_inner, m_mtx); }
 
-    private:
+   private:
 	std::mutex m_mtx;
 	T m_inner;
 };
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_MUTEX_HPP
+#endif	// EKIZU_MUTEX_HPP

@@ -3,8 +3,7 @@
 
 #include <ekizu/user.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 /**
  * @brief Represents an emoji.
  *
@@ -43,6 +42,6 @@ struct EKIZU_EXPORT PartialEmoji {
 
 EKIZU_EXPORT void to_json(nlohmann::json &j, const PartialEmoji &p);
 EKIZU_EXPORT void from_json(const nlohmann::json &j, PartialEmoji &p);
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_EMOJI_HPP
+#endif	// EKIZU_EMOJI_HPP

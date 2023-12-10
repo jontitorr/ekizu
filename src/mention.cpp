@@ -1,13 +1,11 @@
 #include <ekizu/json_util.hpp>
 #include <ekizu/mention.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 using json_util::deserialize;
 using json_util::serialize;
 
-void to_json(nlohmann::json &j, const Mention &m)
-{
+void to_json(nlohmann::json &j, const Mention &m) {
 	serialize(j, "id", m.id);
 	serialize(j, "username", m.username);
 	serialize(j, "discriminator", m.discriminator);
@@ -27,8 +25,7 @@ void to_json(nlohmann::json &j, const Mention &m)
 	serialize(j, "avatar_decoration", m.avatar_decoration);
 }
 
-void from_json(const nlohmann::json &j, Mention &m)
-{
+void from_json(const nlohmann::json &j, Mention &m) {
 	deserialize(j, "id", m.id);
 	deserialize(j, "username", m.username);
 	deserialize(j, "discriminator", m.discriminator);
@@ -47,4 +44,4 @@ void from_json(const nlohmann::json &j, Mention &m)
 	deserialize(j, "public_flags", m.public_flags);
 	deserialize(j, "avatar_decoration", m.avatar_decoration);
 }
-} // namespace ekizu
+}  // namespace ekizu

@@ -6,8 +6,7 @@
 #include <ekizu/role.hpp>
 #include <ekizu/sticker.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 enum class DefaultMessageNotificationLevel : uint8_t {
 	/// Members will receive notifications for all messages by default
 	AllMessages = 0,
@@ -190,6 +189,6 @@ struct Guild {
 
 EKIZU_EXPORT void to_json(nlohmann::json &j, const Guild &g);
 EKIZU_EXPORT void from_json(const nlohmann::json &j, Guild &g);
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_GUILD_HPP
+#endif	// EKIZU_GUILD_HPP

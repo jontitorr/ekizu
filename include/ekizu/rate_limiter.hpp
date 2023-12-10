@@ -1,14 +1,14 @@
 #ifndef EKIZU_RATE_LIMITER_HPP
 #define EKIZU_RATE_LIMITER_HPP
 
-#include <chrono>
 #include <ekizu/export.h>
+
+#include <chrono>
 #include <ekizu/util.hpp>
 #include <mutex>
 #include <net/http.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 /**
  * @brief Represents a Discord API request.
  */
@@ -16,21 +16,20 @@ struct DiscordApiRequest {
 	/// The actual HTTP request to send to the Discord API.
 	net::HttpRequest inner;
 	/// Whether this request is for a bot account.
-	bool bot{ true };
+	bool bot{true};
 };
 
 /**
- * @brief The RateLimiter class is responsible for rate limiting requests to the Discord API.
+ * @brief The RateLimiter class is responsible for rate limiting requests to the
+ * Discord API.
  */
 struct RateLimiter {
 	EKIZU_EXPORT explicit RateLimiter(
-		std::function<Result<net::HttpResponse>(net::HttpRequest)>
-			send_fn);
+		std::function<Result<net::HttpResponse>(net::HttpRequest)> send_fn);
 
-	[[nodiscard]] Result<net::HttpResponse>
-	send(const DiscordApiRequest &req);
+	[[nodiscard]] Result<net::HttpResponse> send(const DiscordApiRequest &req);
 
-    private:
+   private:
 	std::function<Result<net::HttpResponse>(net::HttpRequest)> m_send_fn;
 	bool m_rate_limited{};
 
@@ -42,9 +41,9 @@ struct RateLimiter {
 
 	std::mutex m_mtx;
 	std::unordered_map<net::HttpMethod,
-			   std::unordered_map<std::string, RateLimit> >
+					   std::unordered_map<std::string, RateLimit> >
 		m_rate_limits;
 };
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_RATE_LIMITER_HPP
+#endif	// EKIZU_RATE_LIMITER_HPP

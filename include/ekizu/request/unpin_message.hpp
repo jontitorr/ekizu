@@ -4,8 +4,7 @@
 #include <ekizu/snowflake.hpp>
 #include <net/http.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 /**
  * @brief Represents the Unpin Message REST API endpoint.
  */
@@ -29,12 +28,11 @@ struct UnpinMessage {
 	 */
 	[[nodiscard]] Result<net::HttpResponse> send() const;
 
-    private:
+   private:
 	Snowflake m_channel_id;
 	Snowflake m_message_id;
-	std::function<Result<net::HttpResponse>(net::HttpRequest)>
-		m_make_request;
+	std::function<Result<net::HttpResponse>(net::HttpRequest)> m_make_request;
 };
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_REQUEST_UNPIN_MESSAGE_HPP
+#endif	// EKIZU_REQUEST_UNPIN_MESSAGE_HPP

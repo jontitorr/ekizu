@@ -4,8 +4,7 @@
 #include <ekizu/snowflake.hpp>
 #include <ekizu/user.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 struct EntityMetadata {
 	/// The location of the event (1-100 characters).
 	std::optional<std::string> location;
@@ -37,7 +36,8 @@ struct GuildScheduledEvent {
 	Snowflake id;
 	/// The guild ID to which the scheduled event belongs.
 	Snowflake guild_id;
-	/// The channel ID in which the scheduled event will be hosted (null if scheduled entity type is EXTERNAL).
+	/// The channel ID in which the scheduled event will be hosted (null if
+	/// scheduled entity type is EXTERNAL).
 	std::optional<Snowflake> channel_id;
 	/// The ID of the user that created the scheduled event.
 	std::optional<Snowflake> creator_id;
@@ -47,7 +47,8 @@ struct GuildScheduledEvent {
 	std::optional<std::string> description;
 	/// The time the scheduled event will start.
 	std::string scheduled_start_time;
-	/// The time the scheduled event will end (required if entity_type is EXTERNAL).
+	/// The time the scheduled event will end (required if entity_type is
+	/// EXTERNAL).
 	std::optional<std::string> scheduled_end_time;
 	/// The privacy level of the scheduled event.
 	PrivacyLevel privacy_level;
@@ -69,6 +70,6 @@ struct GuildScheduledEvent {
 
 EKIZU_EXPORT void to_json(nlohmann::json &j, const GuildScheduledEvent &e);
 EKIZU_EXPORT void from_json(const nlohmann::json &j, GuildScheduledEvent &e);
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_GUILD_SCHEDULED_EVENT_HPP
+#endif	// EKIZU_GUILD_SCHEDULED_EVENT_HPP

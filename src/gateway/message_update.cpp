@@ -1,13 +1,11 @@
 #include <ekizu/gateway/message_update.hpp>
 #include <ekizu/json_util.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 using json_util::deserialize;
 using json_util::serialize;
 
-void to_json(nlohmann::json &j, const MessageUpdate &m)
-{
+void to_json(nlohmann::json &j, const MessageUpdate &m) {
 	serialize(j, "id", m.id);
 	serialize(j, "channel_id", m.channel_id);
 	serialize(j, "author", m.author);
@@ -24,8 +22,7 @@ void to_json(nlohmann::json &j, const MessageUpdate &m)
 	serialize(j, "type", m.type);
 }
 
-void from_json(const nlohmann::json &j, MessageUpdate &m)
-{
+void from_json(const nlohmann::json &j, MessageUpdate &m) {
 	deserialize(j, "id", m.id);
 	deserialize(j, "channel_id", m.channel_id);
 	deserialize(j, "author", m.author);
@@ -41,4 +38,4 @@ void from_json(const nlohmann::json &j, MessageUpdate &m)
 	deserialize(j, "pinned", m.pinned);
 	deserialize(j, "type", m.type);
 }
-} // namespace ekizu
+}  // namespace ekizu

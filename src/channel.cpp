@@ -1,25 +1,21 @@
 #include <ekizu/channel.hpp>
 #include <ekizu/json_util.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 using json_util::deserialize;
 using json_util::serialize;
 
-void to_json(nlohmann::json &j, const DefaultReaction &r)
-{
+void to_json(nlohmann::json &j, const DefaultReaction &r) {
 	serialize(j, "emoji_id", r.emoji_id);
 	serialize(j, "emoji_name", r.emoji_name);
 }
 
-void from_json(const nlohmann::json &j, DefaultReaction &r)
-{
+void from_json(const nlohmann::json &j, DefaultReaction &r) {
 	deserialize(j, "emoji_id", r.emoji_id);
 	deserialize(j, "emoji_name", r.emoji_name);
 }
 
-void to_json(nlohmann::json &j, const ForumTag &t)
-{
+void to_json(nlohmann::json &j, const ForumTag &t) {
 	serialize(j, "id", t.id);
 	serialize(j, "name", t.name);
 	serialize(j, "moderated", t.moderated);
@@ -27,8 +23,7 @@ void to_json(nlohmann::json &j, const ForumTag &t)
 	serialize(j, "emoji_name", t.emoji_name);
 }
 
-void from_json(const nlohmann::json &j, ForumTag &t)
-{
+void from_json(const nlohmann::json &j, ForumTag &t) {
 	deserialize(j, "id", t.id);
 	deserialize(j, "name", t.name);
 	deserialize(j, "moderated", t.moderated);
@@ -36,24 +31,21 @@ void from_json(const nlohmann::json &j, ForumTag &t)
 	deserialize(j, "emoji_name", t.emoji_name);
 }
 
-void to_json(nlohmann::json &j, const PermissionOverwrite &p)
-{
+void to_json(nlohmann::json &j, const PermissionOverwrite &p) {
 	serialize(j, "id", p.id);
 	serialize(j, "type", p.type);
 	serialize(j, "allow", p.allow);
 	serialize(j, "deny", p.deny);
 }
 
-void from_json(const nlohmann::json &j, PermissionOverwrite &p)
-{
+void from_json(const nlohmann::json &j, PermissionOverwrite &p) {
 	deserialize(j, "id", p.id);
 	deserialize(j, "type", p.type);
 	deserialize(j, "allow", p.allow);
 	deserialize(j, "deny", p.deny);
 }
 
-void to_json(nlohmann::json &j, const ThreadMetadata &t)
-{
+void to_json(nlohmann::json &j, const ThreadMetadata &t) {
 	serialize(j, "archived", t.archived);
 	serialize(j, "auto_archive_duration", t.auto_archive_duration);
 	serialize(j, "archive_timestamp", t.archive_timestamp);
@@ -62,8 +54,7 @@ void to_json(nlohmann::json &j, const ThreadMetadata &t)
 	serialize(j, "create_timestamp", t.create_timestamp);
 }
 
-void from_json(const nlohmann::json &j, ThreadMetadata &t)
-{
+void from_json(const nlohmann::json &j, ThreadMetadata &t) {
 	deserialize(j, "archived", t.archived);
 	deserialize(j, "auto_archive_duration", t.auto_archive_duration);
 	deserialize(j, "archive_timestamp", t.archive_timestamp);
@@ -72,8 +63,7 @@ void from_json(const nlohmann::json &j, ThreadMetadata &t)
 	deserialize(j, "create_timestamp", t.create_timestamp);
 }
 
-void to_json(nlohmann::json &j, const ThreadMember &m)
-{
+void to_json(nlohmann::json &j, const ThreadMember &m) {
 	serialize(j, "id", m.id);
 	serialize(j, "user_id", m.user_id);
 	serialize(j, "join_timestamp", m.join_timestamp);
@@ -82,8 +72,7 @@ void to_json(nlohmann::json &j, const ThreadMember &m)
 	serialize(j, "presence", m.presence);
 }
 
-void from_json(const nlohmann::json &j, ThreadMember &m)
-{
+void from_json(const nlohmann::json &j, ThreadMember &m) {
 	deserialize(j, "id", m.id);
 	deserialize(j, "user_id", m.user_id);
 	deserialize(j, "join_timestamp", m.join_timestamp);
@@ -92,8 +81,7 @@ void from_json(const nlohmann::json &j, ThreadMember &m)
 	deserialize(j, "presence", m.presence);
 }
 
-void to_json(nlohmann::json &j, const Channel &c)
-{
+void to_json(nlohmann::json &j, const Channel &c) {
 	serialize(j, "id", c.id);
 	serialize(j, "type", c.type);
 	serialize(j, "guild_id", c.guild_id);
@@ -119,8 +107,8 @@ void to_json(nlohmann::json &j, const Channel &c)
 	serialize(j, "member_count", c.member_count);
 	serialize(j, "thread_metadata", c.thread_metadata);
 	serialize(j, "member", c.member);
-	serialize(j, "default_auto_archive_duration",
-		  c.default_auto_archive_duration);
+	serialize(
+		j, "default_auto_archive_duration", c.default_auto_archive_duration);
 	serialize(j, "permissions", c.permissions);
 	serialize(j, "flags", c.flags);
 	serialize(j, "total_messages_sent", c.total_messages_sent);
@@ -128,13 +116,12 @@ void to_json(nlohmann::json &j, const Channel &c)
 	serialize(j, "applied_tags", c.applied_tags);
 	serialize(j, "default_reaction_emoji", c.default_reaction_emoji);
 	serialize(j, "default_thread_rate_limit_per_user",
-		  c.default_thread_rate_limit_per_user);
+			  c.default_thread_rate_limit_per_user);
 	serialize(j, "default_sort_order", c.default_sort_order);
 	serialize(j, "default_forum_layout", c.default_forum_layout);
 }
 
-void from_json(const nlohmann::json &j, Channel &c)
-{
+void from_json(const nlohmann::json &j, Channel &c) {
 	deserialize(j, "id", c.id);
 	deserialize(j, "type", c.type);
 	deserialize(j, "guild_id", c.guild_id);
@@ -160,8 +147,8 @@ void from_json(const nlohmann::json &j, Channel &c)
 	deserialize(j, "member_count", c.member_count);
 	deserialize(j, "thread_metadata", c.thread_metadata);
 	deserialize(j, "member", c.member);
-	deserialize(j, "default_auto_archive_duration",
-		    c.default_auto_archive_duration);
+	deserialize(
+		j, "default_auto_archive_duration", c.default_auto_archive_duration);
 	deserialize(j, "permissions", c.permissions);
 	deserialize(j, "flags", c.flags);
 	deserialize(j, "total_messages_sent", c.total_messages_sent);
@@ -169,9 +156,9 @@ void from_json(const nlohmann::json &j, Channel &c)
 	deserialize(j, "applied_tags", c.applied_tags);
 	deserialize(j, "default_reaction_emoji", c.default_reaction_emoji);
 	deserialize(j, "default_thread_rate_limit_per_user",
-		    c.default_thread_rate_limit_per_user);
+				c.default_thread_rate_limit_per_user);
 	deserialize(j, "default_sort_order", c.default_sort_order);
 	deserialize(j, "default_forum_layout", c.default_forum_layout);
 }
 
-} // namespace ekizu
+}  // namespace ekizu

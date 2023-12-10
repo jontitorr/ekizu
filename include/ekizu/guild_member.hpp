@@ -3,8 +3,7 @@
 
 #include <ekizu/user.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 /**
  * @brief Represents a member of a Discord server.
  *
@@ -40,6 +39,6 @@ struct GuildMember {
 
 EKIZU_EXPORT void to_json(nlohmann::json &j, const GuildMember &m);
 EKIZU_EXPORT void from_json(const nlohmann::json &j, GuildMember &m);
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_GUILD_MEMBER_HPP
+#endif	// EKIZU_GUILD_MEMBER_HPP

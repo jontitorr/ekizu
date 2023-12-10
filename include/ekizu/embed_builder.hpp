@@ -3,8 +3,7 @@
 
 #include <ekizu/embed.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 struct EmbedBuilder {
 	/**
 	 * @brief Adds a field to the Embed.
@@ -12,11 +11,8 @@ struct EmbedBuilder {
 	 * @param field The field to add.
 	 * @return Embed& A reference to the Embed object.
 	 */
-	EmbedBuilder &add_field(const EmbedField &field)
-	{
-		if (!m_embed.fields) {
-			m_embed.fields.emplace();
-		}
+	EmbedBuilder &add_field(const EmbedField &field) {
+		if (!m_embed.fields) { m_embed.fields.emplace(); }
 
 		m_embed.fields->emplace_back(field);
 		return *this;
@@ -28,14 +24,11 @@ struct EmbedBuilder {
 	 * @param fields The fields to add.
 	 * @return Embed& A reference to the Embed object.
 	 */
-	EmbedBuilder &add_fields(const std::vector<EmbedField> &fields)
-	{
-		if (!m_embed.fields) {
-			m_embed.fields.emplace();
-		}
+	EmbedBuilder &add_fields(const std::vector<EmbedField> &fields) {
+		if (!m_embed.fields) { m_embed.fields.emplace(); }
 
-		m_embed.fields->insert(m_embed.fields->end(), fields.begin(),
-				       fields.end());
+		m_embed.fields->insert(
+			m_embed.fields->end(), fields.begin(), fields.end());
 		return *this;
 	}
 
@@ -45,8 +38,7 @@ struct EmbedBuilder {
 	 * @param author The author to set.
 	 * @return Embed& A reference to the Embed object.
 	 */
-	EmbedBuilder &set_author(const EmbedAuthor &author)
-	{
+	EmbedBuilder &set_author(const EmbedAuthor &author) {
 		m_embed.author = author;
 		return *this;
 	}
@@ -57,8 +49,7 @@ struct EmbedBuilder {
 	 * @param color The color to set.
 	 * @return Embed& A reference to the Embed object.
 	 */
-	EmbedBuilder &set_color(uint16_t color)
-	{
+	EmbedBuilder &set_color(uint16_t color) {
 		m_embed.color = color;
 		return *this;
 	}
@@ -69,8 +60,7 @@ struct EmbedBuilder {
 	 * @param description The description to set.
 	 * @return Embed& A reference to the Embed object.
 	 */
-	EmbedBuilder &set_description(const std::string &description)
-	{
+	EmbedBuilder &set_description(const std::string &description) {
 		m_embed.description = description;
 		return *this;
 	}
@@ -81,8 +71,7 @@ struct EmbedBuilder {
 	 * @param fields The fields to set.
 	 * @return Embed& A reference to the Embed object.
 	 */
-	EmbedBuilder &set_fields(const std::vector<EmbedField> &fields)
-	{
+	EmbedBuilder &set_fields(const std::vector<EmbedField> &fields) {
 		m_embed.fields = fields;
 		return *this;
 	}
@@ -93,8 +82,7 @@ struct EmbedBuilder {
 	 * @param footer The footer to set.
 	 * @return Embed& A reference to the Embed object.
 	 */
-	EmbedBuilder &set_footer(const EmbedFooter &footer)
-	{
+	EmbedBuilder &set_footer(const EmbedFooter &footer) {
 		m_embed.footer = footer;
 		return *this;
 	}
@@ -105,8 +93,7 @@ struct EmbedBuilder {
 	 * @param image The image to set.
 	 * @return Embed& A reference to the Embed object.
 	 */
-	EmbedBuilder &set_image(const EmbedImage &image)
-	{
+	EmbedBuilder &set_image(const EmbedImage &image) {
 		m_embed.image = image;
 		return *this;
 	}
@@ -117,8 +104,7 @@ struct EmbedBuilder {
 	 * @param provider The provider to set.
 	 * @return Embed& A reference to the Embed object.
 	 */
-	EmbedBuilder &set_provider(const EmbedProvider &provider)
-	{
+	EmbedBuilder &set_provider(const EmbedProvider &provider) {
 		m_embed.provider = provider;
 		return *this;
 	}
@@ -129,8 +115,7 @@ struct EmbedBuilder {
 	 * @param thumbnail The thumbnail to set.
 	 * @return Embed& A reference to the Embed object.
 	 */
-	EmbedBuilder &set_thumbnail(const EmbedThumbnail &thumbnail)
-	{
+	EmbedBuilder &set_thumbnail(const EmbedThumbnail &thumbnail) {
 		m_embed.thumbnail = thumbnail;
 		return *this;
 	}
@@ -141,8 +126,7 @@ struct EmbedBuilder {
 	 * @param title The title to set.
 	 * @return Embed& A reference to the Embed object.
 	 */
-	EmbedBuilder &set_title(const std::string &title)
-	{
+	EmbedBuilder &set_title(const std::string &title) {
 		m_embed.title = title;
 		return *this;
 	}
@@ -153,8 +137,7 @@ struct EmbedBuilder {
 	 * @param url The URL to set.
 	 * @return Embed& A reference to the Embed object.
 	 */
-	EmbedBuilder &set_url(const std::string &url)
-	{
+	EmbedBuilder &set_url(const std::string &url) {
 		m_embed.url = url;
 		return *this;
 	}
@@ -165,8 +148,7 @@ struct EmbedBuilder {
 	 * @param video The video to set.
 	 * @return Embed& A reference to the Embed object.
 	 */
-	EmbedBuilder &set_video(const EmbedVideo &video)
-	{
+	EmbedBuilder &set_video(const EmbedVideo &video) {
 		m_embed.video = video;
 		return *this;
 	}
@@ -176,15 +158,12 @@ struct EmbedBuilder {
 	 *
 	 * @return Embed The built Embed object.
 	 */
-	[[nodiscard]] Embed build() const
-	{
-		return m_embed;
-	}
+	[[nodiscard]] Embed build() const { return m_embed; }
 
-    private:
+   private:
 	/// The Embed object to build.
 	Embed m_embed;
 };
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_EMBED_BUILDER_HPP
+#endif	// EKIZU_EMBED_BUILDER_HPP

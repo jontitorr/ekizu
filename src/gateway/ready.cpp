@@ -1,13 +1,11 @@
 #include <ekizu/gateway/ready.hpp>
 #include <ekizu/json_util.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 using json_util::deserialize;
 using json_util::serialize;
 
-void to_json(nlohmann::json &j, const Ready &payload)
-{
+void to_json(nlohmann::json &j, const Ready &payload) {
 	serialize(j, "v", payload.v);
 	serialize(j, "user", payload.user);
 	serialize(j, "guilds", payload.guilds);
@@ -17,8 +15,7 @@ void to_json(nlohmann::json &j, const Ready &payload)
 	serialize(j, "application", payload.application);
 }
 
-void from_json(const nlohmann::json &j, Ready &payload)
-{
+void from_json(const nlohmann::json &j, Ready &payload) {
 	deserialize(j, "v", payload.v);
 	deserialize(j, "user", payload.user);
 	deserialize(j, "guilds", payload.guilds);
@@ -27,4 +24,4 @@ void from_json(const nlohmann::json &j, Ready &payload)
 	deserialize(j, "shard_info", payload.shard_info);
 	deserialize(j, "application", payload.application);
 }
-} // namespace ekizu
+}  // namespace ekizu

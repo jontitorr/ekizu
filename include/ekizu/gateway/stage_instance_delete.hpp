@@ -3,14 +3,13 @@
 
 #include <ekizu/stage_instance.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 struct StageInstanceDelete {
 	StageInstance stage_instance;
 };
 
 EKIZU_EXPORT void to_json(nlohmann::json &j, const StageInstanceDelete &s);
 EKIZU_EXPORT void from_json(const nlohmann::json &j, StageInstanceDelete &s);
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_GATEWAY_STAGE_INSTANCE_DELETE_HPP
+#endif	// EKIZU_GATEWAY_STAGE_INSTANCE_DELETE_HPP

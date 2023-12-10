@@ -4,8 +4,7 @@
 #include <ekizu/snowflake.hpp>
 #include <optional>
 
-namespace ekizu
-{
+namespace ekizu {
 /**
  * @brief This structure represents an attachment to a message.
  *
@@ -13,10 +12,10 @@ namespace ekizu
  */
 struct Attachment {
 	/**
-     * Downloads the attachment.
-     *
-     * @return The downloaded attachment as a `Result<std::string>`.
-     */
+	 * Downloads the attachment.
+	 *
+	 * @return The downloaded attachment as a `Result<std::string>`.
+	 */
 	[[nodiscard]] EKIZU_EXPORT Result<std::string> download() const;
 
 	/// The id of the attachment.
@@ -58,6 +57,6 @@ struct PartialAttachment {
 
 EKIZU_EXPORT void to_json(nlohmann::json &j, const PartialAttachment &a);
 EKIZU_EXPORT void from_json(const nlohmann::json &j, PartialAttachment &a);
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_ATTACHMENT_HPP
+#endif	// EKIZU_ATTACHMENT_HPP

@@ -4,8 +4,7 @@
 #include <ekizu/emoji.hpp>
 #include <ekizu/guild_member.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 struct MessageReactionAdd {
 	/// ID of the user.
 	Snowflake user_id;
@@ -25,6 +24,6 @@ struct MessageReactionAdd {
 
 EKIZU_EXPORT void to_json(nlohmann::json &j, const MessageReactionAdd &e);
 EKIZU_EXPORT void from_json(const nlohmann::json &j, MessageReactionAdd &e);
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_GATEWAY_MESSAGE_REACTION_ADD_HPP
+#endif	// EKIZU_GATEWAY_MESSAGE_REACTION_ADD_HPP

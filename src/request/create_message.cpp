@@ -1,13 +1,11 @@
 #include <ekizu/json_util.hpp>
 #include <ekizu/request/create_message.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 using json_util::deserialize;
 using json_util::serialize;
 
-void to_json(nlohmann::json &j, const CreateMessageFields &f)
-{
+void to_json(nlohmann::json &j, const CreateMessageFields &f) {
 	serialize(j, "content", f.content);
 	serialize(j, "nonce", f.nonce);
 	serialize(j, "tts", f.tts);
@@ -21,8 +19,7 @@ void to_json(nlohmann::json &j, const CreateMessageFields &f)
 	serialize(j, "flags", f.flags);
 }
 
-void from_json(const nlohmann::json &j, CreateMessageFields &f)
-{
+void from_json(const nlohmann::json &j, CreateMessageFields &f) {
 	deserialize(j, "content", f.content);
 	deserialize(j, "nonce", f.nonce);
 	deserialize(j, "tts", f.tts);
@@ -40,30 +37,25 @@ CreateMessage::CreateMessage(
 	const std::function<Result<net::HttpResponse>(net::HttpRequest)>
 		&make_request,
 	Snowflake channel_id)
-	: m_channel_id{ channel_id }
-	, m_make_request{ make_request }
-{
+	: m_channel_id{channel_id}, m_make_request{make_request} {}
+
+CreateMessage::operator net::HttpRequest() const {
+	return {net::HttpMethod::Post,
+			fmt::format("/channels/{}/messages", m_channel_id),
+			static_cast<nlohmann::json>(m_fields).dump(),
+			{
+				{"Content-Type", "application/json"},
+			}};
 }
 
-CreateMessage::operator net::HttpRequest() const
-{
-	return { net::HttpMethod::Post,
-		 fmt::format("/channels/{}/messages", m_channel_id),
-		 static_cast<nlohmann::json>(m_fields).dump(),
-		 {
-			 { "Content-Type", "application/json" },
-		 } };
-}
-
-Result<Message> CreateMessage::send() const
-{
+Result<Message> CreateMessage::send() const {
 	if (!m_make_request) {
-		return tl::make_unexpected(std::make_error_code(
-			std::errc::operation_not_permitted));
+		return tl::make_unexpected(
+			std::make_error_code(std::errc::operation_not_permitted));
 	}
 
 	return m_make_request(*this).and_then([](auto res) {
 		return json_util::deserialize<Message>(res.body);
 	});
 }
-} // namespace ekizu
+}  // namespace ekizu

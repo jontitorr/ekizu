@@ -1,29 +1,25 @@
 #include <ekizu/gateway/invite_create.hpp>
 #include <ekizu/json_util.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 using json_util::deserialize;
 using json_util::serialize;
 
-void to_json(nlohmann::json &j, const PartialUser &u)
-{
+void to_json(nlohmann::json &j, const PartialUser &u) {
 	serialize(j, "id", u.id);
 	serialize(j, "username", u.username);
 	serialize(j, "discriminator", u.discriminator);
 	serialize(j, "avatar", u.avatar);
 }
 
-void from_json(const nlohmann::json &j, PartialUser &u)
-{
+void from_json(const nlohmann::json &j, PartialUser &u) {
 	deserialize(j, "id", u.id);
 	deserialize(j, "username", u.username);
 	deserialize(j, "discriminator", u.discriminator);
 	deserialize(j, "avatar", u.avatar);
 }
 
-void to_json(nlohmann::json &j, const InviteCreate &i)
-{
+void to_json(nlohmann::json &j, const InviteCreate &i) {
 	serialize(j, "channel_id", i.channel_id);
 	serialize(j, "code", i.code);
 	serialize(j, "created_at", i.created_at);
@@ -37,8 +33,7 @@ void to_json(nlohmann::json &j, const InviteCreate &i)
 	serialize(j, "uses", i.uses);
 }
 
-void from_json(const nlohmann::json &j, InviteCreate &i)
-{
+void from_json(const nlohmann::json &j, InviteCreate &i) {
 	deserialize(j, "channel_id", i.channel_id);
 	deserialize(j, "code", i.code);
 	deserialize(j, "created_at", i.created_at);
@@ -51,4 +46,4 @@ void from_json(const nlohmann::json &j, InviteCreate &i)
 	deserialize(j, "temporary", i.temporary);
 	deserialize(j, "uses", i.uses);
 }
-} // namespace ekizu
+}  // namespace ekizu

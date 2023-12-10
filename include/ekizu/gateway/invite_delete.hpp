@@ -3,8 +3,7 @@
 
 #include <ekizu/snowflake.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 struct InviteDelete {
 	/// ID of the channel the invite was deleted from.
 	Snowflake channel_id;
@@ -16,6 +15,6 @@ struct InviteDelete {
 
 EKIZU_EXPORT void to_json(nlohmann::json &j, const InviteDelete &invite);
 EKIZU_EXPORT void from_json(const nlohmann::json &j, InviteDelete &invite);
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_MODELS_INVITE_DELETE_HPP
+#endif	// EKIZU_MODELS_INVITE_DELETE_HPP

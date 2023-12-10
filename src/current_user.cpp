@@ -1,13 +1,11 @@
 #include <ekizu/current_user.hpp>
 #include <ekizu/json_util.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 using json_util::deserialize;
 using json_util::serialize;
 
-void to_json(nlohmann::json &j, const CurrentUser &u)
-{
+void to_json(nlohmann::json &j, const CurrentUser &u) {
 	serialize(j, "id", u.id);
 	serialize(j, "username", u.username);
 	serialize(j, "discriminator", u.discriminator);
@@ -23,8 +21,7 @@ void to_json(nlohmann::json &j, const CurrentUser &u)
 	serialize(j, "public_flags", u.public_flags);
 }
 
-void from_json(const nlohmann::json &j, CurrentUser &u)
-{
+void from_json(const nlohmann::json &j, CurrentUser &u) {
 	deserialize(j, "id", u.id);
 	deserialize(j, "username", u.username);
 	deserialize(j, "discriminator", u.discriminator);
@@ -40,4 +37,4 @@ void from_json(const nlohmann::json &j, CurrentUser &u)
 	deserialize(j, "public_flags", u.public_flags);
 }
 
-} // namespace ekizu
+}  // namespace ekizu

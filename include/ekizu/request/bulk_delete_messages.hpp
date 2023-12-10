@@ -4,25 +4,22 @@
 #include <ekizu/snowflake.hpp>
 #include <net/http.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 struct BulkDeleteMessages {
 	BulkDeleteMessages(
 		const std::function<Result<net::HttpResponse>(net::HttpRequest)>
 			&make_request,
-		Snowflake channel_id,
-		const std::vector<Snowflake> &message_ids);
+		Snowflake channel_id, const std::vector<Snowflake> &message_ids);
 
 	operator net::HttpRequest() const;
 
 	[[nodiscard]] Result<net::HttpResponse> send() const;
 
-    private:
+   private:
 	Snowflake m_channel_id;
 	std::vector<Snowflake> m_message_ids;
-	std::function<Result<net::HttpResponse>(net::HttpRequest)>
-		m_make_request;
+	std::function<Result<net::HttpResponse>(net::HttpRequest)> m_make_request;
 };
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_REQUEST_BULK_DELETE_MESSAGES_HPP
+#endif	// EKIZU_REQUEST_BULK_DELETE_MESSAGES_HPP

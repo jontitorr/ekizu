@@ -1,23 +1,19 @@
 #include <ekizu/guild_scheduled_event.hpp>
 #include <ekizu/json_util.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 using json_util::deserialize;
 using json_util::serialize;
 
-void to_json(nlohmann::json &j, const EntityMetadata &e)
-{
+void to_json(nlohmann::json &j, const EntityMetadata &e) {
 	serialize(j, "location", e.location);
 }
 
-void from_json(const nlohmann::json &j, EntityMetadata &e)
-{
+void from_json(const nlohmann::json &j, EntityMetadata &e) {
 	deserialize(j, "location", e.location);
 }
 
-void to_json(nlohmann::json &j, const GuildScheduledEvent &e)
-{
+void to_json(nlohmann::json &j, const GuildScheduledEvent &e) {
 	serialize(j, "id", e.id);
 	serialize(j, "guild_id", e.guild_id);
 	serialize(j, "channel_id", e.channel_id);
@@ -36,8 +32,7 @@ void to_json(nlohmann::json &j, const GuildScheduledEvent &e)
 	serialize(j, "image", e.image);
 }
 
-void from_json(const nlohmann::json &j, GuildScheduledEvent &e)
-{
+void from_json(const nlohmann::json &j, GuildScheduledEvent &e) {
 	deserialize(j, "id", e.id);
 	deserialize(j, "guild_id", e.guild_id);
 	deserialize(j, "channel_id", e.channel_id);
@@ -55,4 +50,4 @@ void from_json(const nlohmann::json &j, GuildScheduledEvent &e)
 	deserialize(j, "user_count", e.user_count);
 	deserialize(j, "image", e.image);
 }
-} // namespace ekizu
+}  // namespace ekizu

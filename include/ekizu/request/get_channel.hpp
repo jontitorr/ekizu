@@ -5,16 +5,14 @@
 #include <ekizu/snowflake.hpp>
 #include <net/http.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 /**
  * @brief Represents the Get Channel REST API endpoint.
  */
 struct GetChannel {
-	GetChannel(
-		const std::function<Result<net::HttpResponse>(net::HttpRequest)>
-			&make_request,
-		Snowflake channel_id);
+	GetChannel(const std::function<Result<net::HttpResponse>(net::HttpRequest)>
+				   &make_request,
+			   Snowflake channel_id);
 
 	/**
 	 * @brief Converts the GetChannel to an HTTP request.
@@ -30,11 +28,10 @@ struct GetChannel {
 	 */
 	[[nodiscard]] Result<Channel> send() const;
 
-    private:
+   private:
 	Snowflake m_channel_id;
-	std::function<Result<net::HttpResponse>(net::HttpRequest)>
-		m_make_request;
+	std::function<Result<net::HttpResponse>(net::HttpRequest)> m_make_request;
 };
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_REQUEST_GET_CHANNEL_HPP
+#endif	// EKIZU_REQUEST_GET_CHANNEL_HPP

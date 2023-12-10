@@ -6,8 +6,7 @@
 #include <ekizu/shard.hpp>
 #include <ekizu/timer_queue.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 struct DiscordApi;
 struct EventManager;
 struct ShardManagerAttorney;
@@ -20,16 +19,15 @@ struct ShardManagerAttorney;
  */
 struct ShardManager {
 	struct CreateKey {
-	    private:
+	   private:
 		friend Client;
 		CreateKey() = default;
 	};
 
 	explicit ShardManager(
-		CreateKey,
-		std::function<void(LogLevel, std::string_view)> log_fn,
+		CreateKey, std::function<void(LogLevel, std::string_view)> log_fn,
 		std::function<void(EventDispatcher &, GatewayEvent event,
-				   const nlohmann::json &data)>
+						   const nlohmann::json &data)>
 			dispatch_fn);
 
 	ShardManager(const ShardManager &) = delete;
@@ -39,21 +37,21 @@ struct ShardManager {
 
 	EKIZU_EXPORT ~ShardManager();
 
-    private:
+   private:
 	friend ShardManagerAttorney;
 
-	[[nodiscard]] Result<void>
-	connect(FunctionView<Result<net::HttpResponse>()> get_gateway,
+	[[nodiscard]] Result<void> connect(
+		FunctionView<Result<net::HttpResponse>()> get_gateway,
 		const ClientOptions &options, std::string_view token);
 
-	[[nodiscard]] Result<void>
-	handle_payload(tcb::span<const std::byte> payload, Shard &shard);
+	[[nodiscard]] Result<void> handle_payload(
+		tcb::span<const std::byte> payload, Shard &shard);
 	[[nodiscard]] Result<void> handle_dispatch(const nlohmann::json &json,
-						   Shard &shard);
+											   Shard &shard);
 
 	std::function<void(LogLevel, std::string_view)> m_log_fn;
-	std::function<void(EventDispatcher &, GatewayEvent event,
-			   const nlohmann::json &data)>
+	std::function<void(
+		EventDispatcher &, GatewayEvent event, const nlohmann::json &data)>
 		m_dispatch_fn;
 	std::string m_gateway;
 	EventDispatcher m_dispatcher;
@@ -63,17 +61,16 @@ struct ShardManager {
 };
 
 struct ShardManagerAttorney {
-    private:
+   private:
 	friend Client;
 
-	static Result<void>
-	connect(ShardManager &shard_manager,
+	static Result<void> connect(
+		ShardManager &shard_manager,
 		FunctionView<Result<net::HttpResponse>()> get_gateway,
-		const ClientOptions &options, std::string_view token)
-	{
+		const ClientOptions &options, std::string_view token) {
 		return shard_manager.connect(get_gateway, options, token);
 	}
 };
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_SHARD_MANAGER_HPP
+#endif	// EKIZU_SHARD_MANAGER_HPP

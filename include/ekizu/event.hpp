@@ -58,8 +58,7 @@
 #include <ekizu/gateway/voice_state_update.hpp>
 #include <ekizu/gateway/webhooks_update.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 using Event = std::variant<
 	GuildBanAdd, GuildBanRemove, ChannelCreate, ChannelDelete,
 	ChannelPinsUpdate, ChannelUpdate, GuildCreate, GuildDelete,
@@ -71,12 +70,12 @@ using Event = std::variant<
 	GuildStickersUpdate, GuildUpdate, IntegrationCreate, IntegrationDelete,
 	IntegrationUpdate, InteractionCreate, InviteCreate, InviteDelete, Log,
 	MessageCreate, MessageDelete, MessageDeleteBulk, MessageReactionAdd,
-	MessageReactionRemove, MessageReactionRemoveAll,
-	MessageReactionRemoveEmoji, MessageUpdate, PresenceUpdate, Ready,
-	Resumed, StageInstanceCreate, StageInstanceDelete, StageInstanceUpdate,
-	ThreadCreate, ThreadDelete, ThreadListSync, ThreadMemberUpdate,
-	ThreadMembersUpdate, ThreadUpdate, TypingStart, UserUpdate,
-	VoiceServerUpdate, VoiceStateUpdate, WebhooksUpdate>;
-} // namespace ekizu
+	MessageReactionRemove, MessageReactionRemoveAll, MessageReactionRemoveEmoji,
+	MessageUpdate, PresenceUpdate, Ready, Resumed, StageInstanceCreate,
+	StageInstanceDelete, StageInstanceUpdate, ThreadCreate, ThreadDelete,
+	ThreadListSync, ThreadMemberUpdate, ThreadMembersUpdate, ThreadUpdate,
+	TypingStart, UserUpdate, VoiceServerUpdate, VoiceStateUpdate,
+	WebhooksUpdate>;
+}  // namespace ekizu
 
-#endif // EKIZU_EVENT_HPP
+#endif	// EKIZU_EVENT_HPP

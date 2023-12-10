@@ -3,8 +3,7 @@
 
 #include <ekizu/role.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 struct GuildRoleDelete {
 	/// ID of the guild.
 	Snowflake guild_id;
@@ -14,6 +13,6 @@ struct GuildRoleDelete {
 
 EKIZU_EXPORT void to_json(nlohmann::json &j, const GuildRoleDelete &e);
 EKIZU_EXPORT void from_json(const nlohmann::json &j, GuildRoleDelete &e);
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_GATEWAY_GUILD_ROLE_DELETE_HPP
+#endif	// EKIZU_GATEWAY_GUILD_ROLE_DELETE_HPP

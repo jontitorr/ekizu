@@ -3,8 +3,7 @@
 
 #include <ekizu/user.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 struct PartialMember {
 	/// The user this guild member represents.
 	std::optional<User> user;
@@ -35,6 +34,6 @@ struct PartialMember {
 
 void to_json(nlohmann::json &j, const PartialMember &m);
 void from_json(const nlohmann::json &j, PartialMember &m);
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_PARTIAL_MEMBER_HPP
+#endif	// EKIZU_PARTIAL_MEMBER_HPP

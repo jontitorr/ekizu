@@ -4,8 +4,7 @@
 #include <ekizu/command_data.hpp>
 #include <ekizu/message.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 using InteractionData = std::variant<CommandData>;
 
 EKIZU_EXPORT void to_json(nlohmann::json &j, const InteractionData &i);
@@ -36,7 +35,8 @@ struct Interaction {
 	int version;
 	/// For components, the message they were attached to.
 	std::optional<Message> message;
-	/// Bitwise set of permissions the app or bot has within the channel the interaction was sent from.
+	/// Bitwise set of permissions the app or bot has within the channel the
+	/// interaction was sent from.
 	std::optional<Permissions> app_permissions;
 	/// Selected language of the invoking user.
 	std::optional<std::string> locale;
@@ -46,6 +46,6 @@ struct Interaction {
 
 EKIZU_EXPORT void to_json(nlohmann::json &j, const Interaction &i);
 EKIZU_EXPORT void from_json(const nlohmann::json &j, Interaction &i);
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_INTERACTION_HPP
+#endif	// EKIZU_INTERACTION_HPP

@@ -5,8 +5,7 @@
 #include <optional>
 #include <string>
 
-namespace ekizu
-{
+namespace ekizu {
 struct StageInstance {
 	/// The id of this Stage instance.
 	Snowflake id;
@@ -26,6 +25,6 @@ struct StageInstance {
 
 EKIZU_EXPORT void to_json(nlohmann::json &j, const StageInstance &s);
 EKIZU_EXPORT void from_json(const nlohmann::json &j, StageInstance &s);
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_STAGE_INSTANCE_HPP
+#endif	// EKIZU_STAGE_INSTANCE_HPP

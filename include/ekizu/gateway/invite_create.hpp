@@ -3,8 +3,7 @@
 
 #include <ekizu/user.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 struct PartialUser {
 	/// ID of the user.
 	Snowflake id;
@@ -48,6 +47,6 @@ struct InviteCreate {
 
 EKIZU_EXPORT void to_json(nlohmann::json &j, const InviteCreate &invite);
 EKIZU_EXPORT void from_json(const nlohmann::json &j, InviteCreate &invite);
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_MODELS_INVITE_CREATE_HPP
+#endif	// EKIZU_MODELS_INVITE_CREATE_HPP

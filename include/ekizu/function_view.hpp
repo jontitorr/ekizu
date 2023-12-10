@@ -3,13 +3,10 @@
 
 #include <type_traits>
 
-namespace ekizu
-{
-namespace detail
-{
+namespace ekizu {
+namespace detail {
 template <typename T>
-struct FunctionTraits : FunctionTraits<decltype(&T::operator())> {
-};
+struct FunctionTraits : FunctionTraits<decltype(&T::operator())> {};
 
 template <typename Class, typename Ret, typename... Params>
 struct FunctionTraits<Ret (Class::*)(Params...) const> {
@@ -25,9 +22,10 @@ template <typename Ret, typename... Params>
 struct FunctionTraits<Ret (*)(Params...)> {
 	using f_type = Ret(Params...);
 };
-} // namespace detail
+}  // namespace detail
 
-template <typename Fn> struct FunctionView;
+template <typename Fn>
+struct FunctionView;
 
 /**
  * @brief A lightweight, non-owning view of a callable.
@@ -38,42 +36,33 @@ template <typename Fn> struct FunctionView;
 template <typename Ret, typename... Params>
 struct FunctionView<Ret(Params...)> {
 	FunctionView() = default;
-	FunctionView(std::nullptr_t)
-	{
-	} // NOLINT
+	FunctionView(std::nullptr_t) {}	 // NOLINT
 
-	template <typename Callable,
-		  typename std::enable_if_t<
-			  std::is_invocable_v<Callable, Params...> &&
-			  !std::is_same_v<std::decay_t<Callable>,
-					  FunctionView> > * = nullptr>
-	FunctionView(Callable &&callable) // NOLINT
-		: m_closure{ reinterpret_cast<void *>(&callable) }
-		, m_proxy{ [](void *closure, Params... params) {
-			return (*reinterpret_cast<
-				std::remove_reference_t<Callable> *>(closure))(
-				static_cast<Params>(params)...);
-		} }
-	{
-	}
+	template <
+		typename Callable,
+		typename std::enable_if_t<std::is_invocable_v<Callable, Params...> &&
+								  !std::is_same_v<std::decay_t<Callable>,
+												  FunctionView> > * = nullptr>
+	FunctionView(Callable &&callable)  // NOLINT
+		: m_closure{reinterpret_cast<void *>(&callable)},
+		  m_proxy{[](void *closure, Params... params) {
+			  return (*reinterpret_cast<std::remove_reference_t<Callable> *>(
+				  closure))(static_cast<Params>(params)...);
+		  }} {}
 
-	explicit operator bool() const
-	{
-		return m_proxy != nullptr;
-	}
+	explicit operator bool() const { return m_proxy != nullptr; }
 
-	Ret operator()(Params... params) const
-	{
+	Ret operator()(Params... params) const {
 		return m_proxy(m_closure, static_cast<Params>(params)...);
 	}
 
-    private:
+   private:
 	void *m_closure{};
 	Ret (*m_proxy)(void *callable, Params... params){};
 };
 
 template <typename Fn>
 FunctionView(Fn) -> FunctionView<typename detail::FunctionTraits<Fn>::f_type>;
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_FUNCTION_VIEW_HPP
+#endif	// EKIZU_FUNCTION_VIEW_HPP

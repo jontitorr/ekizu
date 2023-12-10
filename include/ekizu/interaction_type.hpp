@@ -3,8 +3,7 @@
 
 #include <cstdint>
 
-namespace ekizu
-{
+namespace ekizu {
 enum class InteractionType : uint8_t {
 	Ping = 1,
 	ApplicationCommand,
@@ -12,6 +11,6 @@ enum class InteractionType : uint8_t {
 	ApplicationCommandAutocomplete,
 	ModalSubmit,
 };
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_INTERACTION_TYPE_HPP
+#endif	// EKIZU_INTERACTION_TYPE_HPP

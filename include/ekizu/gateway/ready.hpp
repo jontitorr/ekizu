@@ -6,8 +6,7 @@
 #include <ekizu/guild.hpp>
 #include <ekizu/partial_application.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 struct Ready {
 	/// The API version.
 	uint8_t v{};
@@ -29,6 +28,6 @@ struct Ready {
 
 EKIZU_EXPORT void to_json(nlohmann::json &j, const Ready &payload);
 EKIZU_EXPORT void from_json(const nlohmann::json &j, Ready &payload);
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_GATEWAY_READY_HPP
+#endif	// EKIZU_GATEWAY_READY_HPP

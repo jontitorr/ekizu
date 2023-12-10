@@ -1,17 +1,16 @@
 #ifndef EKIZU_INFLATER_HPP
 #define EKIZU_INFLATER_HPP
 
+#include <ekizu/util.hpp>
 #include <memory>
 #include <tcb/span.hpp>
-#include <ekizu/util.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 /**
-     * @brief A wrapper around zlib's decompression functions. Will be used if
-     * the client connected to the gateway using the zlib-streaming compression
-     * method.
-     */
+ * @brief A wrapper around zlib's decompression functions. Will be used if
+ * the client connected to the gateway using the zlib-streaming compression
+ * method.
+ */
 struct Inflater {
 	Inflater(const Inflater &) = delete;
 	Inflater &operator=(const Inflater &) = delete;
@@ -21,10 +20,10 @@ struct Inflater {
 
 	static Result<Inflater> create();
 
-	[[nodiscard]] Result<std::vector<std::byte> >
-	inflate(tcb::span<const std::byte> data);
+	[[nodiscard]] Result<std::vector<std::byte> > inflate(
+		tcb::span<const std::byte> data);
 
-    private:
+   private:
 	struct Impl;
 
 	explicit Inflater(std::unique_ptr<Impl> impl);
@@ -34,6 +33,6 @@ struct Inflater {
 	std::array<std::byte, BUFFER_SIZE> m_buffer{};
 	std::unique_ptr<Impl> m_impl;
 };
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_INFLATER_HPP
+#endif	// EKIZU_INFLATER_HPP

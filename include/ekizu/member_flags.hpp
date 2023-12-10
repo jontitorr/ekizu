@@ -4,8 +4,7 @@
 #include <cstdint>
 #include <type_traits>
 
-namespace ekizu
-{
+namespace ekizu {
 enum class MemberFlags : uint8_t {
 	/// Member has left and rejoined the guild.
 	DidRejoin = 1 << 0,
@@ -17,19 +16,17 @@ enum class MemberFlags : uint8_t {
 	StartedOnboarding = 1 << 3,
 };
 
-constexpr MemberFlags operator|(MemberFlags lhs, MemberFlags rhs)
-{
+constexpr MemberFlags operator|(MemberFlags lhs, MemberFlags rhs) {
 	return static_cast<MemberFlags>(
 		static_cast<std::underlying_type_t<MemberFlags> >(lhs) |
 		static_cast<std::underlying_type_t<MemberFlags> >(rhs));
 }
 
-constexpr MemberFlags operator&(MemberFlags lhs, MemberFlags rhs)
-{
+constexpr MemberFlags operator&(MemberFlags lhs, MemberFlags rhs) {
 	return static_cast<MemberFlags>(
 		static_cast<std::underlying_type_t<MemberFlags> >(lhs) &
 		static_cast<std::underlying_type_t<MemberFlags> >(rhs));
 }
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_MEMBERFLAGS_HPP
+#endif	// EKIZU_MEMBERFLAGS_HPP

@@ -3,8 +3,7 @@
 
 #include <ekizu/snowflake.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 struct GuildScheduledEventUserRemove {
 	/// Guild ID of the scheduled event.
 	Snowflake guild_id;
@@ -15,9 +14,9 @@ struct GuildScheduledEventUserRemove {
 };
 
 EKIZU_EXPORT void to_json(nlohmann::json &j,
-			  const GuildScheduledEventUserRemove &e);
+						  const GuildScheduledEventUserRemove &e);
 EKIZU_EXPORT void from_json(const nlohmann::json &j,
-			    GuildScheduledEventUserRemove &e);
-} // namespace ekizu
+							GuildScheduledEventUserRemove &e);
+}  // namespace ekizu
 
-#endif // EKIZU_GATEWAY_GUILD_SCHEDULED_EVENT_USER_REMOVE_HPP
+#endif	// EKIZU_GATEWAY_GUILD_SCHEDULED_EVENT_USER_REMOVE_HPP

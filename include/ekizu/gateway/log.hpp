@@ -2,12 +2,12 @@
 #define EKIZU_GATEWAY_LOG_HPP
 
 #include <ekizu/export.h>
+
 #include <ekizu/log_level.hpp>
 #include <nlohmann/json_fwd.hpp>
 #include <string>
 
-namespace ekizu
-{
+namespace ekizu {
 struct Log {
 	LogLevel level;
 	std::string message;
@@ -15,6 +15,6 @@ struct Log {
 
 EKIZU_EXPORT void to_json(nlohmann::json &j, const Log &l);
 EKIZU_EXPORT void from_json(const nlohmann::json &j, Log &l);
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_GATEWAY_LOG_HPP
+#endif	// EKIZU_GATEWAY_LOG_HPP

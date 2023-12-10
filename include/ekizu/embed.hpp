@@ -2,12 +2,12 @@
 #define EKIZU_EMBED_HPP
 
 #include <ekizu/export.h>
+
 #include <nlohmann/json_fwd.hpp>
 #include <optional>
 #include <string>
 
-namespace ekizu
-{
+namespace ekizu {
 /**
  * @brief This structure is used to represent the similar
  * properties that EmbedThumbnail, EmbedVideo, and EmbedImage share.
@@ -110,6 +110,6 @@ struct Embed {
 
 EKIZU_EXPORT void to_json(nlohmann::json &j, const Embed &e);
 EKIZU_EXPORT void from_json(const nlohmann::json &j, Embed &e);
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_EMBED_HPP
+#endif	// EKIZU_EMBED_HPP

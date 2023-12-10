@@ -3,8 +3,7 @@
 
 #include <ekizu/guild_member.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 struct TypingStart {
 	/// ID of the channel.
 	Snowflake channel_id;
@@ -20,6 +19,6 @@ struct TypingStart {
 
 EKIZU_EXPORT void to_json(nlohmann::json &j, const TypingStart &t);
 EKIZU_EXPORT void from_json(const nlohmann::json &j, TypingStart &t);
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_TYPING_START_HPP
+#endif	// EKIZU_TYPING_START_HPP

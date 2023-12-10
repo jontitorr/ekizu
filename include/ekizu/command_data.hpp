@@ -3,8 +3,7 @@
 
 #include <ekizu/command_data_resolved.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 struct CommandDataOption {
 	/// Name of the option.
 	std::string name;
@@ -30,12 +29,13 @@ struct CommandData {
 	std::vector<CommandDataOption> options;
 	/// Resolved data from the interaction's options.
 	std::optional<CommandInteractionDataResolved> resolved;
-	/// If this is a user or message command, the ID of the targeted user/message.
+	/// If this is a user or message command, the ID of the targeted
+	/// user/message.
 	std::optional<Snowflake> target_id;
 };
 
 EKIZU_EXPORT void to_json(nlohmann::json &j, const CommandData &c);
 EKIZU_EXPORT void from_json(const nlohmann::json &j, CommandData &c);
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_COMMAND_DATA_HPP
+#endif	// EKIZU_COMMAND_DATA_HPP

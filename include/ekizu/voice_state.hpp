@@ -3,8 +3,7 @@
 
 #include <ekizu/guild_member.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 struct VoiceState {
 	/// The guild id this voice state is for (optional).
 	std::optional<Snowflake> guild_id;
@@ -36,6 +35,6 @@ struct VoiceState {
 
 EKIZU_EXPORT void to_json(nlohmann::json &j, const VoiceState &v);
 EKIZU_EXPORT void from_json(const nlohmann::json &j, VoiceState &v);
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_VOICE_STATE_HPP
+#endif	// EKIZU_VOICE_STATE_HPP

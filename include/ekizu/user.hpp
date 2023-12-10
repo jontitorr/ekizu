@@ -4,8 +4,7 @@
 #include <ekizu/snowflake.hpp>
 #include <optional>
 
-namespace ekizu
-{
+namespace ekizu {
 /**
  * @brief The type of Nitro subscription on a user's account.
  * @see
@@ -92,6 +91,6 @@ struct User {
 
 EKIZU_EXPORT void to_json(nlohmann::json &j, const User &u);
 EKIZU_EXPORT void from_json(const nlohmann::json &j, User &u);
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_USER_HPP
+#endif	// EKIZU_USER_HPP

@@ -4,8 +4,7 @@
 #include <ekizu/member_flags.hpp>
 #include <ekizu/message.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 struct InteractionChannel {
 	/// ID of the channel.
 	Snowflake id;
@@ -15,7 +14,8 @@ struct InteractionChannel {
 	std::string name;
 	/// ID of the channel the thread was created in.
 	std::optional<Snowflake> parent_id;
-	/// Computed permissions, including overwrites, for the invoking user in the channel.
+	/// Computed permissions, including overwrites, for the invoking user in the
+	/// channel.
 	Permissions permissions;
 	/// Metadata about a thread.
 	std::optional<ThreadMetadata> thread_metadata;
@@ -35,7 +35,8 @@ struct InteractionMember {
 	std::string joined_at;
 	/// Member nickname.
 	std::optional<std::string> nick;
-	/// Whether the user has yet to pass the guild's Membership Screening requirements.
+	/// Whether the user has yet to pass the guild's Membership Screening
+	/// requirements.
 	bool pending;
 	/// Total permissions of the member in this channel, including overwrites.
 	Permissions permissions;
@@ -65,9 +66,9 @@ struct CommandInteractionDataResolved {
 };
 
 EKIZU_EXPORT void to_json(nlohmann::json &j,
-			  const CommandInteractionDataResolved &r);
+						  const CommandInteractionDataResolved &r);
 EKIZU_EXPORT void from_json(const nlohmann::json &j,
-			    CommandInteractionDataResolved &r);
-} // namespace ekizu
+							CommandInteractionDataResolved &r);
+}  // namespace ekizu
 
-#endif // EKIZU_COMMAND_DATA_RESOLVED_HPP
+#endif	// EKIZU_COMMAND_DATA_RESOLVED_HPP

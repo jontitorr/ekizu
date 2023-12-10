@@ -4,8 +4,7 @@
 #include <cstdint>
 #include <type_traits>
 
-namespace ekizu
-{
+namespace ekizu {
 enum class ApplicationFlags : uint64_t {
 	/// Indicates if an app uses the Auto Moderation API.
 	ApplicationAutoModerationRuleCreateBadge = 1 << 6,
@@ -38,19 +37,19 @@ enum class ApplicationFlags : uint64_t {
 	ApplicationCommandBadge = 1 << 23
 };
 
-constexpr ApplicationFlags operator|(ApplicationFlags lhs, ApplicationFlags rhs)
-{
+constexpr ApplicationFlags operator|(ApplicationFlags lhs,
+									 ApplicationFlags rhs) {
 	return static_cast<ApplicationFlags>(
 		static_cast<std::underlying_type_t<ApplicationFlags> >(lhs) |
 		static_cast<std::underlying_type_t<ApplicationFlags> >(rhs));
 }
 
-constexpr ApplicationFlags operator&(ApplicationFlags lhs, ApplicationFlags rhs)
-{
+constexpr ApplicationFlags operator&(ApplicationFlags lhs,
+									 ApplicationFlags rhs) {
 	return static_cast<ApplicationFlags>(
 		static_cast<std::underlying_type_t<ApplicationFlags> >(lhs) &
 		static_cast<std::underlying_type_t<ApplicationFlags> >(rhs));
 }
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_APPLICATION_FLAGS_HPP
+#endif	// EKIZU_APPLICATION_FLAGS_HPP

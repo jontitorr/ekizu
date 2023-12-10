@@ -3,8 +3,7 @@
 
 #include <ekizu/snowflake.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 struct WebhooksUpdate {
 	/// ID of the guild
 	Snowflake guild_id;
@@ -14,6 +13,6 @@ struct WebhooksUpdate {
 
 EKIZU_EXPORT void to_json(nlohmann::json &j, const WebhooksUpdate &w);
 EKIZU_EXPORT void from_json(const nlohmann::json &j, WebhooksUpdate &w);
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_GATEWAY_WEBHOOKS_UPDATE_HPP
+#endif	// EKIZU_GATEWAY_WEBHOOKS_UPDATE_HPP

@@ -4,8 +4,7 @@
 #include <ekizu/mention.hpp>
 #include <ekizu/message.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 struct MessageUpdate {
 	/// ID of the message.
 	Snowflake id;
@@ -39,6 +38,6 @@ struct MessageUpdate {
 
 EKIZU_EXPORT void to_json(nlohmann::json &j, const MessageUpdate &m);
 EKIZU_EXPORT void from_json(const nlohmann::json &j, MessageUpdate &m);
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_MESSAGE_UPDATE_HPP
+#endif	// EKIZU_MESSAGE_UPDATE_HPP

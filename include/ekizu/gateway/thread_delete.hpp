@@ -3,8 +3,7 @@
 
 #include <ekizu/channel.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 struct ThreadDelete {
 	/// The id of the deleted thread.
 	Snowflake id;
@@ -18,6 +17,6 @@ struct ThreadDelete {
 
 EKIZU_EXPORT void to_json(nlohmann::json &j, const ThreadDelete &t);
 EKIZU_EXPORT void from_json(const nlohmann::json &j, ThreadDelete &t);
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_GATEWAY_THREAD_DELETE_HPP
+#endif	// EKIZU_GATEWAY_THREAD_DELETE_HPP

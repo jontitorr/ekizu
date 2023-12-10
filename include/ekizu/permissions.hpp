@@ -4,8 +4,7 @@
 #include <cstdint>
 #include <type_traits>
 
-namespace ekizu
-{
+namespace ekizu {
 enum class Permissions : uint64_t {
 	/// Allows creation of instant invites
 	CreateInstantInvite = 1ULL << 0,
@@ -27,9 +26,11 @@ enum class Permissions : uint64_t {
 	PrioritySpeaker = 1ULL << 8,
 	/// Allows the user to go live
 	Stream = 1ULL << 9,
-	/// Allows guild members to view a channel, which includes reading messages in text channels and joining voice channels
+	/// Allows guild members to view a channel, which includes reading messages
+	/// in text channels and joining voice channels
 	ViewChannel = 1ULL << 10,
-	/// Allows for sending messages in a channel and creating threads in a forum (does not allow sending messages in threads)
+	/// Allows for sending messages in a channel and creating threads in a forum
+	/// (does not allow sending messages in threads)
 	SendMessages = 1ULL << 11,
 	/// Allows for sending of /tts messages
 	SendTTSMessages = 1ULL << 12,
@@ -41,7 +42,8 @@ enum class Permissions : uint64_t {
 	AttachFiles = 1ULL << 15,
 	/// Allows for reading of message history
 	ReadMessageHistory = 1ULL << 16,
-	/// Allows for using the @everyone tag to notify all users in a channel, and the @here tag to notify all online users in a channel
+	/// Allows for using the @everyone tag to notify all users in a channel, and
+	/// the @here tag to notify all online users in a channel
 	MentionEveryone = 1ULL << 17,
 	/// Allows the usage of custom emojis from other servers
 	UseExternalEmojis = 1ULL << 18,
@@ -69,13 +71,15 @@ enum class Permissions : uint64_t {
 	ManageWebhooks = 1ULL << 29,
 	/// Allows management and editing of emojis, stickers, and soundboard sounds
 	ManageGuildExpressions = 1ULL << 30,
-	/// Allows members to use application commands, including slash commands and context menu commands
+	/// Allows members to use application commands, including slash commands and
+	/// context menu commands
 	UseApplicationCommands = 1ULL << 31,
 	/// Allows for requesting to speak in stage channels
 	RequestToSpeak = 1ULL << 32,
 	/// Allows for creating, editing, and deleting scheduled events
 	ManageEvents = 1ULL << 33,
-	/// Allows for deleting and archiving threads, and viewing all private threads
+	/// Allows for deleting and archiving threads, and viewing all private
+	/// threads
 	ManageThreads = 1ULL << 34,
 	/// Allows for creating public and announcement threads
 	CreatePublicThreads = 1ULL << 35,
@@ -85,9 +89,12 @@ enum class Permissions : uint64_t {
 	UseExternalStickers = 1ULL << 37,
 	/// Allows for sending messages in threads
 	SendMessagesInThreads = 1ULL << 38,
-	/// Allows for using Activities (applications with the EMBEDDED flag) in a voice channel
+	/// Allows for using Activities (applications with the EMBEDDED flag) in a
+	/// voice channel
 	UseEmbeddedActivities = 1ULL << 39,
-	/// Allows for timing out users to prevent them from sending or reacting to messages in chat and threads, and from speaking in voice and stage channels
+	/// Allows for timing out users to prevent them from sending or reacting to
+	/// messages in chat and threads, and from speaking in voice and stage
+	/// channels
 	ModerateMembers = 1ULL << 40,
 	/// Allows for viewing role subscription insights
 	ViewCreatorMonetizationAnalytics = 1ULL << 41,
@@ -99,19 +106,17 @@ enum class Permissions : uint64_t {
 	SendVoiceMessages = 1ULL << 46
 };
 
-constexpr Permissions operator|(Permissions lhs, Permissions rhs)
-{
+constexpr Permissions operator|(Permissions lhs, Permissions rhs) {
 	return static_cast<Permissions>(
 		static_cast<std::underlying_type_t<Permissions> >(lhs) |
 		static_cast<std::underlying_type_t<Permissions> >(rhs));
 }
 
-constexpr Permissions operator&(Permissions lhs, Permissions rhs)
-{
+constexpr Permissions operator&(Permissions lhs, Permissions rhs) {
 	return static_cast<Permissions>(
 		static_cast<std::underlying_type_t<Permissions> >(lhs) &
 		static_cast<std::underlying_type_t<Permissions> >(rhs));
 }
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_PERMISSIONS_HPP
+#endif	// EKIZU_PERMISSIONS_HPP

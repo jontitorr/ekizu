@@ -1,11 +1,10 @@
 #ifndef EKIZU_GATEWAY_GUILD_EMOJIS_UPDATE_HPP
 #define EKIZU_GATEWAY_GUILD_EMOJIS_UPDATE_HPP
 
-#include <ekizu/snowflake.hpp>
 #include <ekizu/emoji.hpp>
+#include <ekizu/snowflake.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 struct GuildEmojisUpdate {
 	/// The ID of the guild.
 	Snowflake guild_id;
@@ -15,6 +14,6 @@ struct GuildEmojisUpdate {
 
 EKIZU_EXPORT void to_json(nlohmann::json &j, const GuildEmojisUpdate &e);
 EKIZU_EXPORT void from_json(const nlohmann::json &j, GuildEmojisUpdate &e);
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_GATEWAY_GUILD_EMOJIS_UPDATE_HPP
+#endif	// EKIZU_GATEWAY_GUILD_EMOJIS_UPDATE_HPP

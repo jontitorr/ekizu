@@ -1,13 +1,11 @@
 #include <ekizu/emoji.hpp>
 #include <ekizu/json_util.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 using json_util::deserialize;
 using json_util::serialize;
 
-void to_json(nlohmann::json &j, const Emoji &e)
-{
+void to_json(nlohmann::json &j, const Emoji &e) {
 	serialize(j, "id", e.id);
 	serialize(j, "name", e.name);
 	serialize(j, "roles", e.roles);
@@ -19,8 +17,7 @@ void to_json(nlohmann::json &j, const Emoji &e)
 	serialize(j, "user", e.user);
 }
 
-void from_json(const nlohmann::json &j, Emoji &e)
-{
+void from_json(const nlohmann::json &j, Emoji &e) {
 	deserialize(j, "id", e.id);
 	deserialize(j, "name", e.name);
 	deserialize(j, "roles", e.roles);
@@ -32,17 +29,15 @@ void from_json(const nlohmann::json &j, Emoji &e)
 	deserialize(j, "user", e.user);
 }
 
-void to_json(nlohmann::json &j, const PartialEmoji &p)
-{
+void to_json(nlohmann::json &j, const PartialEmoji &p) {
 	serialize(j, "id", p.id);
 	serialize(j, "name", p.name);
 	serialize(j, "animated", p.animated);
 }
 
-void from_json(const nlohmann::json &j, PartialEmoji &p)
-{
+void from_json(const nlohmann::json &j, PartialEmoji &p) {
 	deserialize(j, "id", p.id);
 	deserialize(j, "name", p.name);
 	deserialize(j, "animated", p.animated);
 }
-} // namespace ekizu
+}  // namespace ekizu

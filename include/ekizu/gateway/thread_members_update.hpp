@@ -3,8 +3,7 @@
 
 #include <ekizu/channel.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 struct ThreadMembersUpdate {
 	/// ID of the thread.
 	Snowflake id;
@@ -20,6 +19,6 @@ struct ThreadMembersUpdate {
 
 EKIZU_EXPORT void to_json(nlohmann::json &j, const ThreadMembersUpdate &t);
 EKIZU_EXPORT void from_json(const nlohmann::json &j, ThreadMembersUpdate &t);
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_THREAD_MEMBERS_UPDATE_HPP
+#endif	// EKIZU_THREAD_MEMBERS_UPDATE_HPP

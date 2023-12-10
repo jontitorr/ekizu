@@ -3,8 +3,7 @@
 
 #include <ekizu/guild_member.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 struct GuildMemberUpdate {
 	Snowflake guild_id;
 	std::vector<Snowflake> roles;
@@ -21,6 +20,6 @@ struct GuildMemberUpdate {
 
 EKIZU_EXPORT void to_json(nlohmann::json &j, const GuildMemberUpdate &m);
 EKIZU_EXPORT void from_json(const nlohmann::json &j, GuildMemberUpdate &m);
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_GATEWAY_GUILD_MEMBER_UPDATE_HPP
+#endif	// EKIZU_GATEWAY_GUILD_MEMBER_UPDATE_HPP

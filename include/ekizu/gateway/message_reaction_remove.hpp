@@ -3,8 +3,7 @@
 
 #include <ekizu/emoji.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 struct MessageReactionRemove {
 	/// ID of the user.
 	Snowflake user_id;
@@ -20,6 +19,6 @@ struct MessageReactionRemove {
 
 EKIZU_EXPORT void to_json(nlohmann::json &j, const MessageReactionRemove &e);
 EKIZU_EXPORT void from_json(const nlohmann::json &j, MessageReactionRemove &e);
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_GATEWAY_MESSAGE_REACTION_REMOVE_HPP
+#endif	// EKIZU_GATEWAY_MESSAGE_REACTION_REMOVE_HPP

@@ -3,8 +3,7 @@
 
 #include <ekizu/guild_member.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 struct GuildMemberRemove {
 	Snowflake guild_id;
 	GuildMember member;
@@ -12,6 +11,6 @@ struct GuildMemberRemove {
 
 EKIZU_EXPORT void to_json(nlohmann::json &j, const GuildMemberRemove &m);
 EKIZU_EXPORT void from_json(const nlohmann::json &j, GuildMemberRemove &m);
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_GATEWAY_GUILD_MEMBER_REMOVE_HPP
+#endif	// EKIZU_GATEWAY_GUILD_MEMBER_REMOVE_HPP

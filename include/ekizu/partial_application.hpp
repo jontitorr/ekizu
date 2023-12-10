@@ -4,8 +4,7 @@
 #include <ekizu/application_flags.hpp>
 #include <ekizu/snowflake.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 struct PartialApplication {
 	/// The application id.
 	Snowflake id;
@@ -15,6 +14,6 @@ struct PartialApplication {
 
 void to_json(nlohmann::json &j, const PartialApplication &a);
 void from_json(const nlohmann::json &j, PartialApplication &a);
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_PARTIAL_APPLICATION_HPP
+#endif	// EKIZU_PARTIAL_APPLICATION_HPP

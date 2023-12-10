@@ -2,10 +2,10 @@
 #define EKIZU_GUILD_FEATURE_HPP
 
 #include <ekizu/export.h>
+
 #include <nlohmann/json_fwd.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 enum class GuildFeature : uint8_t {
 	/// Has access to set an animated guild banner image.
 	AnimatedBanner,
@@ -72,6 +72,6 @@ enum class GuildFeature : uint8_t {
 
 EKIZU_EXPORT void to_json(nlohmann::json &j, const GuildFeature &f);
 EKIZU_EXPORT void from_json(const nlohmann::json &j, GuildFeature &f);
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_GUILD_FEATURE_HPP
+#endif	// EKIZU_GUILD_FEATURE_HPP

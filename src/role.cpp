@@ -1,13 +1,11 @@
 #include <ekizu/json_util.hpp>
 #include <ekizu/role.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 using json_util::deserialize;
 using json_util::serialize;
 
-void to_json(nlohmann::json &j, const RoleTags &t)
-{
+void to_json(nlohmann::json &j, const RoleTags &t) {
 	serialize(j, "bot_id", t.bot_id);
 	serialize(j, "integration_id", t.integration_id);
 	serialize(j, "premium_subscriber", t.premium_subscriber);
@@ -16,8 +14,7 @@ void to_json(nlohmann::json &j, const RoleTags &t)
 	serialize(j, "guild_connections", t.guild_connections);
 }
 
-void from_json(const nlohmann::json &j, RoleTags &t)
-{
+void from_json(const nlohmann::json &j, RoleTags &t) {
 	deserialize(j, "bot_id", t.bot_id);
 	deserialize(j, "integration_id", t.integration_id);
 	deserialize(j, "premium_subscriber", t.premium_subscriber);
@@ -26,8 +23,7 @@ void from_json(const nlohmann::json &j, RoleTags &t)
 	deserialize(j, "guild_connections", t.guild_connections);
 }
 
-void to_json(nlohmann::json &j, const Role &r)
-{
+void to_json(nlohmann::json &j, const Role &r) {
 	serialize(j, "id", r.id);
 	serialize(j, "name", r.name);
 	serialize(j, "color", r.color);
@@ -42,8 +38,7 @@ void to_json(nlohmann::json &j, const Role &r)
 	serialize(j, "flags", r.flags);
 }
 
-void from_json(const nlohmann::json &j, Role &r)
-{
+void from_json(const nlohmann::json &j, Role &r) {
 	deserialize(j, "id", r.id);
 	deserialize(j, "name", r.name);
 	deserialize(j, "color", r.color);
@@ -57,4 +52,4 @@ void from_json(const nlohmann::json &j, Role &r)
 	deserialize(j, "tags", r.tags);
 	deserialize(j, "flags", r.flags);
 }
-} // namespace ekizu
+}  // namespace ekizu

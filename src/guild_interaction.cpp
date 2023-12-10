@@ -1,36 +1,24 @@
 #include <ekizu/guild_interaction.hpp>
 #include <ekizu/json_util.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 using json_util::deserialize;
 using json_util::serialize;
 
-void to_json(nlohmann::json &j, const GuildIntegrationType &i)
-{
+void to_json(nlohmann::json &j, const GuildIntegrationType &i) {
 	switch (i) {
-	case GuildIntegrationType::Twitch:
-		j = "twitch";
-		break;
-	case GuildIntegrationType::Youtube:
-		j = "youtube";
-		break;
-	case GuildIntegrationType::Discord:
-		j = "discord";
-		break;
-	case GuildIntegrationType::GuildSubscription:
-		j = "guild_subscription";
-		break;
-	case GuildIntegrationType::Unknown:
-		j = "unknown";
+		case GuildIntegrationType::Twitch: j = "twitch"; break;
+		case GuildIntegrationType::Youtube: j = "youtube"; break;
+		case GuildIntegrationType::Discord: j = "discord"; break;
+		case GuildIntegrationType::GuildSubscription:
+			j = "guild_subscription";
+			break;
+		case GuildIntegrationType::Unknown: j = "unknown";
 	}
 }
 
-void from_json(const nlohmann::json &j, GuildIntegrationType &i)
-{
-	if (!j.is_string()) {
-		return;
-	}
+void from_json(const nlohmann::json &j, GuildIntegrationType &i) {
+	if (!j.is_string()) { return; }
 
 	const std::string str = j;
 
@@ -47,20 +35,17 @@ void from_json(const nlohmann::json &j, GuildIntegrationType &i)
 	}
 }
 
-void to_json(nlohmann::json &j, const IntegrationAccount &i)
-{
+void to_json(nlohmann::json &j, const IntegrationAccount &i) {
 	serialize(j, "id", i.id);
 	serialize(j, "name", i.name);
 }
 
-void from_json(const nlohmann::json &j, IntegrationAccount &i)
-{
+void from_json(const nlohmann::json &j, IntegrationAccount &i) {
 	deserialize(j, "id", i.id);
 	deserialize(j, "name", i.name);
 }
 
-void to_json(nlohmann::json &j, const IntegrationApplication &i)
-{
+void to_json(nlohmann::json &j, const IntegrationApplication &i) {
 	serialize(j, "id", i.id);
 	serialize(j, "name", i.name);
 	serialize(j, "icon", i.icon);
@@ -68,8 +53,7 @@ void to_json(nlohmann::json &j, const IntegrationApplication &i)
 	serialize(j, "bot", i.bot);
 }
 
-void from_json(const nlohmann::json &j, IntegrationApplication &i)
-{
+void from_json(const nlohmann::json &j, IntegrationApplication &i) {
 	deserialize(j, "id", i.id);
 	deserialize(j, "name", i.name);
 	deserialize(j, "icon", i.icon);
@@ -77,8 +61,7 @@ void from_json(const nlohmann::json &j, IntegrationApplication &i)
 	deserialize(j, "bot", i.bot);
 }
 
-void to_json(nlohmann::json &j, const GuildIntegration &i)
-{
+void to_json(nlohmann::json &j, const GuildIntegration &i) {
 	serialize(j, "id", i.id);
 	serialize(j, "name", i.name);
 	serialize(j, "type", i.type);
@@ -97,8 +80,7 @@ void to_json(nlohmann::json &j, const GuildIntegration &i)
 	serialize(j, "scopes", i.scopes);
 }
 
-void from_json(const nlohmann::json &j, GuildIntegration &i)
-{
+void from_json(const nlohmann::json &j, GuildIntegration &i) {
 	deserialize(j, "id", i.id);
 	deserialize(j, "name", i.name);
 	deserialize(j, "type", i.type);
@@ -116,4 +98,4 @@ void from_json(const nlohmann::json &j, GuildIntegration &i)
 	deserialize(j, "application", i.application);
 	deserialize(j, "scopes", i.scopes);
 }
-} // namespace ekizu
+}  // namespace ekizu

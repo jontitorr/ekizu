@@ -10,13 +10,13 @@
 #include <ekizu/partial_member.hpp>
 #include <ekizu/role.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 /**
  * This structure represents a form of controlling mentions in a Message
  * object.
  *
- * @see https://discord.com/developers/docs/resources/channel#allowed-mentions-object
+ * @see
+ * https://discord.com/developers/docs/resources/channel#allowed-mentions-object
  */
 struct AllowedMentions {
 	/// List of allowed mention types to parse from the content.
@@ -246,6 +246,6 @@ struct Message {
 
 EKIZU_EXPORT void to_json(nlohmann::json &j, const Message &m);
 EKIZU_EXPORT void from_json(const nlohmann::json &j, Message &m);
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_MESSAGE_HPP
+#endif	// EKIZU_MESSAGE_HPP

@@ -1,13 +1,11 @@
 #include <ekizu/gateway/guild_member_update.hpp>
 #include <ekizu/json_util.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 using json_util::deserialize;
 using json_util::serialize;
 
-void to_json(nlohmann::json &j, const GuildMemberUpdate &m)
-{
+void to_json(nlohmann::json &j, const GuildMemberUpdate &m) {
 	serialize(j, "guild_id", m.guild_id);
 	serialize(j, "roles", m.roles);
 	serialize(j, "user", m.user);
@@ -18,12 +16,11 @@ void to_json(nlohmann::json &j, const GuildMemberUpdate &m)
 	serialize(j, "deaf", m.deaf);
 	serialize(j, "mute", m.mute);
 	serialize(j, "pending", m.pending);
-	serialize(j, "communication_disabled_until",
-		  m.communication_disabled_until);
+	serialize(
+		j, "communication_disabled_until", m.communication_disabled_until);
 }
 
-void from_json(const nlohmann::json &j, GuildMemberUpdate &m)
-{
+void from_json(const nlohmann::json &j, GuildMemberUpdate &m) {
 	deserialize(j, "guild_id", m.guild_id);
 	deserialize(j, "roles", m.roles);
 	deserialize(j, "user", m.user);
@@ -34,7 +31,7 @@ void from_json(const nlohmann::json &j, GuildMemberUpdate &m)
 	deserialize(j, "deaf", m.deaf);
 	deserialize(j, "mute", m.mute);
 	deserialize(j, "pending", m.pending);
-	deserialize(j, "communication_disabled_until",
-		    m.communication_disabled_until);
+	deserialize(
+		j, "communication_disabled_until", m.communication_disabled_until);
 }
-} // namespace ekizu
+}  // namespace ekizu

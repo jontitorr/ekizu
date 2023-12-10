@@ -4,8 +4,7 @@
 #include <ekizu/snowflake.hpp>
 #include <optional>
 
-namespace ekizu
-{
+namespace ekizu {
 /**
  * @brief Represents a Discord role's tags.
  * @see
@@ -62,6 +61,6 @@ struct Role {
 
 EKIZU_EXPORT void to_json(nlohmann::json &j, const Role &r);
 EKIZU_EXPORT void from_json(const nlohmann::json &j, Role &r);
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_ROLE_HPP
+#endif	// EKIZU_ROLE_HPP

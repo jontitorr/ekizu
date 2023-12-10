@@ -2,13 +2,13 @@
 #define EKIZU_GATEWAY_RESUMED_HPP
 
 #include <ekizu/export.h>
+
 #include <nlohmann/json_fwd.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 struct Resumed {};
 
 EKIZU_EXPORT void to_json(nlohmann::json &j, const Resumed &r);
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_GATEWAY_RESUMED_HPP
+#endif	// EKIZU_GATEWAY_RESUMED_HPP

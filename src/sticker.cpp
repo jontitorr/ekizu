@@ -1,13 +1,11 @@
 #include <ekizu/json_util.hpp>
 #include <ekizu/sticker.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 using json_util::deserialize;
 using json_util::serialize;
 
-void to_json(nlohmann::json &j, const Sticker &s)
-{
+void to_json(nlohmann::json &j, const Sticker &s) {
 	serialize(j, "id", s.id);
 	serialize(j, "pack_id", s.pack_id);
 	serialize(j, "name", s.name);
@@ -21,8 +19,7 @@ void to_json(nlohmann::json &j, const Sticker &s)
 	serialize(j, "user", s.user);
 }
 
-void from_json(const nlohmann::json &j, Sticker &s)
-{
+void from_json(const nlohmann::json &j, Sticker &s) {
 	deserialize(j, "id", s.id);
 	deserialize(j, "pack_id", s.pack_id);
 	deserialize(j, "name", s.name);
@@ -35,4 +32,4 @@ void from_json(const nlohmann::json &j, Sticker &s)
 	deserialize(j, "sort_value", s.sort_value);
 	deserialize(j, "user", s.user);
 }
-} // namespace ekizu
+}  // namespace ekizu

@@ -3,8 +3,7 @@
 
 #include <ekizu/user.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 enum class StickerFormatType : uint8_t {
 	/// Sticker format is a PNG.
 	Png,
@@ -53,6 +52,6 @@ struct Sticker {
 
 EKIZU_EXPORT void to_json(nlohmann::json &j, const Sticker &s);
 EKIZU_EXPORT void from_json(const nlohmann::json &j, Sticker &s);
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_STICKER_HPP
+#endif	// EKIZU_STICKER_HPP

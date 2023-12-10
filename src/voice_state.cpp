@@ -1,13 +1,11 @@
 #include <ekizu/json_util.hpp>
 #include <ekizu/voice_state.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 using json_util::deserialize;
 using json_util::serialize;
 
-void to_json(nlohmann::json &j, const VoiceState &v)
-{
+void to_json(nlohmann::json &j, const VoiceState &v) {
 	serialize(j, "guild_id", v.guild_id);
 	serialize(j, "channel_id", v.channel_id);
 	serialize(j, "user_id", v.user_id);
@@ -20,12 +18,10 @@ void to_json(nlohmann::json &j, const VoiceState &v)
 	serialize(j, "self_stream", v.self_stream);
 	serialize(j, "self_video", v.self_video);
 	serialize(j, "suppress", v.suppress);
-	serialize(j, "request_to_speak_timestamp",
-		  v.request_to_speak_timestamp);
+	serialize(j, "request_to_speak_timestamp", v.request_to_speak_timestamp);
 }
 
-void from_json(const nlohmann::json &j, VoiceState &v)
-{
+void from_json(const nlohmann::json &j, VoiceState &v) {
 	deserialize(j, "guild_id", v.guild_id);
 	deserialize(j, "channel_id", v.channel_id);
 	deserialize(j, "user_id", v.user_id);
@@ -38,7 +34,6 @@ void from_json(const nlohmann::json &j, VoiceState &v)
 	deserialize(j, "self_stream", v.self_stream);
 	deserialize(j, "self_video", v.self_video);
 	deserialize(j, "suppress", v.suppress);
-	deserialize(j, "request_to_speak_timestamp",
-		    v.request_to_speak_timestamp);
+	deserialize(j, "request_to_speak_timestamp", v.request_to_speak_timestamp);
 }
-} // namespace ekizu
+}  // namespace ekizu

@@ -3,8 +3,7 @@
 
 #include <ekizu/user.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 /**
  * @brief Represents the current user of the client. This is very similar to the
  * `User` struct.
@@ -41,6 +40,6 @@ struct CurrentUser {
 
 void to_json(nlohmann::json &j, const CurrentUser &u);
 void from_json(const nlohmann::json &j, CurrentUser &u);
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_CURRENT_USER_HPP
+#endif	// EKIZU_CURRENT_USER_HPP

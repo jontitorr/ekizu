@@ -1,13 +1,11 @@
 #include <ekizu/json_util.hpp>
 #include <ekizu/message_component.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 using json_util::deserialize;
 using json_util::serialize;
 
-void to_json(nlohmann::json &j, const Button &b)
-{
+void to_json(nlohmann::json &j, const Button &b) {
 	serialize(j, "type", b.type);
 	serialize(j, "style", b.style);
 	serialize(j, "label", b.label);
@@ -17,8 +15,7 @@ void to_json(nlohmann::json &j, const Button &b)
 	serialize(j, "disabled", b.disabled);
 }
 
-void from_json(const nlohmann::json &j, Button &b)
-{
+void from_json(const nlohmann::json &j, Button &b) {
 	deserialize(j, "type", b.type);
 	deserialize(j, "style", b.style);
 	deserialize(j, "label", b.label);
@@ -28,8 +25,7 @@ void from_json(const nlohmann::json &j, Button &b)
 	deserialize(j, "disabled", b.disabled);
 }
 
-void to_json(nlohmann::json &j, const SelectOptions &o)
-{
+void to_json(nlohmann::json &j, const SelectOptions &o) {
 	serialize(j, "label", o.label);
 	serialize(j, "value", o.value);
 	serialize(j, "description", o.description);
@@ -37,8 +33,7 @@ void to_json(nlohmann::json &j, const SelectOptions &o)
 	serialize(j, "default", o.default_);
 }
 
-void from_json(const nlohmann::json &j, SelectOptions &o)
-{
+void from_json(const nlohmann::json &j, SelectOptions &o) {
 	deserialize(j, "label", o.label);
 	deserialize(j, "value", o.value);
 	deserialize(j, "description", o.description);
@@ -46,8 +41,7 @@ void from_json(const nlohmann::json &j, SelectOptions &o)
 	deserialize(j, "default", o.default_);
 }
 
-void to_json(nlohmann::json &j, const SelectMenu &s)
-{
+void to_json(nlohmann::json &j, const SelectMenu &s) {
 	serialize(j, "type", s.type);
 	serialize(j, "custom_id", s.custom_id);
 	serialize(j, "options", s.options);
@@ -57,8 +51,7 @@ void to_json(nlohmann::json &j, const SelectMenu &s)
 	serialize(j, "disabled", s.disabled);
 }
 
-void from_json(const nlohmann::json &j, SelectMenu &s)
-{
+void from_json(const nlohmann::json &j, SelectMenu &s) {
 	deserialize(j, "type", s.type);
 	deserialize(j, "custom_id", s.custom_id);
 	deserialize(j, "options", s.options);
@@ -68,35 +61,29 @@ void from_json(const nlohmann::json &j, SelectMenu &s)
 	deserialize(j, "disabled", s.disabled);
 }
 
-void to_json(nlohmann::json &j, const ActionRowComponent &c)
-{
+void to_json(nlohmann::json &j, const ActionRowComponent &c) {
 	std::visit([&j](const auto &v) { to_json(j, v); }, c);
 }
 
-void from_json(const nlohmann::json &j, ActionRowComponent &c)
-{
+void from_json(const nlohmann::json &j, ActionRowComponent &c) {
 	json_util::detail::deserialize_impl(j, c);
 }
 
-void to_json(nlohmann::json &j, const ActionRow &a)
-{
+void to_json(nlohmann::json &j, const ActionRow &a) {
 	serialize(j, "type", a.type);
 	serialize(j, "components", a.components);
 }
 
-void from_json(const nlohmann::json &j, ActionRow &a)
-{
+void from_json(const nlohmann::json &j, ActionRow &a) {
 	deserialize(j, "type", a.type);
 	deserialize(j, "components", a.components);
 }
 
-void to_json(nlohmann::json &j, const MessageComponent &c)
-{
+void to_json(nlohmann::json &j, const MessageComponent &c) {
 	std::visit([&j](const auto &v) { to_json(j, v); }, c);
 }
 
-void from_json(const nlohmann::json &j, MessageComponent &c)
-{
+void from_json(const nlohmann::json &j, MessageComponent &c) {
 	json_util::detail::deserialize_impl(j, c);
 }
-} // namespace ekizu
+}  // namespace ekizu

@@ -4,8 +4,7 @@
 #include <cstdint>
 #include <type_traits>
 
-namespace ekizu
-{
+namespace ekizu {
 enum class Intents : uint32_t {
 	/// Intent for receipt of guilds.
 	Guilds = (1 << 0),
@@ -42,31 +41,28 @@ enum class Intents : uint32_t {
 	/// Intent for receipt of guild scheduled events.
 	GuildScheduledEvents = (1 << 16),
 	/// Default ekizu intents (all non-privileged intents).
-	DefaultIntents = Guilds | GuildBans | GuildEmojis | GuildIntegrations |
-			 GuildWebhooks | GuildInvites | GuildVoiceStates |
-			 GuildMessages | GuildMessageReactions |
-			 GuildMessageTyping | DirectMessages |
-			 DirectMessageReactions | DirectMessageTyping |
-			 GuildScheduledEvents,
+	DefaultIntents =
+		Guilds | GuildBans | GuildEmojis | GuildIntegrations | GuildWebhooks |
+		GuildInvites | GuildVoiceStates | GuildMessages |
+		GuildMessageReactions | GuildMessageTyping | DirectMessages |
+		DirectMessageReactions | DirectMessageTyping | GuildScheduledEvents,
 	/// Privileged intents requiring ID.
 	PrivilegedIntents = GuildMembers | GuildPresences | MessageContent,
 	/// Every single intent.
 	AllIntents = DefaultIntents | PrivilegedIntents
 };
 
-constexpr Intents operator|(Intents lhs, Intents rhs)
-{
+constexpr Intents operator|(Intents lhs, Intents rhs) {
 	return static_cast<Intents>(
 		static_cast<std::underlying_type_t<Intents> >(lhs) |
 		static_cast<std::underlying_type_t<Intents> >(rhs));
 }
 
-constexpr Intents operator&(Intents lhs, Intents rhs)
-{
+constexpr Intents operator&(Intents lhs, Intents rhs) {
 	return static_cast<Intents>(
 		static_cast<std::underlying_type_t<Intents> >(lhs) &
 		static_cast<std::underlying_type_t<Intents> >(rhs));
 }
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_INTENTS_HPP
+#endif	// EKIZU_INTENTS_HPP

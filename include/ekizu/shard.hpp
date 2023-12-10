@@ -8,8 +8,7 @@
 #include <ekizu/timer_queue.hpp>
 #include <net/ws.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 struct Client;
 struct ShardAttorney;
 struct ShardManager;
@@ -40,7 +39,7 @@ struct ShardId {
 	static const ShardId ONE;
 };
 
-inline const ShardId ShardId::ONE{ 0, 1 };
+inline const ShardId ShardId::ONE{0, 1};
 
 /**
  * @brief Represents a Discord shard, which is a connection to the Discord
@@ -54,15 +53,12 @@ struct Shard {
 	static const net::WebSocketCloseCode DISCORD_SESSION_EXPIRED_CODE =
 		static_cast<net::WebSocketCloseCode>(4009);
 
-	[[nodiscard]] uint64_t id() const
-	{
-		return m_id;
-	}
+	[[nodiscard]] uint64_t id() const { return m_id; }
 
 	[[nodiscard]] Result<void> run(const std::function<void(Event)> &cb);
 	[[nodiscard]] Result<Event> next_event();
 
-    private:
+   private:
 	static TimerQueue &get_timer_queue();
 
 	Result<void> set_auto_reconnect(bool auto_reconnect);
@@ -70,9 +66,9 @@ struct Shard {
 	struct Config {
 		std::string token;
 		std::optional<Intents> intents;
-		uint64_t shard_count{ 1 };
-		bool compression{ true };
-		bool is_bot{ true };
+		uint64_t shard_count{1};
+		bool compression{true};
+		bool is_bot{true};
 	};
 
 	void handle_event(tcb::span<const std::byte> data);
@@ -83,21 +79,19 @@ struct Shard {
 	void handle_heartbeat_ack();
 	void log(std::string_view msg, LogLevel level = LogLevel::Debug);
 
-	void reset_session()
-	{
+	void reset_session() {
 		m_sequence->store(0);
 		auto lk = m_session_id->lock();
 		static_cast<std::string &>(lk).clear();
 	}
 
-	[[nodiscard]] Result<void>
-	connect(const std::function<void(Event)> &cb);
+	[[nodiscard]] Result<void> connect(const std::function<void(Event)> &cb);
 
 	[[nodiscard]] Result<void> reconnect(net::WebSocketCloseCode code,
-					     bool reset);
+										 bool reset);
 
 	[[nodiscard]] Result<void> start_heartbeat(TimerQueue &timer_queue,
-						   uint32_t heartbeat_interval);
+											   uint32_t heartbeat_interval);
 
 	[[nodiscard]] Result<void> send_heartbeat();
 
@@ -109,14 +103,11 @@ struct Shard {
 	uint64_t m_id;
 	Config m_config;
 	std::unique_ptr<std::atomic_bool> m_last_heartbeat_acked{
-		std::make_unique<std::atomic_bool>(true)
-	};
+		std::make_unique<std::atomic_bool>(true)};
 	std::unique_ptr<Mutex<std::string> > m_session_id{
-		std::make_unique<Mutex<std::string> >()
-	};
+		std::make_unique<Mutex<std::string> >()};
 	std::unique_ptr<std::atomic_uint64_t> m_sequence{
-		std::make_unique<std::atomic_uint64_t>()
-	};
+		std::make_unique<std::atomic_uint64_t>()};
 
 	enum class ConnectionState : uint8_t {
 		Disconnected,
@@ -126,14 +117,13 @@ struct Shard {
 
 	std::unique_ptr<std::atomic<ConnectionState> > m_state{
 		std::make_unique<std::atomic<ConnectionState> >(
-			ConnectionState::Disconnected)
-	};
+			ConnectionState::Disconnected)};
 
 	/// May or may not be used based on runtime options.
 	std::unique_ptr<Inflater> m_inflater;
 	std::unique_ptr<Mutex<std::function<void(Event)> > > m_on_event;
 	std::optional<net::WebSocketClient> m_websocket;
 };
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_SHARD_HPP
+#endif	// EKIZU_SHARD_HPP

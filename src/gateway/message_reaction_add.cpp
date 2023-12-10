@@ -1,13 +1,11 @@
 #include <ekizu/gateway/message_reaction_add.hpp>
 #include <ekizu/json_util.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 using json_util::deserialize;
 using json_util::serialize;
 
-void to_json(nlohmann::json &j, const MessageReactionAdd &e)
-{
+void to_json(nlohmann::json &j, const MessageReactionAdd &e) {
 	serialize(j, "user_id", e.user_id);
 	serialize(j, "channel_id", e.channel_id);
 	serialize(j, "message_id", e.message_id);
@@ -17,8 +15,7 @@ void to_json(nlohmann::json &j, const MessageReactionAdd &e)
 	serialize(j, "message_author_id", e.message_author_id);
 }
 
-void from_json(const nlohmann::json &j, MessageReactionAdd &e)
-{
+void from_json(const nlohmann::json &j, MessageReactionAdd &e) {
 	deserialize(j, "user_id", e.user_id);
 	deserialize(j, "channel_id", e.channel_id);
 	deserialize(j, "message_id", e.message_id);
@@ -27,4 +24,4 @@ void from_json(const nlohmann::json &j, MessageReactionAdd &e)
 	deserialize(j, "emoji", e.emoji);
 	deserialize(j, "message_author_id", e.message_author_id);
 }
-} // namespace ekizu
+}  // namespace ekizu

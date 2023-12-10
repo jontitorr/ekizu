@@ -3,8 +3,6 @@
 
 #include <ekizu/emoji.hpp>
 
-namespace ekizu
-{
-} // namespace ekizu
+namespace ekizu {}	// namespace ekizu
 
-#endif // EKIZU_SELECT_OPTIONS_HPP
+#endif	// EKIZU_SELECT_OPTIONS_HPP

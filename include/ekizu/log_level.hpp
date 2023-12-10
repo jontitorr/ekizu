@@ -3,9 +3,8 @@
 
 #include <cstdint>
 
-namespace ekizu
-{
+namespace ekizu {
 enum class LogLevel : uint8_t { Trace, Debug, Info, Warn, Error, Critical };
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_LOG_LEVEL_HPP
+#endif	// EKIZU_LOG_LEVEL_HPP

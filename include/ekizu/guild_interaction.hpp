@@ -4,8 +4,7 @@
 #include <cstdint>
 #include <ekizu/user.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 enum class GuildIntegrationType : uint8_t {
 	Twitch,
 	Youtube,
@@ -61,7 +60,8 @@ struct GuildIntegration {
 	std::optional<bool> syncing;
 	/// ID that this integration uses for "subscribers."
 	std::optional<Snowflake> role_id;
-	/// Whether emoticons should be synced for this integration (twitch only currently).
+	/// Whether emoticons should be synced for this integration (twitch only
+	/// currently).
 	std::optional<bool> enable_emoticons;
 	/// The behavior of expiring subscribers.
 	std::optional<IntegrationExpireBehavior> expire_behavior;
@@ -85,6 +85,6 @@ struct GuildIntegration {
 
 EKIZU_EXPORT void to_json(nlohmann::json &j, const GuildIntegration &i);
 EKIZU_EXPORT void from_json(const nlohmann::json &j, GuildIntegration &i);
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_GATEWAY_GUILD_INTEGRATION_HPP
+#endif	// EKIZU_GATEWAY_GUILD_INTEGRATION_HPP

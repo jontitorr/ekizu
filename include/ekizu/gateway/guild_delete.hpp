@@ -3,8 +3,7 @@
 
 #include <ekizu/snowflake.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 struct GuildDelete {
 	/// The ID of the guild.
 	Snowflake guild_id;
@@ -14,6 +13,6 @@ struct GuildDelete {
 
 EKIZU_EXPORT void to_json(nlohmann::json &j, const GuildDelete &g);
 EKIZU_EXPORT void from_json(const nlohmann::json &j, GuildDelete &g);
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_GATEWAY_GUILD_DELETE_HPP
+#endif	// EKIZU_GATEWAY_GUILD_DELETE_HPP

@@ -4,10 +4,9 @@
 #include <system_error>
 #include <tl/expected.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 template <typename T, typename E = std::error_code>
 using Result = tl::expected<T, E>;
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_UTIL_HPP
+#endif	// EKIZU_UTIL_HPP

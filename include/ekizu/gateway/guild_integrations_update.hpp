@@ -3,8 +3,7 @@
 
 #include <ekizu/snowflake.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 struct GuildIntegrationsUpdate {
 	/// The ID of the guild.
 	Snowflake guild_id;
@@ -12,7 +11,7 @@ struct GuildIntegrationsUpdate {
 
 EKIZU_EXPORT void to_json(nlohmann::json &j, const GuildIntegrationsUpdate &i);
 EKIZU_EXPORT void from_json(const nlohmann::json &j,
-			    GuildIntegrationsUpdate &i);
-} // namespace ekizu
+							GuildIntegrationsUpdate &i);
+}  // namespace ekizu
 
-#endif // EKIZU_GATEWAY_GUILD_INTEGRATIONS_UPDATE_HPP
+#endif	// EKIZU_GATEWAY_GUILD_INTEGRATIONS_UPDATE_HPP

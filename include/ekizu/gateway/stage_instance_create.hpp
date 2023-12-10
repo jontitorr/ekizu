@@ -3,14 +3,13 @@
 
 #include <ekizu/stage_instance.hpp>
 
-namespace ekizu
-{
+namespace ekizu {
 struct StageInstanceCreate {
 	StageInstance stage_instance;
 };
 
 EKIZU_EXPORT void to_json(nlohmann::json &j, const StageInstanceCreate &s);
 EKIZU_EXPORT void from_json(const nlohmann::json &j, StageInstanceCreate &s);
-} // namespace ekizu
+}  // namespace ekizu
 
-#endif // EKIZU_GATEWAY_STAGE_INSTANCE_CREATE_HPP
+#endif	// EKIZU_GATEWAY_STAGE_INSTANCE_CREATE_HPP
