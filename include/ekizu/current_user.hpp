@@ -9,6 +9,8 @@ namespace ekizu {
  * `User` struct.
  */
 struct CurrentUser {
+	[[nodiscard]] std::string display_avatar_url() const;
+
 	/// The user's id.
 	Snowflake id;
 	/// The user's username, not unique across the platform.

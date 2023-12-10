@@ -7,6 +7,8 @@
 #include <ekizu/request/crosspost_message.hpp>
 #include <ekizu/request/delete_message.hpp>
 #include <ekizu/request/edit_message.hpp>
+#include <ekizu/request/get_current_user.hpp>
+#include <ekizu/request/get_user.hpp>
 #include <ekizu/request/pin_message.hpp>
 #include <ekizu/request/unpin_message.hpp>
 
@@ -27,6 +29,8 @@ struct HttpClient {
 										 Snowflake message_id);
 	[[nodiscard]] UnpinMessage unpin_message(Snowflake channel_id,
 											 Snowflake message_id);
+	[[nodiscard]] GetCurrentUser get_current_user();
+	[[nodiscard]] GetUser get_user(Snowflake user_id);
 
    private:
 	/// Function which sends an HTTP request. This is wrapped around a

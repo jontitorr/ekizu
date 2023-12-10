@@ -5,6 +5,13 @@ namespace ekizu {
 using json_util::deserialize;
 using json_util::serialize;
 
+std::string User::display_avatar_url() const {
+	if (!avatar) { return "https://cdn.discordapp.com/embed/avatars/0.png"; }
+
+	return fmt::format(
+		"https://cdn.discordapp.com/avatars/{}/{}.png", id, *avatar);
+}
+
 void to_json(nlohmann::json &j, const User &u) {
 	serialize(j, "id", u.id);
 	serialize(j, "username", u.username);

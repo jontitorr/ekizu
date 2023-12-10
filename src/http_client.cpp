@@ -50,6 +50,14 @@ UnpinMessage HttpClient::unpin_message(Snowflake channel_id,
 	return UnpinMessage{m_rate_limiter_make_request, channel_id, message_id};
 }
 
+GetCurrentUser HttpClient::get_current_user() {
+	return GetCurrentUser{m_rate_limiter_make_request};
+}
+
+GetUser HttpClient::get_user(Snowflake user_id) {
+	return GetUser{m_rate_limiter_make_request, user_id};
+}
+
 Result<net::HttpResponse> HttpClient::send(net::HttpRequest req) {
 	if (!m_token) {
 		return tl::make_unexpected(
