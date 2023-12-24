@@ -89,23 +89,18 @@ jobs:
         uses: johnwason/vcpkg-action@v5
         id: vcpkg
         with:
-          pkgs: openssl
+          pkgs: openssl zlib
           triplet: ${{ matrix.arch }}-windows-static
-          cache-key: ${{ runner.os }}-vcpkg
+          cache-key: ${{ runner.os }}-${{ matrix.arch }}-vcpkg
           token: ${{ github.token }}
-
-      - name: Add OPENSSL_ROOT
-        if: runner.os == 'Windows'
-        run: |
-          echo "OPENSSL_ROOT=${{ github.workspace }}\vcpkg\installed\${{ matrix.arch }}-windows-static" | Out-File -FilePath $env:GITHUB_ENV -Append
 
       - name: Configure CMake (x64)
         if: ${{ matrix.arch == 'x64' }}
-        run: cmake -S . -B build -G "Visual Studio ${{ matrix.vs.version }} ${{ matrix.vs.name }}" -A x64 -T host=x64
+        run: cmake ${{ steps.vcpkg.outputs.vcpkg-cmake-config }} -S . -B build -G "Visual Studio ${{ matrix.vs.version }} ${{ matrix.vs.name }}" -A x64 -T host=x64
 
       - name: Configure CMake (x86)
         if: ${{ matrix.arch == 'x86' }}
-        run: cmake -S . -B build -G "Visual Studio ${{ matrix.vs.version }} ${{ matrix.vs.name }}" -A Win32 -T host=x86
+        run: cmake ${{ steps.vcpkg.outputs.vcpkg-cmake-config }} -S . -B build -G "Visual Studio ${{ matrix.vs.version }} ${{ matrix.vs.name }}" -A Win32 -T host=x86
 
       - name: Build
         run: cmake --build build --config ${{ matrix.config }}
