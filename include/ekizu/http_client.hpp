@@ -17,21 +17,21 @@ namespace ekizu {
 struct HttpClient {
 	explicit HttpClient(boost::asio::io_context &ctx, std::string_view token);
 
-	[[nodiscard]] CreateMessage create_message(Snowflake channel_id);
-	[[nodiscard]] CrosspostMessage crosspost_message(Snowflake channel_id,
-													 Snowflake message_id);
+	[[nodiscard]] CreateMessage create_message(Snowflake channel_id) const;
+	[[nodiscard]] CrosspostMessage crosspost_message(
+		Snowflake channel_id, Snowflake message_id) const;
 	[[nodiscard]] EditMessage edit_message(Snowflake channel_id,
-										   Snowflake message_id);
+										   Snowflake message_id) const;
 	[[nodiscard]] DeleteMessage delete_message(Snowflake channel_id,
-											   Snowflake message_id);
+											   Snowflake message_id) const;
 	[[nodiscard]] BulkDeleteMessages bulk_delete_messages(
-		Snowflake channel_id, const std::vector<Snowflake> &message_ids);
+		Snowflake channel_id, const std::vector<Snowflake> &message_ids) const;
 	[[nodiscard]] PinMessage pin_message(Snowflake channel_id,
-										 Snowflake message_id);
+										 Snowflake message_id) const;
 	[[nodiscard]] UnpinMessage unpin_message(Snowflake channel_id,
-											 Snowflake message_id);
-	[[nodiscard]] GetCurrentUser get_current_user();
-	[[nodiscard]] GetUser get_user(Snowflake user_id);
+											 Snowflake message_id) const;
+	[[nodiscard]] GetCurrentUser get_current_user() const;
+	[[nodiscard]] GetUser get_user(Snowflake user_id) const;
 
    private:
 	/// Function which sends an HTTP request. This is wrapped around a
