@@ -10,6 +10,7 @@
 #pragma GCC diagnostic pop
 #endif
 
+#include <boost/outcome/try.hpp>
 #include <ekizu/util.hpp>
 #include <optional>
 #include <type_traits>
@@ -232,25 +233,20 @@ T get_or_default(const nlohmann::json &data, std::string_view key) {
 inline Result<nlohmann::json> try_parse(std::string_view str) {
 	auto json = nlohmann::json::parse(str, nullptr, false);
 
-	if (json.is_discarded()) {
-		return tl::make_unexpected(
-			std::make_error_code(std::errc::invalid_argument));
-	}
+	if (json.is_discarded()) { return boost::system::errc::invalid_argument; }
 
 	return json;
 }
 
 template <typename T>
 Result<T> deserialize(std::string_view str) {
-	return try_parse(str).and_then([](const nlohmann::json &j) -> Result<T> {
-		// I don't like exceptions but oh well.
-		try {
-			return j.get<T>();
-		} catch (const nlohmann::json::exception &) {
-			return tl::make_unexpected(
-				std::make_error_code(std::errc::invalid_argument));
-		}
-	});
+	BOOST_OUTCOME_TRY(auto j, try_parse(str));
+
+	try {
+		return j.get<T>();
+	} catch (const nlohmann::json::exception &) {
+		return boost::system::errc::invalid_argument;
+	}
 }
 }  // namespace ekizu::json_util
 

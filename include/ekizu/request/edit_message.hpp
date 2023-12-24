@@ -1,8 +1,8 @@
 #ifndef EKIZU_REQUEST_EDIT_MESSAGE_HPP
 #define EKIZU_REQUEST_EDIT_MESSAGE_HPP
 
+#include <ekizu/http.hpp>
 #include <ekizu/message.hpp>
-#include <net/http.hpp>
 
 namespace ekizu {
 struct EditMessageFields {
@@ -28,7 +28,8 @@ EKIZU_EXPORT void to_json(nlohmann::json &j, const EditMessageFields &f);
 EKIZU_EXPORT void from_json(const nlohmann::json &j, EditMessageFields &f);
 
 struct EditMessage {
-	EditMessage(const std::function<Result<net::HttpResponse>(net::HttpRequest)>
+	EditMessage(const std::function<void(
+					net::HttpRequest, std::function<void(net::HttpResponse)>)>
 					&make_request,
 				Snowflake channel_id, Snowflake message_id);
 
@@ -61,13 +62,15 @@ struct EditMessage {
 		return *this;
 	}
 
-	[[nodiscard]] Result<net::HttpResponse> send() const;
+	void send(std::function<void(Message)> cb) const;
 
    private:
 	Snowflake m_channel_id;
 	Snowflake m_message_id;
 	EditMessageFields m_fields;
-	std::function<Result<net::HttpResponse>(net::HttpRequest)> m_make_request;
+	std::function<void(
+		net::HttpRequest, std::function<void(net::HttpResponse)>)>
+		m_make_request;
 };
 }  // namespace ekizu
 

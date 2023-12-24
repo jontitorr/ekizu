@@ -47,24 +47,133 @@ endif()
 
 include(cmake/CPM.cmake)
 
-cpmfindpackage(NAME "fmt" GITHUB_REPOSITORY "fmtlib/fmt" GIT_TAG "13156e5")
+file(GLOB_RECURSE sources CONFIGURE_DEPENDS "include/*.hpp" "src/*.cpp")
 
-if(WIN32)
+add_library(${PROJECT_NAME} ${sources})
+add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
+
+target_compile_definitions(
+    ${PROJECT_NAME}
+    PUBLIC
+        $<$<NOT:$<BOOL:${BUILD_SHARED_LIBS}>>:${PROJECT_NAME_UPPERCASE}_STATIC_DEFINE>
+)
+
+target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
+target_compile_options(
+    ${PROJECT_NAME} PUBLIC "$<$<COMPILE_LANG_AND_ID:CXX,MSVC>:/permissive->"
+                           "$<$<PLATFORM_ID:Windows>:/bigobj>"
+)
+
+target_include_directories(
+    ${PROJECT_NAME}
+    PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+           $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/export>
+           $<INSTALL_INTERFACE:include>
+)
+
+if(MSVC)
     target_compile_definitions(
-        fmt PUBLIC _SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING
+        ${PROJECT_NAME}
+        PUBLIC -D_WIN32_WINNT=0x0601
+               -D_SCL_SECURE_NO_WARNINGS=1
+               -D_CRT_SECURE_NO_WARNINGS=1
+               -D_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING
+               -D_SILENCE_CXX17_ADAPTOR_TYPEDEFS_DEPRECATION_WARNING
     )
+endif()
+
+set(${PROJECT_NAME}_WARNINGS_AS_ERRORS ON)
+include(cmake/CompilerWarnings.cmake)
+
+set_project_warnings(${PROJECT_NAME})
+
+set(TRY_BOOST_VERSION "1.81.0")
+set(BOOST_NOT_HEADER_ONLY_COMPONENTS_THAT_YOU_NEED
+    "coroutine;filesystem;thread;url"
+)
+set(BOOST_HEADER_ONLY_COMPONENTS_THAT_YOU_NEED "asio;beast;outcome")
+
+set(IS_BOOST_LOCAL OFF)
+if(${CPM_LOCAL_PACKAGES_ONLY})
+    message(STATUS "Trying to find Boost...")
+    find_package(
+        Boost ${TRY_BOOST_VERSION} REQUIRED
+        COMPONENTS ${BOOST_NOT_HEADER_ONLY_COMPONENTS_THAT_YOU_NEED}
+    )
+    set(IS_BOOST_LOCAL ON)
+elseif(${CPM_USE_LOCAL_PACKAGES} OR NOT ${CPM_DOWNLOAD_ALL})
+    message(STATUS "Trying to use local Boost...")
+    find_package(
+        Boost ${TRY_BOOST_VERSION}
+        COMPONENTS ${BOOST_NOT_HEADER_ONLY_COMPONENTS_THAT_YOU_NEED}
+    )
+    if(${BOOST_FOUND})
+        set(IS_BOOST_LOCAL ON)
+        message(DEBUG "boost include dir: ${Boost_INCLUDE_DIRS}")
+    endif()
+endif()
+
+if(NOT (${BOOST_FOUND}) OR (NOT DEFINED BOOST_FOUND))
+    message(STATUS "Trying to download Boost...")
+    set(BOOST_INCLUDE_LIBRARIES
+        "${BOOST_NOT_HEADER_ONLY_COMPONENTS_THAT_YOU_NEED};${BOOST_HEADER_ONLY_COMPONENTS_THAT_YOU_NEED}"
+    )
+    set(BOOST_SKIP_INSTALL_RULES OFF)
+    cpmaddpackage(
+        NAME
+        Boost
+        URL
+        "https://github.com/Xminent/boost-cmake/releases/download/1.84.0-release/boost-1.84.0.tar.xz"
+    )
+    set(IS_BOOST_LOCAL OFF)
 endif()
 
 cpmfindpackage(
     NAME
-    "net"
+    "OpenSSL"
     GITHUB_REPOSITORY
-    "Xminent/net"
+    "Xminent/openssl-cmake"
     GIT_TAG
-    "main"
+    "master"
     OPTIONS
-    "BUILD_SHARED_LIBS OFF"
+    "WITH_APPS OFF"
 )
+
+if(OpenSSL_ADDED)
+    add_library(OpenSSL::Crypto ALIAS crypto)
+    add_library(OpenSSL::SSL ALIAS ssl)
+    install(TARGETS crypto ssl EXPORT ${PROJECT_NAME}Targets)
+else()
+    set(SEPARATE_DEPENDENCIES "OpenSSL;SSL;")
+endif()
+
+cpmfindpackage(NAME "fmt" GITHUB_REPOSITORY "fmtlib/fmt" GIT_TAG "13156e5")
+
+if(fmt_ADDED)
+    install(TARGETS fmt EXPORT ${PROJECT_NAME}Targets)
+
+    if(WIN32)
+        target_compile_definitions(
+            fmt PUBLIC _SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING
+        )
+    endif()
+else()
+    set(SEPARATE_DEPENDENCIES "${SEPARATE_DEPENDENCIES}fmt;;")
+endif()
+
+cpmaddpackage(NAME certify GITHUB_REPOSITORY "Xminent/certify" GIT_TAG "master")
+
+set(SEPARATE_DEPENDENCIES
+    "${SEPARATE_DEPENDENCIES}Threads;;Boost;coroutine,date_time,filesystem,system,thread,url"
+)
+
+if(${IS_BOOST_LOCAL})
+    target_link_libraries(${PROJECT_NAME} PUBLIC Boost::boost)
+else()
+    target_link_libraries(
+        ${PROJECT_NAME} PUBLIC Boost::asio Boost::beast Boost::outcome
+    )
+endif()
 
 cpmaddpackage(
     NAME
@@ -84,51 +193,14 @@ target_include_directories(
               $<INSTALL_INTERFACE:include>
 )
 
+install(TARGETS core nlohmann_json EXPORT ${PROJECT_NAME}Targets)
+
 find_package(ZLIB)
 
-file(GLOB_RECURSE sources CONFIGURE_DEPENDS "include/*.hpp" "src/*.cpp")
-
-add_library(${PROJECT_NAME} ${sources})
-
-include(GenerateExportHeader)
-
-generate_export_header(
-    ${PROJECT_NAME} EXPORT_FILE_NAME export/${PROJECT_NAME_LOWERCASE}/export.h
-)
-
-target_compile_definitions(
-    ${PROJECT_NAME}
-    PUBLIC
-        $<$<NOT:$<BOOL:${BUILD_SHARED_LIBS}>>:${PROJECT_NAME_UPPERCASE}_STATIC_DEFINE>
-)
-
-target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
-target_include_directories(
-    ${PROJECT_NAME}
-    PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
-           $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/export>
-           $<INSTALL_INTERFACE:include>
-)
-
-set(${PROJECT_NAME}_TARGETS ${PROJECT_NAME} nlohmann_json)
-set(SEPARATE_DEPENDENCIES "")
-
-if(fmt_ADDED)
-    list(APPEND ${PROJECT_NAME}_TARGETS fmt)
-else()
-    list(APPEND SEPARATE_DEPENDENCIES "fmt")
-endif()
-
-if(net_ADDED)
-    list(APPEND ${PROJECT_NAME}_TARGETS net)
-else()
-    list(APPEND SEPARATE_DEPENDENCIES "net")
-endif()
-
 if(ZLIB_FOUND)
-    list(APPEND SEPARATE_DEPENDENCIES "ZLIB")
+    set(SEPARATE_DEPENDENCIES "${SEPARATE_DEPENDENCIES}ZLIB;;")
 else()
-    cpmfindpackage(
+    cpmaddpackage(
         NAME
         "ZLIB"
         GITHUB_REPOSITORY
@@ -140,33 +212,23 @@ else()
         "ZLIB_ENABLE_TESTS OFF"
         "SKIP_INSTALL_ALL ON"
     )
+
     add_library(ZLIB::ZLIB ALIAS zlib)
     list(APPEND ${PROJECT_NAME}_TARGETS zlib)
+    install(TARGETS zlib EXPORT ${PROJECT_NAME}Targets)
 endif()
 
 target_link_libraries(
     ${PROJECT_NAME}
-    PUBLIC fmt::fmt net::net nlohmann_json
-    PRIVATE ZLIB::ZLIB
+    PUBLIC certify::core Boost::coroutine Boost::thread fmt::fmt nlohmann_json
+    PRIVATE Boost::url ZLIB::ZLIB
 )
-# target_precompile_headers( ${PROJECT_NAME} PRIVATE
-# "${nlohmann_json_SOURCE_DIR}/include/nlohmann/json.hpp" )
 
-find_program(CLANG_TIDY_EXE NAMES "clang-tidy")
+include(GenerateExportHeader)
 
-if(CLANG_TIDY_EXE)
-    # set(CLANG_TIDY_COMMAND "${CLANG_TIDY_EXE}"
-    # "-checks=bugprone-*,cert-*,clang-analyzer-*,concurrency-*,cppcoreguidelines-*,google-build-using-namespace,google-explicit-constructor,google-global-names-in-headers,google-readability-casting,google-runtime-int,google-runtime-operator,hicpp-*,llvm-*,misc-*,modernize-*,performance-*,portability-*,readability-*,-cppcoreguidelines-pro-type-vararg,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-hicpp-signed-bitwise,-hicpp-uppercase-literal-suffix,-hicpp-vararg,-llvm-header-guard,-modernize-use-trailing-return-type,-readability-identifier-length,-readability-uppercase-literal-suffix,-cppcoreguidelines-avoid-const-or-ref-data-members,-cppcoreguidelines-avoid-do-while,-cppcoreguidelines-pro-type-reinterpret-cast,-misc-non-private-member-variables-in-classes"
-    # ) set_target_properties( ${PROJECT_NAME} PROPERTIES CXX_CLANG_TIDY
-    # "${CLANG_TIDY_COMMAND}" )
-
-    message(
-        STATUS
-            "clang-tidy found: ${CLANG_TIDY_EXE} and applied to ${PROJECT_NAME}."
-    )
-else()
-    message(STATUS "clang-tidy not found.")
-endif()
+generate_export_header(
+    ${PROJECT_NAME} EXPORT_FILE_NAME export/${PROJECT_NAME_LOWERCASE}/export.h
+)
 
 if(${PROJECT_NAME}_BUILD_EXAMPLES)
     add_subdirectory(examples)
@@ -176,7 +238,7 @@ if(${PROJECT_NAME}_INSTALL)
     include(GNUInstallDirs)
 
     install(
-        TARGETS ${${PROJECT_NAME}_TARGETS}
+        TARGETS ${PROJECT_NAME}
         EXPORT ${PROJECT_NAME}Targets
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}

@@ -1,9 +1,9 @@
 #ifndef EKIZU_INFLATER_HPP
 #define EKIZU_INFLATER_HPP
 
+#include <boost/core/span.hpp>
 #include <ekizu/util.hpp>
 #include <memory>
-#include <tcb/span.hpp>
 
 namespace ekizu {
 /**
@@ -18,10 +18,11 @@ struct Inflater {
 	Inflater &operator=(Inflater &&) noexcept;
 	~Inflater();
 
+	[[nodiscard]] static bool is_compressed(boost::span<const std::byte> data);
 	static Result<Inflater> create();
 
 	[[nodiscard]] Result<std::vector<std::byte> > inflate(
-		tcb::span<const std::byte> data);
+		boost::span<const std::byte> data);
 
    private:
 	struct Impl;

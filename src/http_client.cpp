@@ -1,18 +1,18 @@
+#include <boost/outcome/try.hpp>
 #include <ekizu/http_client.hpp>
-#include <utility>
-
-namespace {
-constexpr uint8_t API_VERSION{10};
-}  // namespace
 
 namespace ekizu {
-HttpClient::HttpClient(std::string_view token)
-	: m_rate_limiter{[this](net::HttpRequest req) {
-		  return send(std::move(req));
+HttpClient::HttpClient(boost::asio::io_context &ctx, std::string_view token)
+	: m_ctx{ctx},
+	  m_rate_limiter{[this](net::HttpRequest req,
+							std::function<void(net::HttpResponse)> cb) {
+		  return send(std::move(req), std::move(cb));
 	  }},
-	  m_rate_limiter_make_request{[this](net::HttpRequest req) {
-		  return m_rate_limiter.send({std::move(req)});
-	  }},
+	  m_rate_limiter_make_request{
+		  [this](
+			  net::HttpRequest req, std::function<void(net::HttpResponse)> cb) {
+			  return m_rate_limiter.send({std::move(req)}, std::move(cb));
+		  }},
 	  m_token{token} {}
 
 CreateMessage HttpClient::create_message(Snowflake channel_id) {
@@ -58,34 +58,25 @@ GetUser HttpClient::get_user(Snowflake user_id) {
 	return GetUser{m_rate_limiter_make_request, user_id};
 }
 
-Result<net::HttpResponse> HttpClient::send(net::HttpRequest req) {
-	if (!m_token) {
-		return tl::make_unexpected(
-			std::make_error_code(std::errc::operation_not_permitted));
-	}
+Result<void> HttpClient::send(net::HttpRequest req,
+							  std::function<void(net::HttpResponse)> cb) {
+	if (!m_token) { return boost::system::errc::operation_not_permitted; }
 
-	if (!m_http) {
-		auto conn = net::HttpConnection::connect("https://discord.com");
+	req.set(net::http::field::authorization, fmt::format("Bot {}", *m_token));
+	req.set(net::http::field::host, "discord.com");
+	req.target(fmt::format("/api/v10{}", boost::to_string(req.target())));
 
-		if (!conn) { return tl::make_unexpected(conn.error()); }
+	if (m_http) { return m_http->request(req, std::move(cb)); }
 
-		m_http = std::move(*conn);
-	}
+	BOOST_OUTCOME_TRY(
+		auto http,
+		net::HttpConnection::connect(
+			m_ctx, "https://discord.com",
+			[this, req = std::move(req), cb = std::move(cb)]() mutable {
+				boost::ignore_unused(m_http->request(req, std::move(cb)));
+			}));
 
-	req.headers.emplace("Authorization", fmt::format("Bot {}", *m_token));
-	req.path = fmt::format("/api/v{}/{}", API_VERSION, req.path);
-
-	auto res = m_http->request(req);
-
-	if (!res && res.error() == net::SslError::ZeroReturn) {
-		auto conn = net::HttpConnection::connect("https://discord.com");
-
-		if (!conn) { return tl::make_unexpected(conn.error()); }
-
-		m_http = std::move(*conn);
-		res = m_http->request(req);
-	}
-
-	return res;
+	m_http = std::move(http);
+	return outcome::success();
 }
 }  // namespace ekizu

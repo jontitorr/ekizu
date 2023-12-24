@@ -33,8 +33,7 @@ struct Inflater::Impl {
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 #endif
 	if (inflateInit(stream.get()) != Z_OK) {
-		return tl::make_unexpected(
-			std::make_error_code(std::errc::not_supported));
+		return boost::system::errc::not_supported;
 	}
 #ifndef _WIN32
 #pragma GCC diagnostic pop
@@ -49,8 +48,17 @@ Inflater::Inflater(Inflater &&) noexcept = default;
 Inflater &Inflater::operator=(Inflater &&) noexcept = default;
 Inflater::~Inflater() = default;
 
+bool Inflater::is_compressed(boost::span<const std::byte> data) {
+	const auto last = data.last(4);
+	const auto expected = boost::span<const std::byte, 4>{
+		{static_cast<std::byte>(0x00), static_cast<std::byte>(0x00),
+		 static_cast<std::byte>(0xFF), static_cast<std::byte>(0xFF)}};
+
+	return std::equal(last.begin(), last.end(), expected.begin());
+}
+
 Result<std::vector<std::byte> > Inflater::inflate(
-	tcb::span<const std::byte> data) {
+	boost::span<const std::byte> data) {
 	m_impl->stream->avail_in = static_cast<uint32_t>(data.size());
 	// NOLINTBEGIN cppcoreguidelines-pro-type-const-cast
 	m_impl->stream->next_in = reinterpret_cast<uint8_t *>(
@@ -67,8 +75,7 @@ Result<std::vector<std::byte> > Inflater::inflate(
 		if (const auto res = ::inflate(m_impl->stream.get(), Z_NO_FLUSH);
 			res != Z_OK) {
 			inflateReset(m_impl->stream.get());
-			return tl::make_unexpected(
-				std::make_error_code(std::errc::not_supported));
+			return boost::system::errc::not_supported;
 		}
 
 		const auto have = m_buffer.size() - m_impl->stream->avail_out;

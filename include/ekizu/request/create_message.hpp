@@ -1,8 +1,8 @@
 #ifndef EKIZU_REQUEST_CREATE_MESSAGE_HPP
 #define EKIZU_REQUEST_CREATE_MESSAGE_HPP
 
+#include <ekizu/http.hpp>
 #include <ekizu/message.hpp>
-#include <net/http.hpp>
 
 namespace ekizu {
 struct CreateMessageFields {
@@ -37,10 +37,10 @@ EKIZU_EXPORT void to_json(nlohmann::json &j, const CreateMessageFields &f);
 EKIZU_EXPORT void from_json(const nlohmann::json &j, CreateMessageFields &f);
 
 struct CreateMessage {
-	CreateMessage(
-		const std::function<Result<net::HttpResponse>(net::HttpRequest)>
-			&make_request,
-		Snowflake channel_id);
+	CreateMessage(const std::function<void(
+					  net::HttpRequest, std::function<void(net::HttpResponse)>)>
+					  &make_request,
+				  Snowflake channel_id);
 
 	operator net::HttpRequest() const;
 
@@ -86,12 +86,14 @@ struct CreateMessage {
 		return *this;
 	}
 
-	[[nodiscard]] Result<Message> send() const;
+	void send(std::function<void(Message)> cb = {}) const;
 
    private:
 	Snowflake m_channel_id;
 	CreateMessageFields m_fields;
-	std::function<Result<net::HttpResponse>(net::HttpRequest)> m_make_request;
+	std::function<void(
+		net::HttpRequest, std::function<void(net::HttpResponse)>)>
+		m_make_request;
 };
 }  // namespace ekizu
 

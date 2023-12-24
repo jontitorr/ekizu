@@ -1,8 +1,8 @@
 #ifndef EKIZU_REQUEST_GET_CURRENT_USER_HPP
 #define EKIZU_REQUEST_GET_CURRENT_USER_HPP
 
+#include <ekizu/http.hpp>
 #include <ekizu/user.hpp>
-#include <net/http.hpp>
 
 namespace ekizu {
 /**
@@ -10,7 +10,8 @@ namespace ekizu {
  */
 struct GetCurrentUser {
 	GetCurrentUser(
-		const std::function<Result<net::HttpResponse>(net::HttpRequest)>
+		const std::function<void(net::HttpRequest,
+								 std::function<void(net::HttpResponse)>)>
 			&make_request);
 
 	/**
@@ -25,10 +26,12 @@ struct GetCurrentUser {
 	 *
 	 * @return The result of the request as an HTTP response.
 	 */
-	[[nodiscard]] Result<User> send() const;
+	void send(std::function<void(User)> cb) const;
 
    private:
-	std::function<Result<net::HttpResponse>(net::HttpRequest)> m_make_request;
+	std::function<void(
+		net::HttpRequest, std::function<void(net::HttpResponse)>)>
+		m_make_request;
 };
 }  // namespace ekizu
 

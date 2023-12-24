@@ -4,9 +4,9 @@
 #include <ekizu/export.h>
 
 #include <chrono>
+#include <ekizu/http.hpp>
 #include <ekizu/util.hpp>
 #include <mutex>
-#include <net/http.hpp>
 
 namespace ekizu {
 /**
@@ -25,12 +25,17 @@ struct DiscordApiRequest {
  */
 struct RateLimiter {
 	EKIZU_EXPORT explicit RateLimiter(
-		std::function<Result<net::HttpResponse>(net::HttpRequest)> send_fn);
+		std::function<void(net::HttpRequest,
+						   std::function<void(net::HttpResponse)>)>
+			send_fn);
 
-	[[nodiscard]] Result<net::HttpResponse> send(const DiscordApiRequest &req);
+	[[nodiscard]] Result<void> send(const DiscordApiRequest &req,
+									std::function<void(net::HttpResponse)> cb);
 
    private:
-	std::function<Result<net::HttpResponse>(net::HttpRequest)> m_send_fn;
+	std::function<void(
+		net::HttpRequest, std::function<void(net::HttpResponse)>)>
+		m_send_fn;
 	bool m_rate_limited{};
 
 	struct RateLimit {
@@ -41,7 +46,7 @@ struct RateLimiter {
 
 	std::mutex m_mtx;
 	std::unordered_map<net::HttpMethod,
-					   std::unordered_map<std::string, RateLimit> >
+					   std::unordered_map<std::string, RateLimit>>
 		m_rate_limits;
 };
 }  // namespace ekizu

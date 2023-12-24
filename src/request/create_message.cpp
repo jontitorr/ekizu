@@ -34,28 +34,30 @@ void from_json(const nlohmann::json &j, CreateMessageFields &f) {
 }
 
 CreateMessage::CreateMessage(
-	const std::function<Result<net::HttpResponse>(net::HttpRequest)>
+	const std::function<void(net::HttpRequest,
+							 std::function<void(net::HttpResponse)>)>
 		&make_request,
 	Snowflake channel_id)
 	: m_channel_id{channel_id}, m_make_request{make_request} {}
 
 CreateMessage::operator net::HttpRequest() const {
-	return {net::HttpMethod::Post,
-			fmt::format("/channels/{}/messages", m_channel_id),
-			static_cast<nlohmann::json>(m_fields).dump(),
-			{
-				{"Content-Type", "application/json"},
-			}};
+	auto req = net::HttpRequest{
+		net::HttpMethod::post,
+		fmt::format("/channels/{}/messages", m_channel_id), 11,
+		static_cast<nlohmann::json>(m_fields).dump()};
+
+	req.set(net::http::field::content_type, "application/json");
+	req.prepare_payload();
+
+	return req;
 }
 
-Result<Message> CreateMessage::send() const {
-	if (!m_make_request) {
-		return tl::make_unexpected(
-			std::make_error_code(std::errc::operation_not_permitted));
-	}
+void CreateMessage::send(std::function<void(Message)> cb) const {
+	if (!m_make_request) { return; }
 
-	return m_make_request(*this).and_then([](auto res) {
-		return json_util::deserialize<Message>(res.body);
+	m_make_request(*this, [cb = std::move(cb)](net::HttpResponse res) {
+		auto msg = json_util::deserialize<Message>(res.body());
+		if (cb && msg) { cb(msg.value()); }
 	});
 }
 }  // namespace ekizu

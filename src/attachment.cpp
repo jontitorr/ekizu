@@ -1,13 +1,17 @@
 #include <ekizu/attachment.hpp>
+#include <ekizu/http.hpp>
 #include <ekizu/json_util.hpp>
-#include <net/http.hpp>
 
 namespace ekizu {
 using json_util::deserialize;
 using json_util::serialize;
 
-Result<std::string> Attachment::download() const {
-	return net::http::get(url).map([](auto res) { return res.body; });
+Result<void> Attachment::download(boost::asio::io_context &ctx,
+								  std::function<void(std::string)> cb) const {
+	return net::HttpConnection::get(
+		ctx, url, [cb = std::move(cb)](net::HttpResponse res) {
+			if (cb) { cb(res.body()); };
+		});
 }
 
 void to_json(nlohmann::json &j, const Attachment &a) {

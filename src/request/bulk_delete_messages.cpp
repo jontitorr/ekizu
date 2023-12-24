@@ -3,7 +3,8 @@
 
 namespace ekizu {
 BulkDeleteMessages::BulkDeleteMessages(
-	const std::function<Result<net::HttpResponse>(net::HttpRequest)>
+	const std::function<void(net::HttpRequest,
+							 std::function<void(net::HttpResponse)>)>
 		&make_request,
 	Snowflake channel_id, const std::vector<Snowflake> &message_ids)
 	: m_channel_id{channel_id},
@@ -11,20 +12,25 @@ BulkDeleteMessages::BulkDeleteMessages(
 	  m_make_request{make_request} {}
 
 BulkDeleteMessages::operator net::HttpRequest() const {
-	return {
-		net::HttpMethod::Post,
-		fmt::format("/channels/{}/messages/bulk-delete", m_channel_id),
-		nlohmann::json{{"messages", m_message_ids}}.dump(),
-		{},
-	};
+	auto req = net::HttpRequest{
+		net::HttpMethod::post,
+		fmt::format("/channels/{}/messages/bulk-delete", m_channel_id), 11};
+
+	req.body() = nlohmann::json{{"messages", m_message_ids}}.dump();
+
+	return req;
 }
 
-Result<net::HttpResponse> BulkDeleteMessages::send() const {
+Result<void> BulkDeleteMessages::send(
+	std::function<void(net::HttpResponse)> cb) const {
 	if (!m_make_request) {
-		return tl::make_unexpected(
-			std::make_error_code(std::errc::operation_not_permitted));
+		return boost::system::errc::operation_not_permitted;
 	}
 
-	return m_make_request(*this);
+	m_make_request(*this, [cb = std::move(cb)](const net::HttpResponse &res) {
+		if (cb) { cb(res); }
+	});
+
+	return outcome::success();
 }
 }  // namespace ekizu

@@ -45,7 +45,7 @@ struct ShardManager {
 		const ClientOptions &options, std::string_view token);
 
 	[[nodiscard]] Result<void> handle_payload(
-		tcb::span<const std::byte> payload, Shard &shard);
+		boost::span<const std::byte> payload, Shard &shard);
 	[[nodiscard]] Result<void> handle_dispatch(const nlohmann::json &json,
 											   Shard &shard);
 

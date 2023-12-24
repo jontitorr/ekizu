@@ -4,28 +4,23 @@
 
 namespace ekizu {
 GetChannel::GetChannel(
-	const std::function<Result<net::HttpResponse>(net::HttpRequest)>
+	const std::function<void(net::HttpRequest,
+							 std::function<void(net::HttpResponse)>)>
 		&make_request,
 	Snowflake channel_id)
 	: m_channel_id{channel_id}, m_make_request{make_request} {}
 
 GetChannel::operator net::HttpRequest() const {
-	return {
-		net::HttpMethod::Get,
-		fmt::format("/channels/{}", m_channel_id),
-		{},
-		{},
-	};
+	return net::HttpRequest{
+		net::HttpMethod::get, fmt::format("/channels/{}", m_channel_id), 11};
 }
 
-Result<Channel> GetChannel::send() const {
-	if (!m_make_request) {
-		return tl::make_unexpected(
-			std::make_error_code(std::errc::operation_not_permitted));
-	}
+void GetChannel::send(std::function<void(Channel)> cb) const {
+	if (!m_make_request) { return; }
 
-	return m_make_request(*this).and_then([](auto res) -> Result<Channel> {
-		return json_util::deserialize<Channel>(res.body);
+	m_make_request(*this, [cb = std::move(cb)](net::HttpResponse res) {
+		auto msg = json_util::deserialize<Channel>(res.body());
+		if (cb && msg) { cb(msg.value()); }
 	});
 }
 }  // namespace ekizu

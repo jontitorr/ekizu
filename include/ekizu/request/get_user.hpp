@@ -1,15 +1,16 @@
 #ifndef EKIZU_REQUEST_GET_USER_HPP
 #define EKIZU_REQUEST_GET_USER_HPP
 
+#include <ekizu/http.hpp>
 #include <ekizu/user.hpp>
-#include <net/http.hpp>
 
 namespace ekizu {
 /**
  * @brief Represents the  REST API endpoint.
  */
 struct GetUser {
-	GetUser(const std::function<Result<net::HttpResponse>(net::HttpRequest)>
+	GetUser(const std::function<void(net::HttpRequest,
+									 std::function<void(net::HttpResponse)>)>
 				&make_request,
 			Snowflake user_id);
 
@@ -25,11 +26,13 @@ struct GetUser {
 	 *
 	 * @return The result of the request as an HTTP response.
 	 */
-	[[nodiscard]] Result<User> send() const;
+	void send(std::function<void(User)> cb) const;
 
    private:
 	Snowflake m_user_id;
-	std::function<Result<net::HttpResponse>(net::HttpRequest)> m_make_request;
+	std::function<void(
+		net::HttpRequest, std::function<void(net::HttpResponse)>)>
+		m_make_request;
 };
 }  // namespace ekizu
 

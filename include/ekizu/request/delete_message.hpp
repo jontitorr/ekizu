@@ -1,24 +1,26 @@
 #ifndef EKIZU_REQUEST_DELETE_MESSAGE_HPP
 #define EKIZU_REQUEST_DELETE_MESSAGE_HPP
 
+#include <ekizu/http.hpp>
 #include <ekizu/snowflake.hpp>
-#include <net/http.hpp>
 
 namespace ekizu {
 struct DeleteMessage {
-	DeleteMessage(
-		const std::function<Result<net::HttpResponse>(net::HttpRequest)>
-			&make_request,
-		Snowflake channel_id, Snowflake message_id);
+	DeleteMessage(const std::function<void(
+					  net::HttpRequest, std::function<void(net::HttpResponse)>)>
+					  &make_request,
+				  Snowflake channel_id, Snowflake message_id);
 
 	operator net::HttpRequest() const;
 
-	[[nodiscard]] Result<net::HttpResponse> send() const;
+	void send(std::function<void()> cb = {}) const;
 
    private:
 	Snowflake m_channel_id;
 	Snowflake m_message_id;
-	std::function<Result<net::HttpResponse>(net::HttpRequest)> m_make_request;
+	std::function<void(
+		net::HttpRequest, std::function<void(net::HttpResponse)>)>
+		m_make_request;
 };
 }  // namespace ekizu
 
