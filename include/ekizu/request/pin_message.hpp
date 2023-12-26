@@ -9,10 +9,10 @@ namespace ekizu {
  * @brief Represents the Pin Message REST API endpoint.
  */
 struct PinMessage {
-	PinMessage(const std::function<void(net::HttpRequest,
-										std::function<void(net::HttpResponse)>)>
-				   &make_request,
-			   Snowflake channel_id, Snowflake message_id);
+	PinMessage(
+		const std::function<Result<net::HttpResponse>(
+			net::HttpRequest, const asio::yield_context &)> &make_request,
+		Snowflake channel_id, Snowflake message_id);
 
 	/**
 	 * @brief Converts the PinMessage to an HTTP request.
@@ -26,13 +26,13 @@ struct PinMessage {
 	 *
 	 * @return The result of the request as an HTTP response.
 	 */
-	void send(std::function<void()> cb) const;
+	Result<> send(const asio::yield_context &yield) const;
 
    private:
 	Snowflake m_channel_id;
 	Snowflake m_message_id;
-	std::function<void(
-		net::HttpRequest, std::function<void(net::HttpResponse)>)>
+	std::function<Result<net::HttpResponse>(
+		net::HttpRequest, const asio::yield_context &)>
 		m_make_request;
 };
 }  // namespace ekizu

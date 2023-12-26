@@ -40,14 +40,14 @@ struct ShardManager {
    private:
 	friend ShardManagerAttorney;
 
-	[[nodiscard]] Result<void> connect(
+	[[nodiscard]] Result<> connect(
 		FunctionView<Result<net::HttpResponse>()> get_gateway,
 		const ClientOptions &options, std::string_view token);
 
-	[[nodiscard]] Result<void> handle_payload(
-		boost::span<const std::byte> payload, Shard &shard);
-	[[nodiscard]] Result<void> handle_dispatch(const nlohmann::json &json,
-											   Shard &shard);
+	[[nodiscard]] Result<> handle_payload(boost::span<const std::byte> payload,
+										  Shard &shard);
+	[[nodiscard]] Result<> handle_dispatch(const nlohmann::json &json,
+										   Shard &shard);
 
 	std::function<void(LogLevel, std::string_view)> m_log_fn;
 	std::function<void(
@@ -64,7 +64,7 @@ struct ShardManagerAttorney {
    private:
 	friend Client;
 
-	static Result<void> connect(
+	static Result<> connect(
 		ShardManager &shard_manager,
 		FunctionView<Result<net::HttpResponse>()> get_gateway,
 		const ClientOptions &options, std::string_view token) {

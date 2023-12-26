@@ -6,15 +6,20 @@
 #pragma warning(disable : 4242)
 #endif
 
+#include <boost/asio/spawn.hpp>
 #include <boost/beast/http.hpp>
+#include <boost/outcome/try.hpp>
 #include <ekizu/util.hpp>
 
 #ifdef _WIN32
 #pragma warning(pop)
 #endif
 
-namespace ekizu::net {
+namespace ekizu {
 namespace asio = boost::asio;
+}  // namespace ekizu
+
+namespace ekizu::net {
 namespace http = boost::beast::http;
 using HttpRequest = http::request<http::string_body>;
 using HttpResponse = http::response<http::string_body>;
@@ -29,14 +34,13 @@ struct HttpConnection {
 	~HttpConnection();
 
 	[[nodiscard]] static Result<HttpConnection> connect(
-		asio::io_context &ioc, std::string_view url,
-		std::function<void()> cb = {});
+		std::string_view url, const asio::yield_context &yield);
 
-	Result<void> request(const HttpRequest &req,
-						 std::function<void(HttpResponse)> cb);
+	Result<HttpResponse> request(const HttpRequest &req,
+								 const asio::yield_context &yield);
 
-	static Result<void> get(asio::io_context &ioc, std::string_view url,
-							std::function<void(HttpResponse)> cb);
+	static Result<HttpResponse> get(std::string_view url,
+									const asio::yield_context &yield);
 
    private:
 	struct Impl;

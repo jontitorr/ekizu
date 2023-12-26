@@ -6,12 +6,10 @@ namespace ekizu {
 using json_util::deserialize;
 using json_util::serialize;
 
-Result<void> Attachment::download(boost::asio::io_context &ctx,
-								  std::function<void(std::string)> cb) const {
-	return net::HttpConnection::get(
-		ctx, url, [cb = std::move(cb)](net::HttpResponse res) {
-			if (cb) { cb(res.body()); };
-		});
+Result<std::string> Attachment::download(
+	const boost::asio::yield_context &yield) const {
+	BOOST_OUTCOME_TRY(auto res, net::HttpConnection::get(url, yield));
+	return res.body();
 }
 
 void to_json(nlohmann::json &j, const Attachment &a) {

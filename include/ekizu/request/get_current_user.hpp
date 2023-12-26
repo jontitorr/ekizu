@@ -9,10 +9,9 @@ namespace ekizu {
  * @brief Represents the  REST API endpoint.
  */
 struct GetCurrentUser {
-	GetCurrentUser(
-		const std::function<void(net::HttpRequest,
-								 std::function<void(net::HttpResponse)>)>
-			&make_request);
+	explicit GetCurrentUser(
+		const std::function<Result<net::HttpResponse>(
+			net::HttpRequest, const asio::yield_context &)> &make_request);
 
 	/**
 	 * @brief Converts the GetCurrentUser to an HTTP request.
@@ -26,11 +25,11 @@ struct GetCurrentUser {
 	 *
 	 * @return The result of the request as an HTTP response.
 	 */
-	void send(std::function<void(User)> cb) const;
+	Result<User> send(const asio::yield_context &yield) const;
 
    private:
-	std::function<void(
-		net::HttpRequest, std::function<void(net::HttpResponse)>)>
+	std::function<Result<net::HttpResponse>(
+		net::HttpRequest, const asio::yield_context &)>
 		m_make_request;
 };
 }  // namespace ekizu

@@ -1,7 +1,7 @@
 #ifndef EKIZU_ATTACHMENT_HPP
 #define EKIZU_ATTACHMENT_HPP
 
-#include <boost/asio/io_context.hpp>
+#include <boost/asio/spawn.hpp>
 #include <ekizu/snowflake.hpp>
 #include <optional>
 
@@ -12,9 +12,8 @@ namespace ekizu {
  * @see https://discord.com/developers/docs/resources/channel#attachment-object
  */
 struct Attachment {
-	EKIZU_EXPORT Result<void> download(
-		boost::asio::io_context &ctx,
-		std::function<void(std::string)> cb) const;
+	[[nodiscard]] EKIZU_EXPORT Result<std::string> download(
+		const boost::asio::yield_context &yield) const;
 
 	/// The id of the attachment.
 	Snowflake id;

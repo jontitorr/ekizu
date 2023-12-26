@@ -10,9 +10,8 @@ namespace ekizu {
  */
 struct CrosspostMessage {
 	CrosspostMessage(
-		const std::function<void(net::HttpRequest,
-								 std::function<void(net::HttpResponse)>)>
-			&make_request,
+		const std::function<Result<net::HttpResponse>(
+			net::HttpRequest, const asio::yield_context &)> &make_request,
 		Snowflake channel_id, Snowflake message_id);
 
 	/**
@@ -27,13 +26,13 @@ struct CrosspostMessage {
 	 *
 	 * @return The result of the request as an HTTP response.
 	 */
-	void send(std::function<void(Message)> cb) const;
+	Result<Message> send(const asio::yield_context &yield) const;
 
    private:
 	Snowflake m_channel_id;
 	Snowflake m_message_id;
-	std::function<void(
-		net::HttpRequest, std::function<void(net::HttpResponse)>)>
+	std::function<Result<net::HttpResponse>(
+		net::HttpRequest, const asio::yield_context &)>
 		m_make_request;
 };
 }  // namespace ekizu

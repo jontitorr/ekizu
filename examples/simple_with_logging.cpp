@@ -2,7 +2,7 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 
-#include <ekizu/embed_builder.hpp>
+#include <ekizu/async_main.hpp>
 #include <ekizu/http_client.hpp>
 #include <ekizu/shard.hpp>
 #include <nlohmann/json.hpp>
@@ -29,65 +29,114 @@ struct overload : Func... {
 template <typename... Func>
 overload(Func...) -> overload<Func...>;
 
-std::function<void(Event)> handle_event(HttpClient &http);
+Result<> handle_event(Snowflake &bot_id, const Event &ev,
+					  const HttpClient &http, const asio::yield_context &yield);
 
-int main() {
+async_main(const asio::yield_context &yield) {
 	dotenv::init();
 
 	const auto token = dotenv::getenv("DISCORD_TOKEN");
 
 	if (token.empty()) {
 		get_logger()->error("No token :(");
-		return 1;
+		return boost::system::errc::invalid_argument;
 	}
 
-	boost::asio::io_context ctx;
-	auto http = HttpClient{ctx, token};
-	auto shard = Shard{ctx, ShardId::ONE, token, Intents::AllIntents};
+	Snowflake bot_id;
+	HttpClient http{token};
+	Shard shard{ShardId::ONE, token, Intents::AllIntents};
 
-	if (const auto res = shard.connect(handle_event(http)); !res) {
-		get_logger()->error("Failed to run shard: {}", res.error().message());
-		return 1;
+	// Attach logger to shard.
+	shard.attach_logger([](const Log &log) {
+		const auto &msg = log.message;
+
+		switch (log.level) {
+			case LogLevel::Debug: return get_logger()->debug(msg);
+			case LogLevel::Info: return get_logger()->info(msg);
+			case LogLevel::Warn: return get_logger()->warn(msg);
+			case LogLevel::Error: return get_logger()->error(msg);
+			case LogLevel::Trace: return get_logger()->trace(msg);
+			case LogLevel::Critical: return get_logger()->critical(msg);
+		}
+	});
+
+	// Close the shard after 5 seconds. Will reconnect automatically.
+	asio::spawn(
+		yield,
+		[&shard](auto y) {
+			asio::deadline_timer timer{
+				y.get_executor(), boost::posix_time::seconds(5)};
+			timer.async_wait(y);
+			get_logger()->info("Shutting down");
+			(void)shard.close(CloseFrame::NORMAL, y);
+		},
+		asio::detached);
+
+	while (true) {
+		auto res = shard.next_event(yield);
+
+		if (!res) {
+			if (res.error().failed()) {
+				get_logger()->error(
+					"Failed to get next event: {}", res.error().message());
+				return res.error();
+			}
+			// Could be handling a non-dispatch event.
+			continue;
+		}
+
+		asio::spawn(
+			yield,
+			[&bot_id, e = std::move(res.value()), &http](auto y) {
+				boost::ignore_unused(handle_event(bot_id, e, http, y));
+			},
+			asio::detached);
 	}
 
-	ctx.run();
+	return outcome::success();
 }
 
-std::function<void(Event)> handle_event(HttpClient &http) {
-	return [&http, bot_id = Snowflake{}](Event ev) mutable {
-		const auto &logger = get_logger();
+Result<> handle_event(Snowflake &bot_id, const Event &ev,
+					  const HttpClient &http,
+					  const asio::yield_context &yield) {
+	const auto &logger = get_logger();
 
-		std::visit(
-			overload{
-				[&logger, &bot_id](const Ready &payload) {
-					const auto &user = payload.user;
-					logger->info("Logged in as {}", user.username);
-					bot_id = user.id;
-					logger->info("API version: {}", payload.v);
-					logger->info("Guilds: {}", payload.guilds.size());
-				},
-				[&logger, &http, &bot_id](const MessageCreate &payload) {
-					const auto &[msg] = payload;
-					if (msg.author.id == bot_id) { return; }
+	std::visit(
+		overload{
+			[&logger, &bot_id](const Ready &payload) {
+				const auto &user = payload.user;
+				logger->info("Logged in as {}", user.username);
+				bot_id = user.id;
+				logger->info("API version: {}", payload.v);
+				logger->info("Guilds: {}", payload.guilds.size());
+			},
+			[&http, &yield, &bot_id](const MessageCreate &payload) {
+				const auto &[msg] = payload;
 
+				if (msg.author.id == bot_id) {
+					get_logger()->info("Ignoring own message");
+					return;
+				}
+
+				auto m =
 					http.create_message(msg.channel_id)
 						.content(fmt::format(
 							"{} said: {}\nAvatar: {}", msg.author.username,
 							msg.content,
 							msg.author.avatar ? *msg.author.avatar : "null"))
-						.send([&logger](auto m) {
-							logger->info("Sent message: {}", m.content);
-						});
+						.send(yield);
 
-					if (msg.content == "delete me") {
-						http.delete_message(msg.channel_id, msg.id).send();
-					}
-				},
-				[&logger](const Log &log) { logger->debug(log.message); },
-				[&logger](const auto &e) {
-					logger->info("Uncaught {} event: {}", typeid(e).name(),
-								 nlohmann::json{e}.dump());
-				}},
-			ev);
-	};
+				if (msg.content == "delete me") {
+					(void)http.delete_message(msg.channel_id, msg.id)
+						.send(yield);
+				}
+			},
+			[&logger](const Log &log) { logger->debug(log.message); },
+			[&logger](const auto &e) {
+				logger->info("Uncaught {} event: {}", typeid(e).name(),
+							 nlohmann::json{e}.dump());
+			}},
+		ev);
+
+	return outcome::success();
 }

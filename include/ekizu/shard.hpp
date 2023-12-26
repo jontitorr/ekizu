@@ -5,13 +5,34 @@
 #include <ekizu/event.hpp>
 #include <ekizu/inflater.hpp>
 #include <ekizu/intents.hpp>
-#include <ekizu/mutex.hpp>
 #include <ekizu/ws.hpp>
 
 namespace ekizu {
 struct Client;
 struct ShardAttorney;
 struct ShardManager;
+
+namespace detail {
+struct CloseFrame {
+	constexpr CloseFrame(std::uint16_t code_, std::string_view reason_)
+		: code{code_}, reason{reason_.begin(), reason_.end()} {}
+
+	std::uint16_t code;
+	net::ws::reason_string reason;
+};
+
+struct CloseFrameConstants {
+	static constexpr CloseFrame NORMAL{1000, "closing connection"};
+	static constexpr CloseFrame RESUME{4000, "resuming connection"};
+	static constexpr CloseFrame SESSION_EXPIRED{4009, "session expired"};
+};
+}  // namespace detail
+
+struct CloseFrame : detail::CloseFrame, detail::CloseFrameConstants {
+	using detail::CloseFrame::CloseFrame;
+	constexpr CloseFrame(const detail::CloseFrame &base)
+		: detail::CloseFrame(base) {}
+};
 
 /**
  * @brief The Discord gateway opcodes.
@@ -46,19 +67,6 @@ inline const ShardId ShardId::ONE{0, 1};
  * gateway.
  */
 struct Shard {
-	Shard(boost::asio::io_context &ctx, ShardId id, std::string_view token,
-		  Intents intents);
-
-	static const net::ws::close_reason RESUME;
-	static const net::ws::close_reason SESSION_EXPIRED;
-
-	[[nodiscard]] uint64_t id() const { return m_id; }
-
-	[[nodiscard]] Result<void> connect(const std::function<void(Event)> &cb);
-
-   private:
-	Result<void> set_auto_reconnect(bool auto_reconnect);
-
 	struct Config {
 		std::string token;
 		std::optional<Intents> intents;
@@ -67,58 +75,52 @@ struct Shard {
 		bool is_bot{true};
 	};
 
-	void handle_event(boost::span<const std::byte> data);
-	void handle_dispatch(const nlohmann::json &data);
-	void handle_reconnect();
-	void handle_invalid_session(const nlohmann::json &data);
-	void handle_hello(const nlohmann::json &data);
+	Shard(ShardId id, std::string_view token, Intents intents);
+
+	[[nodiscard]] uint64_t id() const { return m_id; }
+
+	void attach_logger(std::function<void(Log)> on_log);
+	Result<> close(CloseFrame reason, const boost::asio::yield_context &yield);
+	[[nodiscard]] Result<Event> next_event(
+		const boost::asio::yield_context &yield);
+
+   private:
+	struct Session {
+		std::string id{};
+		uint64_t sequence{};
+	};
+
+	Result<Event> handle_event(std::string_view data,
+							   const boost::asio::yield_context &yield);
+	Result<Event> handle_dispatch(const nlohmann::json &data);
+	Result<> handle_reconnect(const boost::asio::yield_context &yield);
+	Result<> handle_invalid_session(const nlohmann::json &data,
+									const boost::asio::yield_context &yield);
+	Result<> handle_hello(const nlohmann::json &data,
+						  const boost::asio::yield_context &yield);
 	void handle_heartbeat_ack();
+
 	void log(std::string_view msg, LogLevel level = LogLevel::Debug) const;
+	Result<std::string> next_message(const boost::asio::yield_context &yield);
+	Result<> reconnect(const boost::asio::yield_context &yield);
+	Result<> start_heartbeat(uint32_t heartbeat_interval,
+							 const boost::asio::any_io_executor &executor);
+	Result<> send_heartbeat(const boost::asio::yield_context &yield);
+	Result<> send_identify(const boost::asio::yield_context &yield);
+	Result<> send_resume(const boost::asio::yield_context &yield);
 
-	void reset_session() {
-		m_sequence = 0;
-		m_session_id.clear();
-	}
-
-	[[nodiscard]] Result<void> reconnect(net::ws::close_reason reason,
-										 bool reset);
-
-	[[nodiscard]] Result<void> start_heartbeat(uint32_t heartbeat_interval);
-
-	[[nodiscard]] Result<void> send_heartbeat(
-		const boost::system::error_code &ec);
-
-	[[nodiscard]] Result<void> send_identify();
-
-	[[nodiscard]] Result<void> disconnect(net::ws::close_reason reason);
-
-	boost::asio::io_context &m_ctx;
 	std::optional<boost::asio::deadline_timer> m_timer;
 	uint64_t m_id;
 	Config m_config;
 	bool m_last_heartbeat_acked{true};
-	std::string m_session_id;
-	uint64_t m_sequence{};
 	uint32_t m_heartbeat_interval{};
-
-	enum class ConnectionState : uint8_t {
-		Disconnected,
-		Connecting,
-		Connected,
-	};
-
-	ConnectionState m_state{ConnectionState::Disconnected};
-
+	std::function<void(Log)> m_on_log;
 	/// May or may not be used based on runtime options.
-	std::unique_ptr<Inflater> m_inflater;
-	std::function<void(Event)> m_on_event;
+	std::optional<Inflater> m_inflater;
+	std::optional<Session> m_session;
+	std::optional<std::string> m_resume_gateway_url;
 	std::optional<net::WebSocketClient> m_ws;
 };
-
-inline const net::ws::close_reason Shard::RESUME = {
-	static_cast<net::ws::close_code>(4000), "resuming connection"};
-inline const net::ws::close_reason Shard::SESSION_EXPIRED = {
-	static_cast<net::ws::close_code>(4009), "session expired"};
 }  // namespace ekizu
 
 #endif	// EKIZU_SHARD_HPP

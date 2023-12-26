@@ -18,11 +18,10 @@ struct Inflater {
 	Inflater &operator=(Inflater &&) noexcept;
 	~Inflater();
 
-	[[nodiscard]] static bool is_compressed(boost::span<const std::byte> data);
+	[[nodiscard]] static bool is_compressed(boost::span<const char> data);
 	static Result<Inflater> create();
 
-	[[nodiscard]] Result<std::vector<std::byte> > inflate(
-		boost::span<const std::byte> data);
+	[[nodiscard]] Result<std::string> inflate(boost::span<const char> data);
 
    private:
 	struct Impl;
@@ -31,7 +30,7 @@ struct Inflater {
 
 	static constexpr size_t BUFFER_SIZE = 1024;
 
-	std::array<std::byte, BUFFER_SIZE> m_buffer{};
+	std::array<char, BUFFER_SIZE> m_buffer{};
 	std::unique_ptr<Impl> m_impl;
 };
 }  // namespace ekizu

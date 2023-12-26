@@ -3,9 +3,8 @@
 
 namespace ekizu {
 CrosspostMessage::CrosspostMessage(
-	const std::function<void(net::HttpRequest,
-							 std::function<void(net::HttpResponse)>)>&
-		make_request,
+	const std::function<Result<net::HttpResponse>(
+		net::HttpRequest, const asio::yield_context&)>& make_request,
 	Snowflake channel_id, Snowflake message_id)
 	: m_channel_id{channel_id},
 	  m_message_id{message_id},
@@ -18,12 +17,13 @@ CrosspostMessage::operator net::HttpRequest() const {
 			11};
 }
 
-void CrosspostMessage::send(std::function<void(Message)> cb) const {
-	if (!m_make_request) { return; }
+Result<Message> CrosspostMessage::send(const asio::yield_context& yield) const {
+	if (!m_make_request) {
+		return boost::system::errc::operation_not_permitted;
+	}
 
-	m_make_request(*this, [c = std::move(cb)](net::HttpResponse res) {
-		auto msg = json_util::deserialize<Message>(res.body());
-		if (c && msg) { c(msg.value()); }
-	});
+	BOOST_OUTCOME_TRY(auto res, m_make_request(*this, yield));
+
+	return json_util::deserialize<Message>(res.body());
 }
 }  // namespace ekizu

@@ -9,10 +9,10 @@ namespace ekizu {
  * @brief Represents the Unpin Message REST API endpoint.
  */
 struct UnpinMessage {
-	UnpinMessage(const std::function<void(
-					 net::HttpRequest, std::function<void(net::HttpResponse)>)>
-					 &make_request,
-				 Snowflake channel_id, Snowflake message_id);
+	UnpinMessage(
+		const std::function<Result<net::HttpResponse>(
+			net::HttpRequest, const asio::yield_context &)> &make_request,
+		Snowflake channel_id, Snowflake message_id);
 
 	/**
 	 * @brief Converts the UnpinMessage to an HTTP request.
@@ -26,14 +26,13 @@ struct UnpinMessage {
 	 *
 	 * @return The result of the request as an HTTP response.
 	 */
-	[[nodiscard]] Result<void> send(
-		std::function<void(net::HttpResponse)> cb) const;
+	[[nodiscard]] Result<> send(const asio::yield_context &yield) const;
 
    private:
 	Snowflake m_channel_id;
 	Snowflake m_message_id;
-	std::function<void(
-		net::HttpRequest, std::function<void(net::HttpResponse)>)>
+	std::function<Result<net::HttpResponse>(
+		net::HttpRequest, const asio::yield_context &)>
 		m_make_request;
 };
 }  // namespace ekizu

@@ -2,9 +2,8 @@
 
 namespace ekizu {
 PinMessage::PinMessage(
-	const std::function<void(net::HttpRequest,
-							 std::function<void(net::HttpResponse)>)>&
-		make_request,
+	const std::function<Result<net::HttpResponse>(
+		net::HttpRequest, const asio::yield_context&)>& make_request,
 	Snowflake channel_id, Snowflake message_id)
 	: m_channel_id{channel_id},
 	  m_message_id{message_id},
@@ -16,11 +15,17 @@ PinMessage::operator net::HttpRequest() const {
 			11};
 }
 
-void PinMessage::send(std::function<void()> cb) const {
-	if (!m_make_request) { return; }
+Result<> PinMessage::send(const asio::yield_context& yield) const {
+	if (!m_make_request) {
+		return boost::system::errc::operation_not_permitted;
+	}
 
-	m_make_request(*this, [c = std::move(cb)](const net::HttpResponse& res) {
-		if (res.result() == net::HttpStatus::no_content && c) { c(); }
-	});
+	BOOST_OUTCOME_TRY(auto res, m_make_request(*this, yield));
+
+	if (res.result() == net::HttpStatus::no_content) {
+		return outcome::success();
+	}
+
+	return boost::system::errc::operation_not_permitted;
 }
 }  // namespace ekizu

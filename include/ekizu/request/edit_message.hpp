@@ -28,10 +28,10 @@ EKIZU_EXPORT void to_json(nlohmann::json &j, const EditMessageFields &f);
 EKIZU_EXPORT void from_json(const nlohmann::json &j, EditMessageFields &f);
 
 struct EditMessage {
-	EditMessage(const std::function<void(
-					net::HttpRequest, std::function<void(net::HttpResponse)>)>
-					&make_request,
-				Snowflake channel_id, Snowflake message_id);
+	EditMessage(
+		const std::function<Result<net::HttpResponse>(
+			net::HttpRequest, const asio::yield_context &)> &make_request,
+		Snowflake channel_id, Snowflake message_id);
 
 	operator net::HttpRequest() const;
 
@@ -62,14 +62,14 @@ struct EditMessage {
 		return *this;
 	}
 
-	void send(std::function<void(Message)> cb) const;
+	Result<Message> send(const asio::yield_context &yield) const;
 
    private:
 	Snowflake m_channel_id;
 	Snowflake m_message_id;
 	EditMessageFields m_fields;
-	std::function<void(
-		net::HttpRequest, std::function<void(net::HttpResponse)>)>
+	std::function<Result<net::HttpResponse>(
+		net::HttpRequest, const asio::yield_context &)>
 		m_make_request;
 };
 }  // namespace ekizu

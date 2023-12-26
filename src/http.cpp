@@ -21,44 +21,33 @@ void fail(beast::error_code ec, char const *what) {
 }  // namespace
 
 namespace ekizu::net {
-struct HttpConnection::Impl : std::enable_shared_from_this<Impl> {
-	Impl(asio::io_context &ex, ssl::context &ctx)
-		: m_ctx{ex}, m_resolver{ex}, m_stream{ex, ctx} {}
+struct HttpConnection::Impl {
+	Impl(asio::any_io_executor ex, ssl::context &ctx)
+		: m_resolver{ex}, m_stream{ex, ctx} {}
 
 	void run(std::string_view host, std::string_view port,
-			 std::function<void()> on_handshake = {}) {
-		boost::asio::spawn(
-			m_ctx,
-			[this, host, port, on_handshake = std::move(on_handshake)](
-				const boost::asio::yield_context &yield) mutable {
-				if (!SSL_set_tlsext_host_name(
-						m_stream.native_handle(), host.data())) {
-					beast::error_code ec{static_cast<int>(::ERR_get_error()),
-										 asio::error::get_ssl_category()};
-					std::cerr << ec.message() << "\n";
-					return;
-				}
+			 const asio::yield_context &yield) {
+		if (!SSL_set_tlsext_host_name(m_stream.native_handle(), host.data())) {
+			beast::error_code ec{static_cast<int>(::ERR_get_error()),
+								 asio::error::get_ssl_category()};
+			std::cerr << ec.message() << "\n";
+			return;
+		}
 
-				boost::system::error_code ec;
-				m_on_handshake = std::move(on_handshake);
-				const auto results =
-					m_resolver.async_resolve(host, port, yield[ec]);
+		boost::system::error_code ec;
+		const auto results = m_resolver.async_resolve(host, port, yield[ec]);
 
-				if (ec) { return fail(ec, "resolve"); }
+		if (ec) { return fail(ec, "resolve"); }
 
-				beast::get_lowest_layer(m_stream).expires_after(
-					std::chrono::seconds(30));
-				beast::get_lowest_layer(m_stream).async_connect(
-					results, yield[ec]);
+		beast::get_lowest_layer(m_stream).expires_after(
+			std::chrono::seconds(30));
+		beast::get_lowest_layer(m_stream).async_connect(results, yield[ec]);
 
-				if (ec) { return fail(ec, "connect"); }
+		if (ec) { return fail(ec, "connect"); }
 
-				m_stream.async_handshake(ssl::stream_base::client, yield[ec]);
+		m_stream.async_handshake(ssl::stream_base::client, yield[ec]);
 
-				if (ec) { return fail(ec, "handshake"); }
-				if (m_on_handshake) { m_on_handshake(); }
-			},
-			boost::asio::detached);
+		if (ec) { return fail(ec, "handshake"); }
 	}
 
 	void do_request(boost::asio::yield_context yield) {
@@ -76,34 +65,32 @@ struct HttpConnection::Impl : std::enable_shared_from_this<Impl> {
 		if (!m_queue.empty()) { do_request(yield); }
 	}
 
-	Result<void> request(const HttpRequest &req,
-						 std::function<void(HttpResponse)> cb) {
-		boost::asio::spawn(
-			m_ctx,
-			[this, req, cb = std::move(cb)](
-				const boost::asio::yield_context &yield) mutable {
-				bool write_in_progress = !m_queue.empty();
-				m_queue.emplace_back(req, std::move(cb));
-				if (!write_in_progress) { do_request(yield); }
-			},
-			boost::asio::detached);
-		return outcome::success();
+	Result<HttpResponse> request(const HttpRequest &req,
+								 const asio::yield_context &yield) {
+		boost::system::error_code ec;
+		http::async_write(m_stream, req, yield[ec]);
+
+		if (ec) { return ec; }
+
+		http::async_read(m_stream, m_buffer, m_res, yield[ec]);
+
+		if (ec) { return ec; }
+
+		return m_res;
 	}
 
    private:
-	asio::io_context &m_ctx;
 	asio::ip::tcp::resolver m_resolver;
 	beast::ssl_stream<beast::tcp_stream> m_stream;
 	beast::flat_buffer m_buffer;
 	HttpResponse m_res;
-	std::function<void()> m_on_handshake;
 	std::deque<std::pair<HttpRequest, std::function<void(HttpResponse)>>>
 		m_queue;
 };
 
-Result<void> HttpConnection::request(const HttpRequest &req,
-									 std::function<void(HttpResponse)> cb) {
-	return m_impl->request(req, std::move(cb));
+Result<HttpResponse> HttpConnection::request(const HttpRequest &req,
+											 const asio::yield_context &yield) {
+	return m_impl->request(req, yield);
 }
 
 HttpConnection::HttpConnection(HttpConnection &&) noexcept = default;
@@ -111,7 +98,7 @@ HttpConnection &HttpConnection::operator=(HttpConnection &&) noexcept = default;
 HttpConnection::~HttpConnection() = default;
 
 Result<HttpConnection> HttpConnection::connect(
-	asio::io_context &ioc, std::string_view url, std::function<void()> cb) {
+	std::string_view url, const asio::yield_context &yield) {
 	BOOST_OUTCOME_TRY(auto uri, boost::urls::parse_uri(url));
 
 	if (uri.scheme() != "http" && uri.scheme() != "https") {
@@ -121,32 +108,29 @@ Result<HttpConnection> HttpConnection::connect(
 	ssl::context ctx{ssl::context::tlsv12_client};
 	boost::system::error_code ec;
 
-	ctx.set_verify_mode(
-		ssl::context::verify_peer | ssl::context::verify_fail_if_no_peer_cert,
-		ec);
-
-	if (ec) { return ec; }
-
-	ctx.set_default_verify_paths(ec);
-
-	if (ec) { return ec; }
+	if (ctx.set_verify_mode(ssl::context::verify_peer |
+								ssl::context::verify_fail_if_no_peer_cert,
+							ec) ||
+		ctx.set_default_verify_paths(ec)) {
+		return ec;
+	}
 
 	boost::certify::enable_native_https_server_verification(ctx);
 
-	auto impl = std::make_shared<Impl>(ioc, ctx);
-	impl->run(uri.host(), uri.scheme() == "http" ? "80" : "443", std::move(cb));
+	auto impl = std::make_shared<Impl>(yield.get_executor(), ctx);
+	impl->run(uri.host(), uri.scheme() == "http" ? "80" : "443", yield);
 
 	return HttpConnection{std::move(impl)};
 }
 
-Result<void> HttpConnection::get(asio::io_context &ioc, std::string_view url,
-								 std::function<void(HttpResponse)> cb) {
+Result<HttpResponse> HttpConnection::get(std::string_view url,
+										 const asio::yield_context &yield) {
 	BOOST_OUTCOME_TRY(auto uri, boost::urls::parse_uri(url));
-	BOOST_OUTCOME_TRY(auto conn, connect(ioc, url));
+	BOOST_OUTCOME_TRY(auto conn, connect(url, yield));
 
 	HttpRequest req{http::verb::get, uri.path().empty() ? "/" : uri.path(), 11};
 
-	return conn.request(req, std::move(cb));
+	return conn.request(req, yield);
 }
 
 HttpConnection::HttpConnection(std::shared_ptr<Impl> impl)

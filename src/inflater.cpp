@@ -48,24 +48,19 @@ Inflater::Inflater(Inflater &&) noexcept = default;
 Inflater &Inflater::operator=(Inflater &&) noexcept = default;
 Inflater::~Inflater() = default;
 
-bool Inflater::is_compressed(boost::span<const std::byte> data) {
+bool Inflater::is_compressed(boost::span<const char> data) {
 	const auto last = data.last(4);
-	const auto expected = boost::span<const std::byte, 4>{
-		{static_cast<std::byte>(0x00), static_cast<std::byte>(0x00),
-		 static_cast<std::byte>(0xFF), static_cast<std::byte>(0xFF)}};
-
+	const auto expected = boost::span<const char, 4>{
+		{0x00, 0x00, static_cast<char>(0xFF), static_cast<char>(0xFF)}};
 	return std::equal(last.begin(), last.end(), expected.begin());
 }
 
-Result<std::vector<std::byte> > Inflater::inflate(
-	boost::span<const std::byte> data) {
+Result<std::string> Inflater::inflate(boost::span<const char> data) {
 	m_impl->stream->avail_in = static_cast<uint32_t>(data.size());
-	// NOLINTBEGIN cppcoreguidelines-pro-type-const-cast
-	m_impl->stream->next_in = reinterpret_cast<uint8_t *>(
-		const_cast<char *>(reinterpret_cast<const char *>(data.data())));
-	// NOLINTEND
+	m_impl->stream->next_in =
+		reinterpret_cast<uint8_t *>(const_cast<char *>(data.data()));
 
-	std::vector<std::byte> result;
+	std::string result;
 	result.reserve(data.size() * 2);
 
 	do {

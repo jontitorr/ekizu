@@ -3,10 +3,10 @@
 
 namespace ekizu {
 
-GetUser::GetUser(const std::function<void(
-					 net::HttpRequest, std::function<void(net::HttpResponse)>)>
-					 &make_request,
-				 Snowflake user_id)
+GetUser::GetUser(
+	const std::function<Result<net::HttpResponse>(
+		net::HttpRequest, const asio::yield_context &)> &make_request,
+	Snowflake user_id)
 	: m_user_id{user_id}, m_make_request{make_request} {}
 
 GetUser::operator net::HttpRequest() const {
@@ -14,12 +14,12 @@ GetUser::operator net::HttpRequest() const {
 		net::HttpMethod::get, fmt::format("/users/{}", m_user_id), 11};
 }
 
-void GetUser::send(std::function<void(User)> cb) const {
-	if (!m_make_request) { return; }
+Result<User> GetUser::send(const asio::yield_context &yield) const {
+	if (!m_make_request) {
+		return boost::system::errc::operation_not_permitted;
+	}
 
-	m_make_request(*this, [cb = std::move(cb)](net::HttpResponse res) {
-		auto user = json_util::deserialize<User>(res.body());
-		if (cb && user) { cb(user.value()); }
-	});
+	BOOST_OUTCOME_TRY(auto res, m_make_request(*this, yield));
+	return json_util::deserialize<User>(res.body());
 }
 }  // namespace ekizu

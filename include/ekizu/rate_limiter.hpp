@@ -3,7 +3,8 @@
 
 #include <ekizu/export.h>
 
-#include <chrono>
+#include <boost/asio/spawn.hpp>
+#include <boost/date_time/posix_time/ptime.hpp>
 #include <ekizu/http.hpp>
 #include <ekizu/util.hpp>
 #include <mutex>
@@ -25,23 +26,23 @@ struct DiscordApiRequest {
  */
 struct RateLimiter {
 	EKIZU_EXPORT explicit RateLimiter(
-		std::function<void(net::HttpRequest,
-						   std::function<void(net::HttpResponse)>)>
+		std::function<Result<net::HttpResponse>(net::HttpRequest,
+												const asio::yield_context &)>
 			send_fn);
 
-	[[nodiscard]] Result<void> send(const DiscordApiRequest &req,
-									std::function<void(net::HttpResponse)> cb);
+	[[nodiscard]] Result<net::HttpResponse> send(
+		const DiscordApiRequest &req, const boost::asio::yield_context &yield);
 
    private:
-	std::function<void(
-		net::HttpRequest, std::function<void(net::HttpResponse)>)>
+	std::function<Result<net::HttpResponse>(
+		net::HttpRequest, const asio::yield_context &)>
 		m_send_fn;
 	bool m_rate_limited{};
 
 	struct RateLimit {
 		uint16_t limit{};
 		uint16_t remaining{};
-		std::chrono::system_clock::time_point reset_time;
+		boost::posix_time::ptime reset_time;
 	};
 
 	std::mutex m_mtx;

@@ -23,90 +23,30 @@ using WebSocketCloseCode = ws::close_code;
 struct WebSocketClientBuilder;
 
 struct WebSocketClient {
-	WebSocketClient &set_auto_reconnect(bool auto_reconnect) {
-		m_auto_reconnect = auto_reconnect;
-		return *this;
-	}
-
-	Result<void> run(asio::io_context &ioc);
-	void close(ws::close_reason reason);
-	void send(std::string_view message);
+	[[nodiscard]] static Result<WebSocketClient> connect(
+		std::string_view url, const asio::yield_context &yield);
+	[[nodiscard]] bool is_open() const;
+	Result<> close(ws::close_reason reason, const asio::yield_context &yield);
+	Result<std::string> read(const asio::yield_context &yield);
+	Result<> send(std::string_view message, const asio::yield_context &yield);
 
    private:
 	friend WebSocketClientBuilder;
 
 	explicit WebSocketClient(
-		bool auto_reconnect, std::function<void()> on_connect,
-		std::function<void(ws::close_reason)> on_close,
-		std::function<void(boost::system::error_code, std::string_view)>
-			on_error,
-		std::function<void(boost::span<const std::byte>)> on_message,
-		std::string url);
-
-	void do_send(const asio::yield_context &yield);
-	void fail(boost::system::error_code ec, std::string_view what);
+		tcp::resolver resolver,
+		std::variant<ws::stream<tcp_stream>, ws::stream<ssl_stream>> ws,
+		std::string host, std::string path, bool ssl);
 
 	boost::optional<asio::io_context &> m_ctx;
-	bool m_auto_reconnect{};
 	std::optional<tcp::resolver> m_resolver;
-	boost::optional<
-		std::variant<ws::stream<tcp_stream>, ws::stream<ssl_stream>>>
-		m_ws;
+	std::variant<ws::stream<tcp_stream>, ws::stream<ssl_stream>> m_stream;
 	beast::flat_buffer m_buffer;
 	std::string m_host;
 	std::string m_path;
-	std::function<void()> m_on_connect;
-	std::function<void(ws::close_reason)> m_on_close;
-	std::function<void(boost::system::error_code, std::string_view)> m_on_error;
-	std::function<void(boost::span<const std::byte>)> m_on_message;
+	bool m_ssl{};
 	std::deque<std::string> m_queue;
-	std::string m_url;
-};
-
-struct WebSocketClientBuilder {
-	[[nodiscard]] WebSocketClient build();
-
-	WebSocketClientBuilder &with_auto_reconnect(bool auto_reconnect) {
-		m_auto_reconnect = auto_reconnect;
-		return *this;
-	}
-
-	WebSocketClientBuilder &with_on_connect(std::function<void()> on_connect) {
-		m_on_connect = std::move(on_connect);
-		return *this;
-	}
-
-	WebSocketClientBuilder &with_on_close(
-		std::function<void(ws::close_reason)> on_close) {
-		m_on_close = std::move(on_close);
-		return *this;
-	}
-
-	WebSocketClientBuilder &with_on_error(
-		std::function<void(boost::system::error_code, std::string_view)>
-			on_error) {
-		m_on_error = std::move(on_error);
-		return *this;
-	}
-
-	WebSocketClientBuilder &with_on_message(
-		std::function<void(boost::span<const std::byte>)> on_message) {
-		m_on_message = std::move(on_message);
-		return *this;
-	}
-
-	WebSocketClientBuilder &with_url(std::string_view url) {
-		m_url = url;
-		return *this;
-	}
-
-   private:
-	bool m_auto_reconnect{};
-	std::function<void()> m_on_connect;
-	std::function<void(ws::close_reason)> m_on_close;
-	std::function<void(boost::system::error_code, std::string_view)> m_on_error;
-	std::function<void(boost::span<const std::byte>)> m_on_message;
-	std::string m_url;
+	bool m_closing{};
 };
 }  // namespace ekizu::net
 
