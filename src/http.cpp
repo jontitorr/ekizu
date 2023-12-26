@@ -72,6 +72,7 @@ struct HttpConnection::Impl {
 
 		if (ec) { return ec; }
 
+		m_res = {};
 		http::async_read(m_stream, m_buffer, m_res, yield[ec]);
 
 		if (ec) { return ec; }
