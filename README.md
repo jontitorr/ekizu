@@ -4,6 +4,7 @@ A WIP C++ library for Discord applications.
 
 ## Features
 
+- Fully asynchronous, perfect for single-threaded applications
 - Low memory footprint
 - Discord API v10 support
 - Gateway support, with auto-reconnect
@@ -12,79 +13,64 @@ A WIP C++ library for Discord applications.
 ## Usage/Examples
 
 ```cpp
-#include <dotenv/dotenv.h>
+#include <ekizu/async_main.hpp>
 #include <ekizu/http_client.hpp>
 #include <ekizu/shard.hpp>
-#include <nlohmann/json.hpp>
 
 using namespace ekizu;
 
-std::function<void(Event)> handle_event(HttpClient &http);
+Result<> handle_event(const Event &ev, const HttpClient &http,
+       const asio::yield_context &yield);
 
-int main()
-{
-	dotenv::init();
-	const auto token = dotenv::getenv("DISCORD_TOKEN");
+async_main(const asio::yield_context &yield) {
+ const std::string token{std::getenv("DISCORD_TOKEN")};
+ HttpClient http{token};
+ Shard shard{ShardId::ONE, token, Intents::AllIntents};
 
-	auto http = HttpClient{ token };
-	const auto intents = Intents::AllIntents;
-	auto shard = Shard{ ShardId::ONE, token, intents };
+ while (true) {
+  auto res = shard.next_event(yield);
 
-	if (const auto res = shard.run(handle_event(http)); !res) {
-		fmt::println("Failed to run shard: {}", res.error().message());
-		return 1;
-	}
+  if (!res) {
+   if (res.error().failed()) {
+    fmt::println(
+     "Failed to get next event: {}", res.error().message());
+    return res.error();
+   }
+   // Could be handling a non-dispatch event.
+   continue;
+  }
+
+  asio::spawn(
+   yield,
+   [e = std::move(res.value()), &http](auto y) {
+    (void)handle_event(e, http, y);
+   },
+   asio::detached);
+ }
+
+ return outcome::success();
 }
 
-template <typename... Func> struct overload : Func... {
-	using Func::operator()...;
-};
+Result<> handle_event(const Event &ev, const HttpClient &http,
+       const asio::yield_context &yield) {
+ std::visit(
+  [&](auto &&event) {
+   using T = std::decay_t<decltype(event)>;
 
-template <typename... Func> overload(Func...) -> overload<Func...>;
+   if constexpr (std::is_same_v<T, MessageCreate>) {
+    const auto &[msg_a] = event;
+    const Message &msg = msg_a;
 
-std::function<void(Event)> handle_event(HttpClient &http)
-{
-	return [&http](Event ev) {
-		std::visit(
-			overload{
-				[](const Ready &r) {
-					fmt::println("{} is ready!",
-						     r.user.username);
-				},
-				[&http](const MessageCreate &payload) {
-					const auto &[msg] = payload;
+    if (msg.content == "ping") {
+     (void)http.create_message(msg.channel_id)
+      .content("pong")
+      .send(yield);
+    }
+   }
+  },
+  ev);
 
-					const auto res =
-						http.create_message(
-							    msg.channel_id)
-							.content(fmt::format(
-								"{} said: {}\nAvatar: {}",
-								msg.author
-									.username,
-								msg.content,
-								msg.author.avatar ?
-									*msg.author
-										 .avatar :
-									"null"))
-							.send();
-
-					if (!res) {
-						fmt::println(
-							"Failed to send message: {}",
-							res.error().message());
-					}
-				},
-				[](Resumed) {
-					fmt::println("Resumed Event Called");
-				},
-				[](const auto &e) {
-					fmt::println(
-						"Uncaught {} event: {}",
-						typeid(e).name(),
-						nlohmann::json{ e }.dump());
-				} },
-			ev);
-	};
+ return outcome::success();
 }
 ```
 
@@ -127,7 +113,7 @@ Take full advantage of the [.clang-format](.clang-format) file located in the ro
 ### Third party Dependencies
 
 - [fmt](https://github.com/fmtlib/fmt) (comes bundled with project)
-- [net](https://github.com/xminent/net) (comes bundled with project)
+- [Boost (ASIO, Beast, Outcome, URL)](https://github.com/boostorg/boost) (comes bundled with project, unless you have it installed)
 - [nlohmann_json](https://github.com/nlohmann/json) (comes bundled with project)
 - [zlib](https://github.com/madler/zlib) (comes bundled with project, unless you have it installed)
 

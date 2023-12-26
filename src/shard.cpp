@@ -104,12 +104,6 @@ Result<> Shard::close(CloseFrame reason,
 		{static_cast<net::ws::close_code>(reason.code), reason.reason}, yield);
 }
 
-// Result<> Shard::close(CloseFrame reason,
-// 					  const boost::asio::yield_context &yield) {
-// 	if (!m_ws) { return boost::system::errc::not_connected; }
-
-// }
-
 Result<Event> Shard::next_event(const boost::asio::yield_context &yield) {
 	BOOST_OUTCOME_TRY(auto msg, next_message(yield));
 
