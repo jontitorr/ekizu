@@ -31,7 +31,6 @@
 #include <ekizu/gateway/interaction_create.hpp>
 #include <ekizu/gateway/invite_create.hpp>
 #include <ekizu/gateway/invite_delete.hpp>
-#include <ekizu/gateway/log.hpp>
 #include <ekizu/gateway/message_create.hpp>
 #include <ekizu/gateway/message_delete.hpp>
 #include <ekizu/gateway/message_delete_bulk.hpp>
@@ -68,7 +67,7 @@ using Event = std::variant<
 	GuildScheduledEventDelete, GuildScheduledEventUpdate,
 	GuildScheduledEventUserAdd, GuildScheduledEventUserRemove,
 	GuildStickersUpdate, GuildUpdate, IntegrationCreate, IntegrationDelete,
-	IntegrationUpdate, InteractionCreate, InviteCreate, InviteDelete, Log,
+	IntegrationUpdate, InteractionCreate, InviteCreate, InviteDelete,
 	MessageCreate, MessageDelete, MessageDeleteBulk, MessageReactionAdd,
 	MessageReactionRemove, MessageReactionRemoveAll, MessageReactionRemoveEmoji,
 	MessageUpdate, PresenceUpdate, Ready, Resumed, StageInstanceCreate,

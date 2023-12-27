@@ -1,5 +1,5 @@
-#include <ekizu/gateway/log.hpp>
 #include <ekizu/json_util.hpp>
+#include <ekizu/log.hpp>
 
 namespace ekizu {
 using json_util::deserialize;

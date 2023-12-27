@@ -5,6 +5,7 @@
 #include <ekizu/event.hpp>
 #include <ekizu/inflater.hpp>
 #include <ekizu/intents.hpp>
+#include <ekizu/log.hpp>
 #include <ekizu/ws.hpp>
 
 namespace ekizu {
@@ -104,7 +105,8 @@ struct Shard {
 	void handle_heartbeat_ack();
 
 	void log(std::string_view msg, LogLevel level = LogLevel::Debug) const;
-	Result<std::string> next_message(const boost::asio::yield_context &yield);
+	Result<net::WebSocketMessage> next_message(
+		const boost::asio::yield_context &yield);
 	Result<> reconnect(const boost::asio::yield_context &yield);
 	Result<> start_heartbeat(uint32_t heartbeat_interval,
 							 const boost::asio::any_io_executor &executor);

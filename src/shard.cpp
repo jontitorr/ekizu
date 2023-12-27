@@ -111,12 +111,12 @@ Result<> Shard::close(CloseFrame reason,
 Result<Event> Shard::next_event(const boost::asio::yield_context &yield) {
 	BOOST_OUTCOME_TRY(auto msg, next_message(yield));
 
-	if (m_inflater && Inflater::is_compressed(msg)) {
-		BOOST_OUTCOME_TRY(auto inflated, m_inflater->inflate(msg));
-		msg = std::move(inflated);
+	if (m_inflater && msg.is_binary) {
+		BOOST_OUTCOME_TRY(auto inflated, m_inflater->inflate(msg.payload));
+		msg.payload = inflated;
 	}
 
-	return handle_event(msg, yield);
+	return handle_event(msg.payload, yield);
 }
 
 Result<Event> Shard::handle_event(std::string_view data,
@@ -250,7 +250,7 @@ void Shard::log(std::string_view msg, LogLevel level) const {
 	});
 }
 
-Result<std::string> Shard::next_message(
+Result<net::WebSocketMessage> Shard::next_message(
 	const boost::asio::yield_context &yield) {
 	static uint8_t reconnect_attempts{};
 	static constexpr uint8_t max_reconnect_attempts{5};

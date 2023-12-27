@@ -48,13 +48,6 @@ Inflater::Inflater(Inflater &&) noexcept = default;
 Inflater &Inflater::operator=(Inflater &&) noexcept = default;
 Inflater::~Inflater() = default;
 
-bool Inflater::is_compressed(boost::span<const char> data) {
-	const auto last = data.last(4);
-	const auto expected = boost::span<const char, 4>{
-		{0x00, 0x00, static_cast<char>(0xFF), static_cast<char>(0xFF)}};
-	return std::equal(last.begin(), last.end(), expected.begin());
-}
-
 Result<std::string> Inflater::inflate(boost::span<const char> data) {
 	m_impl->stream->avail_in = static_cast<uint32_t>(data.size());
 	m_impl->stream->next_in =

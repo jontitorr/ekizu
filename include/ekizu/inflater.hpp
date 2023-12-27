@@ -18,7 +18,6 @@ struct Inflater {
 	Inflater &operator=(Inflater &&) noexcept;
 	~Inflater();
 
-	[[nodiscard]] static bool is_compressed(boost::span<const char> data);
 	static Result<Inflater> create();
 
 	[[nodiscard]] Result<std::string> inflate(boost::span<const char> data);

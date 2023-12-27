@@ -22,12 +22,19 @@ using WebSocketCloseCode = ws::close_code;
 
 struct WebSocketClientBuilder;
 
+struct WebSocketMessage {
+	/// The message payload.
+	std::string payload;
+	/// Whether or not the message is binary.
+	bool is_binary;
+};
+
 struct WebSocketClient {
 	[[nodiscard]] static Result<WebSocketClient> connect(
 		std::string_view url, const asio::yield_context &yield);
 	[[nodiscard]] bool is_open() const;
 	Result<> close(ws::close_reason reason, const asio::yield_context &yield);
-	Result<std::string> read(const asio::yield_context &yield);
+	Result<WebSocketMessage> read(const asio::yield_context &yield);
 	Result<> send(std::string_view message, const asio::yield_context &yield);
 
    private:

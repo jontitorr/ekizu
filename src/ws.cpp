@@ -135,13 +135,16 @@ bool WebSocketClient::is_open() const {
 	return std::visit([](auto &&s) { return s.is_open(); }, m_stream);
 }
 
-Result<std::string> WebSocketClient::read(
+Result<WebSocketMessage> WebSocketClient::read(
 	const boost::asio::yield_context &yield) {
 	boost::system::error_code ec;
 
-	std::visit([this, &yield,
-				&ec](auto &&stream) { stream.async_read(m_buffer, yield[ec]); },
-			   m_stream);
+	auto is_binary = std::visit(
+		[this, &yield, &ec](auto &&stream) {
+			stream.async_read(m_buffer, yield[ec]);
+			return stream.got_binary();
+		},
+		m_stream);
 
 	if (ec) { return ec; }
 
@@ -150,7 +153,7 @@ Result<std::string> WebSocketClient::read(
 
 	m_buffer.consume(m_buffer.size());
 
-	return ret;
+	return WebSocketMessage{std::move(ret), is_binary};
 }
 
 Result<> WebSocketClient::close(ws::close_reason reason,
