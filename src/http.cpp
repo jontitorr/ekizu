@@ -108,7 +108,9 @@ Result<HttpResponse> HttpConnection::get(std::string_view url,
 	BOOST_OUTCOME_TRY(auto uri, boost::urls::parse_uri(url));
 	BOOST_OUTCOME_TRY(auto conn, connect(url, yield));
 
-	HttpRequest req{http::verb::get, uri.path().empty() ? "/" : uri.path(), 11};
+	HttpRequest req{
+		http::verb::get, uri.path().empty() ? "/" : uri.encoded_path(), 11};
+	req.set(http::field::host, uri.host());
 
 	return conn.request(req, yield);
 }
