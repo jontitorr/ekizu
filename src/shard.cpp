@@ -101,7 +101,11 @@ Result<> Shard::close(CloseFrame reason,
 	log(fmt::format("sending websocket close message | code={}, reason={}",
 					reason.code, reason.reason.data()));
 	return m_ws->close(
-		{static_cast<net::ws::close_code>(reason.code), reason.reason}, yield);
+		net::ws::close_reason{static_cast<net::ws::close_code>(reason.code),
+							  boost::string_view{
+								  reason.reason,
+							  }},
+		yield);
 }
 
 Result<Event> Shard::next_event(const boost::asio::yield_context &yield) {
