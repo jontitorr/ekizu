@@ -78,6 +78,12 @@ Result<net::HttpResponse> HttpClient::send(net::HttpRequest req,
 		m_http = std::move(http);
 	}
 
+	if (auto res = m_http->request(req, yield); res) { return res; }
+
+	BOOST_OUTCOME_TRY(
+		auto http, net::HttpConnection::connect("https://discord.com", yield));
+	m_http = std::move(http);
+
 	return m_http->request(req, yield);
 }
 }  // namespace ekizu
