@@ -31,6 +31,9 @@ string(TOUPPER ${PROJECT_NAME} PROJECT_NAME_UPPERCASE)
 
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 option(${PROJECT_NAME}_INSTALL "Generate the install target" ON)
+option(${PROJECT_NAME}_WARNINGS_AS_ERRORS "Treat compiler warnings as errors"
+       ON
+)
 
 include(CMakeDependentOption)
 
@@ -82,7 +85,6 @@ if(MSVC)
     )
 endif()
 
-set(${PROJECT_NAME}_WARNINGS_AS_ERRORS ON)
 include(cmake/CompilerWarnings.cmake)
 
 set_project_warnings(${PROJECT_NAME})

@@ -19,8 +19,34 @@ on:
       - "**.cpp"
       - "**CMakeLists.txt"
 
+env:
+  BRANCH_NAME: ${{ github.ref == 'refs/heads/dev' && 'dev' || 'main' }}
+  PRERELEASE: ${{ github.ref == 'refs/heads/dev' && 'true' || 'false' }}
+  TAG_SUFFIX: ${{ github.ref == 'refs/heads/dev' && '-dev' || '' }}
+
 jobs:
+  changes:
+    runs-on: ubuntu-22.04
+    outputs:
+      build: ${{ steps.filter.outputs.src }}
+
+    steps:
+      - name: Checkout
+        if: github.event_name == 'push'
+        uses: actions/checkout@v3
+
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          base: ${{ env.BRANCH_NAME }}
+          filters: |
+            src:
+              - '**/*.cpp'
+              - '**/*.hpp'
+              - '**/CMakeLists.txt'
+
   linux:
+    needs: changes
     name: Linux ${{ matrix.arch }} (${{ matrix.gcc-version }})
     runs-on: ${{ matrix.os }}
     strategy:
@@ -29,6 +55,7 @@ jobs:
         arch: [amd64]
         gcc-version: ["g++-9", "g++-10", "g++-12"]
         os: ["ubuntu-22.04"]
+    if: needs.changes.outputs.build == 'true'
 
     steps:
       - name: Checkout
@@ -45,6 +72,14 @@ jobs:
 
       - name: Configure CMake
         run: cmake -S . -B build -G Ninja
+        if: matrix.gcc-version != 'g++-12'
+        env:
+          BOOST_ROOT: ${{ steps.install-boost.outputs.BOOST_ROOT }}
+          CXX: ${{ matrix.gcc-version }}
+
+      - name: Configure CMake (g++-12)
+        run: cmake -S . -B build -G Ninja -Dekizu_WARNINGS_AS_ERRORS=OFF
+        if: matrix.gcc-version == 'g++-12'
         env:
           BOOST_ROOT: ${{ steps.install-boost.outputs.BOOST_ROOT }}
           CXX: ${{ matrix.gcc-version }}
@@ -66,7 +101,9 @@ jobs:
         with:
           name: "libekizu - RPM Package ${{ matrix.arch }}"
           path: "${{ github.workspace }}/build/*.rpm"
+
   windows:
+    needs: changes
     strategy:
       fail-fast: false
       matrix:
@@ -75,6 +112,7 @@ jobs:
         vs:
           - { name: 2019, version: 16, os: windows-2019 }
           - { name: 2022, version: 17, os: windows-2022 }
+    if: needs.changes.outputs.build == 'true'
 
     name: "Windows ${{ matrix.arch }}-${{ matrix.config }}-vs${{ matrix.vs.name }}"
     runs-on: ${{ matrix.vs.os }}
@@ -113,3 +151,91 @@ jobs:
         with:
           name: "libekizu - Windows ${{ matrix.arch }}-${{ matrix.config }}-vs${{ matrix.vs.name }}"
           path: "${{ github.workspace }}/build/*.zip"
+
+  release:
+    needs: [linux, windows]
+    runs-on: ubuntu-22.04
+    if: github.event_name == 'push'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Get Latest Tag
+        id: latest-tag
+        run: |
+          if [[ "${{ github.ref }}" == 'refs/heads/dev' ]]; then
+            latest_tag=$(git tag -l | grep "\-dev" | sort -V | tail -n 1 || true)
+          else
+            latest_tag=$(git tag -l | grep -v "\-dev" | sort -V | tail -n 1 || true)
+          fi
+
+          if [[ -z $latest_tag ]]; then
+            latest_tag=""
+          fi
+
+          echo "::set-output name=tag::$latest_tag"
+        shell: bash
+
+      - name: Get Next Version
+        id: semver
+        uses: ietf-tools/semver-action@v1
+        with:
+          token: ${{ github.token }}
+          branch: ${{ env.BRANCH_NAME }}
+          fromTag: ${{ steps.latest-tag.outputs.tag }}
+
+      - name: Create Draft Release
+        uses: ncipollo/release-action@v1.12.0
+        with:
+          prerelease: ${{ env.PRERELEASE }}
+          draft: false
+          commit: ${{ github.sha }}
+          tag: ${{ steps.semver.outputs.next }}${{ env.TAG_SUFFIX }}
+          name: ${{ steps.semver.outputs.next }}${{ env.TAG_SUFFIX }}
+          body: "*pending*"
+          token: ${{ github.token }}
+
+      - name: Update CHANGELOG
+        id: changelog
+        uses: requarks/changelog-action@v1
+        with:
+          token: ${{ github.token }}
+          fromTag: ${{ steps.semver.outputs.next }}${{ env.TAG_SUFFIX }}
+          toTag: ${{ steps.semver.outputs.current }}${{ env.TAG_SUFFIX }}
+          writeToFile: false
+
+      - name: Create Release
+        uses: ncipollo/release-action@v1.12.0
+        with:
+          prerelease: ${{ env.PRERELEASE }}
+          allowUpdates: true
+          draft: false
+          makeLatest: true
+          commit: ${{ github.sha }}
+          tag: ${{ steps.semver.outputs.next }}${{ env.TAG_SUFFIX }}
+          name: ${{ steps.semver.outputs.next }}${{ env.TAG_SUFFIX }}
+          body: ${{ steps.changelog.outputs.changes }}
+          token: ${{ github.token }}
+
+    outputs:
+      next: ${{ steps.semver.outputs.next }}
+
+  upload:
+    needs: release
+    runs-on: ubuntu-22.04
+    if: github.event_name == 'push'
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: .
+
+      - name: Upload artifacts to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ github.token }}
+          file_glob: true
+          file: "**/*"
+          tag: ${{ needs.release.outputs.next }}${{ env.TAG_SUFFIX }}
