@@ -40,10 +40,9 @@ CreateMessage::CreateMessage(
 	: m_channel_id{channel_id}, m_make_request{make_request} {}
 
 CreateMessage::operator net::HttpRequest() const {
-	auto req = net::HttpRequest{
-		net::HttpMethod::post,
-		fmt::format("/channels/{}/messages", m_channel_id), 11,
-		static_cast<nlohmann::json>(m_fields).dump()};
+	net::HttpRequest req{net::HttpMethod::post,
+						 fmt::format("/channels/{}/messages", m_channel_id), 11,
+						 static_cast<nlohmann::json>(m_fields).dump()};
 
 	req.set(net::http::field::content_type, "application/json");
 	req.prepare_payload();

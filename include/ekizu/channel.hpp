@@ -6,6 +6,13 @@
 #include <ekizu/presence.hpp>
 
 namespace ekizu {
+enum class ChannelFlags : uint64_t {
+	/// Channel is pinned in a forum.
+	Pinned = 1 << 1,
+	/// New threads in a forum channel require a tag.
+	RequireTag = 1 << 4,
+};
+
 enum class ChannelType : uint8_t {
 	/// A text channel within a server.
 	GuildText = 0,
@@ -44,6 +51,22 @@ struct DefaultReaction {
 
 EKIZU_EXPORT void to_json(nlohmann::json &j, const DefaultReaction &r);
 EKIZU_EXPORT void from_json(const nlohmann::json &j, DefaultReaction &r);
+
+enum class ForumLayout : uint8_t {
+	/// Display posts as a collection of tiles.
+	GalleryView,
+	/// Display posts as a list.
+	ListView,
+	/// No default has been set for the forum channel.
+	NotSet,
+};
+
+enum class ForumSortOrder : uint8_t {
+	/// Sort forum posts by creation time (from most recent to oldest).
+	CreationDate,
+	/// Sort forum posts by activity.
+	LatestActivity,
+};
 
 struct ForumTag {
 	/// The ID of the tag.
@@ -119,6 +142,13 @@ struct ThreadMember {
 
 EKIZU_EXPORT void to_json(nlohmann::json &j, const ThreadMember &m);
 EKIZU_EXPORT void from_json(const nlohmann::json &j, ThreadMember &m);
+
+enum class VideoQualityMode : uint8_t {
+	/// Discord chooses the quality for optimal performance.
+	Auto = 1,
+	/// 720p.
+	Full,
+};
 
 struct Channel {
 	/// The ID of the channel.

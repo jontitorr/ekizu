@@ -14,6 +14,29 @@ HttpClient::HttpClient(std::string_view token)
 		  }},
 	  m_token{token} {}
 
+GetChannel HttpClient::get_channel(Snowflake channel_id) const {
+	return GetChannel{m_rate_limiter_make_request, channel_id};
+}
+
+ModifyChannel HttpClient::modify_channel(Snowflake channel_id) const {
+	return ModifyChannel{m_rate_limiter_make_request, channel_id};
+}
+
+DeleteChannel HttpClient::delete_channel(Snowflake channel_id) const {
+	return DeleteChannel{m_rate_limiter_make_request, channel_id};
+}
+
+GetChannelMessages HttpClient::get_channel_messages(
+	Snowflake channel_id) const {
+	return GetChannelMessages{m_rate_limiter_make_request, channel_id};
+}
+
+GetChannelMessage HttpClient::get_channel_message(Snowflake channel_id,
+												  Snowflake message_id) const {
+	return GetChannelMessage{
+		m_rate_limiter_make_request, channel_id, message_id};
+}
+
 CreateMessage HttpClient::create_message(Snowflake channel_id) const {
 	return CreateMessage{m_rate_limiter_make_request, channel_id};
 }
@@ -21,6 +44,25 @@ CreateMessage HttpClient::create_message(Snowflake channel_id) const {
 CreateReaction HttpClient::create_reaction(
 	Snowflake channel_id, Snowflake message_id, RequestReaction emoji) const {
 	return CreateReaction{
+		m_rate_limiter_make_request, channel_id, message_id, std::move(emoji)};
+}
+
+DeleteOwnReaction HttpClient::delete_own_reaction(
+	Snowflake channel_id, Snowflake message_id, RequestReaction emoji) const {
+	return DeleteOwnReaction{
+		m_rate_limiter_make_request, channel_id, message_id, std::move(emoji)};
+}
+
+DeleteUserReaction HttpClient::delete_user_reaction(
+	Snowflake channel_id, Snowflake message_id, RequestReaction emoji,
+	Snowflake user_id) const {
+	return DeleteUserReaction{m_rate_limiter_make_request, channel_id,
+							  message_id, std::move(emoji), user_id};
+}
+
+GetReactions HttpClient::get_reactions(
+	Snowflake channel_id, Snowflake message_id, RequestReaction emoji) const {
+	return GetReactions{
 		m_rate_limiter_make_request, channel_id, message_id, std::move(emoji)};
 }
 
@@ -62,6 +104,14 @@ GetCurrentUser HttpClient::get_current_user() const {
 
 GetUser HttpClient::get_user(Snowflake user_id) const {
 	return GetUser{m_rate_limiter_make_request, user_id};
+}
+
+ModifyCurrentUser HttpClient::modify_current_user() const {
+	return ModifyCurrentUser{m_rate_limiter_make_request};
+}
+
+CreateDM HttpClient::create_dm(Snowflake user_id) const {
+	return CreateDM{m_rate_limiter_make_request, user_id};
 }
 
 Result<net::HttpResponse> HttpClient::send(net::HttpRequest req,
