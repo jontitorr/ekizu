@@ -181,10 +181,9 @@ Result<Event> Shard::handle_dispatch(const nlohmann::json &data) {
 			return boost::system::errc::invalid_argument;
 		}
 
-		m_session.emplace();
+		m_session.emplace(
+			event["session_id"].get<std::string>(), sequence.value_or(0));
 		m_resume_gateway_url = event["resume_gateway_url"].get<std::string>();
-		m_session->id = event["session_id"];
-		m_session->sequence = sequence.value_or(0);
 
 		log(fmt::format("received ready | resume_gateway_url={}, session_id={}",
 						*m_resume_gateway_url, m_session->id));

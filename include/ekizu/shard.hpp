@@ -86,7 +86,10 @@ struct Shard {
 
    private:
 	struct Session {
-		std::string id{};
+		Session(std::string_view id_, uint64_t sequence_)
+			: id{id_}, sequence{sequence_} {}
+
+		std::string id;
 		uint64_t sequence{};
 	};
 
