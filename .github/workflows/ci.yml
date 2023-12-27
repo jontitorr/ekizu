@@ -166,6 +166,7 @@ jobs:
         run: |
           if [[ "${{ github.ref }}" == 'refs/heads/dev' ]]; then
             latest_tag=$(git tag -l | grep "\-dev" | sort -V | tail -n 1 || true)
+            latest_tag=${latest_tag%-dev}
           else
             latest_tag=$(git tag -l | grep -v "\-dev" | sort -V | tail -n 1 || true)
           fi

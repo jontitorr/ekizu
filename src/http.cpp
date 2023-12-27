@@ -5,7 +5,6 @@
 #include <boost/certify/https_verification.hpp>
 #include <boost/outcome/try.hpp>
 #include <boost/url/parse.hpp>
-#include <deque>
 #include <ekizu/http.hpp>
 
 namespace {
