@@ -75,7 +75,8 @@ ekizu::Result<ekizu::Event> event_from_str(std::string_view event_type,
 	EKIZU_EVENT(VOICE_STATE_UPDATE, VoiceStateUpdate)
 	EKIZU_EVENT(WEBHOOKS_UPDATE, WebhooksUpdate)
 
-	return boost::system::errc::invalid_argument;
+	// Not an error, we just don't handle it.
+	return boost::system::error_code{};
 }
 }  // namespace
 
