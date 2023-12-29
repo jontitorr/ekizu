@@ -8,12 +8,16 @@
 #include <ekizu/request/create_message.hpp>
 #include <ekizu/request/create_reaction.hpp>
 #include <ekizu/request/crosspost_message.hpp>
+#include <ekizu/request/delete_all_reactions.hpp>
+#include <ekizu/request/delete_all_reactions_for_emoji.hpp>
 #include <ekizu/request/delete_channel.hpp>
 #include <ekizu/request/delete_message.hpp>
 #include <ekizu/request/delete_own_reaction.hpp>
 #include <ekizu/request/delete_user_reaction.hpp>
+#include <ekizu/request/edit_channel_permissions.hpp>
 #include <ekizu/request/edit_message.hpp>
 #include <ekizu/request/get_channel.hpp>
+#include <ekizu/request/get_channel_invites.hpp>
 #include <ekizu/request/get_channel_message.hpp>
 #include <ekizu/request/get_channel_messages.hpp>
 #include <ekizu/request/get_current_user.hpp>
@@ -36,6 +40,8 @@ struct HttpClient {
 	[[nodiscard]] GetChannelMessage get_channel_message(
 		Snowflake channel_id, Snowflake message_id) const;
 	[[nodiscard]] CreateMessage create_message(Snowflake channel_id) const;
+	[[nodiscard]] CrosspostMessage crosspost_message(
+		Snowflake channel_id, Snowflake message_id) const;
 	[[nodiscard]] CreateReaction create_reaction(Snowflake channel_id,
 												 Snowflake message_id,
 												 RequestReaction emoji) const;
@@ -48,14 +54,21 @@ struct HttpClient {
 	[[nodiscard]] GetReactions get_reactions(Snowflake channel_id,
 											 Snowflake message_id,
 											 RequestReaction emoji) const;
-	[[nodiscard]] CrosspostMessage crosspost_message(
+	[[nodiscard]] DeleteAllReactions delete_all_reactions(
 		Snowflake channel_id, Snowflake message_id) const;
+	[[nodiscard]] DeleteAllReactionsForEmoji delete_all_reactions_for_emoji(
+		Snowflake channel_id, Snowflake message_id,
+		RequestReaction emoji) const;
 	[[nodiscard]] EditMessage edit_message(Snowflake channel_id,
 										   Snowflake message_id) const;
 	[[nodiscard]] DeleteMessage delete_message(Snowflake channel_id,
 											   Snowflake message_id) const;
 	[[nodiscard]] BulkDeleteMessages bulk_delete_messages(
 		Snowflake channel_id, const std::vector<Snowflake> &message_ids) const;
+	[[nodiscard]] EditChannelPermissions edit_channel_permissions(
+		Snowflake channel_id, const PermissionOverwrite &overwrite) const;
+	[[nodiscard]] GetChannelInvites get_channel_invites(
+		Snowflake channel_id) const;
 	[[nodiscard]] PinMessage pin_message(Snowflake channel_id,
 										 Snowflake message_id) const;
 	[[nodiscard]] UnpinMessage unpin_message(Snowflake channel_id,

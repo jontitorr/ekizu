@@ -41,6 +41,12 @@ CreateMessage HttpClient::create_message(Snowflake channel_id) const {
 	return CreateMessage{m_rate_limiter_make_request, channel_id};
 }
 
+CrosspostMessage HttpClient::crosspost_message(Snowflake channel_id,
+											   Snowflake message_id) const {
+	return CrosspostMessage{
+		m_rate_limiter_make_request, channel_id, message_id};
+}
+
 CreateReaction HttpClient::create_reaction(
 	Snowflake channel_id, Snowflake message_id, RequestReaction emoji) const {
 	return CreateReaction{
@@ -66,10 +72,16 @@ GetReactions HttpClient::get_reactions(
 		m_rate_limiter_make_request, channel_id, message_id, std::move(emoji)};
 }
 
-CrosspostMessage HttpClient::crosspost_message(Snowflake channel_id,
-											   Snowflake message_id) const {
-	return CrosspostMessage{
+DeleteAllReactions HttpClient::delete_all_reactions(
+	Snowflake channel_id, Snowflake message_id) const {
+	return DeleteAllReactions{
 		m_rate_limiter_make_request, channel_id, message_id};
+}
+
+DeleteAllReactionsForEmoji HttpClient::delete_all_reactions_for_emoji(
+	Snowflake channel_id, Snowflake message_id, RequestReaction emoji) const {
+	return DeleteAllReactionsForEmoji{
+		m_rate_limiter_make_request, channel_id, message_id, std::move(emoji)};
 }
 
 EditMessage HttpClient::edit_message(Snowflake channel_id,
@@ -86,6 +98,16 @@ BulkDeleteMessages HttpClient::bulk_delete_messages(
 	Snowflake channel_id, const std::vector<Snowflake> &message_ids) const {
 	return BulkDeleteMessages{
 		m_rate_limiter_make_request, channel_id, message_ids};
+}
+
+EditChannelPermissions HttpClient::edit_channel_permissions(
+	Snowflake channel_id, const PermissionOverwrite &overwrite) const {
+	return EditChannelPermissions{
+		m_rate_limiter_make_request, channel_id, overwrite};
+}
+
+GetChannelInvites HttpClient::get_channel_invites(Snowflake channel_id) const {
+	return GetChannelInvites{m_rate_limiter_make_request, channel_id};
 }
 
 PinMessage HttpClient::pin_message(Snowflake channel_id,

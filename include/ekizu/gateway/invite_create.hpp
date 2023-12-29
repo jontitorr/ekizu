@@ -1,7 +1,7 @@
-#ifndef EKIZU_MODELS_INVITE_CREATE_HPP
-#define EKIZU_MODELS_INVITE_CREATE_HPP
+#ifndef EKIZU_GATEWAY_INVITE_CREATE_HPP
+#define EKIZU_GATEWAY_INVITE_CREATE_HPP
 
-#include <ekizu/user.hpp>
+#include <ekizu/invite.hpp>
 
 namespace ekizu {
 struct PartialUser {
@@ -17,8 +17,6 @@ struct PartialUser {
 
 EKIZU_EXPORT void to_json(nlohmann::json &j, const PartialUser &u);
 EKIZU_EXPORT void from_json(const nlohmann::json &j, PartialUser &u);
-
-enum class TargetType : uint8_t { Stream = 1, EmbeddedApplication = 2 };
 
 struct InviteCreate {
 	/// ID of the channel invited users will first see.
@@ -49,4 +47,4 @@ EKIZU_EXPORT void to_json(nlohmann::json &j, const InviteCreate &invite);
 EKIZU_EXPORT void from_json(const nlohmann::json &j, InviteCreate &invite);
 }  // namespace ekizu
 
-#endif	// EKIZU_MODELS_INVITE_CREATE_HPP
+#endif	// EKIZU_GATEWAY_INVITE_CREATE_HPP
