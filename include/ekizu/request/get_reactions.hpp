@@ -22,7 +22,8 @@ struct GetReactions {
 		return *this;
 	}
 
-	[[nodiscard]] Result<void> send(const asio::yield_context& yield) const;
+	[[nodiscard]] Result<std::vector<User>> send(
+		const asio::yield_context& yield) const;
 
    private:
 	std::optional<Snowflake> m_after;

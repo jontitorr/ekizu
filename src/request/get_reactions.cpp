@@ -52,17 +52,13 @@ GetReactions::operator net::HttpRequest() const {
 	return {net::HttpMethod::get, url, 11};
 }
 
-Result<void> GetReactions::send(const asio::yield_context& yield) const {
+Result<std::vector<User>> GetReactions::send(
+	const asio::yield_context& yield) const {
 	if (!m_make_request) {
 		return boost::system::errc::operation_not_permitted;
 	}
 
 	BOOST_OUTCOME_TRY(auto res, m_make_request(*this, yield));
-
-	if (res.result() == net::HttpStatus::no_content) {
-		return outcome::success();
-	}
-
-	return boost::system::errc::invalid_argument;
+	return json_util::deserialize<std::vector<User>>(res.body());
 }
 }  // namespace ekizu
