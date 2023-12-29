@@ -11,6 +11,13 @@ namespace {
 using boost::asio::ip::tcp;
 namespace beast = boost::beast;
 namespace ssl = boost::asio::ssl;
+
+template <typename F>
+struct defer {
+	F f;
+	explicit defer(F &&f_) : f(std::move(f_)) {}
+	~defer() { f(); }
+};
 }  // namespace
 
 namespace ekizu::net {
@@ -44,8 +51,13 @@ struct HttpConnection::Impl {
 		return outcome::success();
 	}
 
-	Result<HttpResponse> request(const HttpRequest &req,
-								 const asio::yield_context &yield) {
+	Result<HttpResponse> do_request(const HttpRequest &req,
+									const asio::yield_context &yield) {
+		defer timer_d{[this] {
+			--m_tasks;
+			m_timer->cancel_one();
+		}};
+
 		boost::system::error_code ec;
 		http::async_write(m_stream, req, yield[ec]);
 
@@ -59,10 +71,27 @@ struct HttpConnection::Impl {
 		return res;
 	}
 
+	Result<HttpResponse> request(const HttpRequest &req,
+								 const asio::yield_context &yield) {
+		++m_tasks;
+
+		if (m_tasks == 1) {
+			m_timer.emplace(yield.get_executor());
+			m_timer->expires_at(boost::posix_time::pos_infin);
+		} else {
+			boost::system::error_code ec;
+			m_timer->async_wait(yield[ec]);
+		}
+
+		return do_request(req, yield);
+	}
+
    private:
 	asio::ip::tcp::resolver m_resolver;
 	beast::ssl_stream<beast::tcp_stream> m_stream;
 	beast::flat_buffer m_buffer;
+	uint64_t m_tasks{};
+	std::optional<asio::deadline_timer> m_timer;
 };
 
 Result<HttpResponse> HttpConnection::request(const HttpRequest &req,
