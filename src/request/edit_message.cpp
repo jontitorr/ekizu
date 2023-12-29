@@ -36,11 +36,11 @@ EditMessage::EditMessage(
 EditMessage::operator net::HttpRequest() const {
 	auto req = net::HttpRequest{
 		net::HttpMethod::patch,
-		fmt::format("/channels/{}/messages/{}", m_channel_id, m_message_id),
-		11};
+		fmt::format("/channels/{}/messages/{}", m_channel_id, m_message_id), 11,
+		static_cast<nlohmann::json>(m_fields).dump()};
 
-	req.body() = static_cast<nlohmann::json>(m_fields).dump();
-	req.set("Content-Type", "application/json");
+	req.set(net::http::field::content_type, "application/json");
+	req.prepare_payload();
 
 	return req;
 }

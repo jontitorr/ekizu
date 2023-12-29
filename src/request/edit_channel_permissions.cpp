@@ -14,9 +14,9 @@ EditChannelPermissions::operator net::HttpRequest() const {
 	net::HttpRequest req{net::HttpMethod::put,
 						 fmt::format("/channels/{}/permissions/{}",
 									 m_channel_id, m_overwrite.id),
-						 11};
+						 11, static_cast<nlohmann::json>(m_overwrite).dump()};
 
-	req.body() = static_cast<nlohmann::json>(m_overwrite).dump();
+	req.set(net::http::field::content_type, "application/json");
 	req.prepare_payload();
 
 	return req;

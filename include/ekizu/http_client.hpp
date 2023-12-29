@@ -5,17 +5,20 @@
 #include <ekizu/rate_limiter.hpp>
 #include <ekizu/request/bulk_delete_messages.hpp>
 #include <ekizu/request/create_dm.hpp>
+#include <ekizu/request/create_invite.hpp>
 #include <ekizu/request/create_message.hpp>
 #include <ekizu/request/create_reaction.hpp>
 #include <ekizu/request/crosspost_message.hpp>
 #include <ekizu/request/delete_all_reactions.hpp>
 #include <ekizu/request/delete_all_reactions_for_emoji.hpp>
 #include <ekizu/request/delete_channel.hpp>
+#include <ekizu/request/delete_channel_permission.hpp>
 #include <ekizu/request/delete_message.hpp>
 #include <ekizu/request/delete_own_reaction.hpp>
 #include <ekizu/request/delete_user_reaction.hpp>
 #include <ekizu/request/edit_channel_permissions.hpp>
 #include <ekizu/request/edit_message.hpp>
+#include <ekizu/request/follow_announcement_channel.hpp>
 #include <ekizu/request/get_channel.hpp>
 #include <ekizu/request/get_channel_invites.hpp>
 #include <ekizu/request/get_channel_message.hpp>
@@ -69,6 +72,11 @@ struct HttpClient {
 		Snowflake channel_id, const PermissionOverwrite &overwrite) const;
 	[[nodiscard]] GetChannelInvites get_channel_invites(
 		Snowflake channel_id) const;
+	[[nodiscard]] CreateInvite create_invite(Snowflake channel_id) const;
+	[[nodiscard]] DeleteChannelPermission delete_channel_permission(
+		Snowflake channel_id, Snowflake overwrite_id);
+	[[nodiscard]] FollowAnnouncementChannel follow_announcement_channel(
+		Snowflake channel_id, Snowflake webhook_channel_id) const;
 	[[nodiscard]] PinMessage pin_message(Snowflake channel_id,
 										 Snowflake message_id) const;
 	[[nodiscard]] UnpinMessage unpin_message(Snowflake channel_id,

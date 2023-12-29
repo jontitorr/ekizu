@@ -10,14 +10,11 @@ CreateDM::CreateDM(
 
 CreateDM::operator net::HttpRequest() const {
 	net::HttpRequest req{
-		net::HttpMethod::post,
-		"/users/@me/channels",
-		11,
+		net::HttpMethod::post, "/users/@me/channels", 11,
 		nlohmann::json{
 			{"recipient_id", m_user_id},
 		}
-			.dump(),
-	};
+			.dump()};
 
 	req.set(net::http::field::content_type, "application/json");
 	req.prepare_payload();

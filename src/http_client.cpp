@@ -110,6 +110,22 @@ GetChannelInvites HttpClient::get_channel_invites(Snowflake channel_id) const {
 	return GetChannelInvites{m_rate_limiter_make_request, channel_id};
 }
 
+CreateInvite HttpClient::create_invite(Snowflake channel_id) const {
+	return CreateInvite{m_rate_limiter_make_request, channel_id};
+}
+
+DeleteChannelPermission HttpClient::delete_channel_permission(
+	Snowflake channel_id, Snowflake overwrite_id) {
+	return DeleteChannelPermission{
+		m_rate_limiter_make_request, channel_id, overwrite_id};
+}
+
+FollowAnnouncementChannel HttpClient::follow_announcement_channel(
+	Snowflake channel_id, Snowflake webhook_channel_id) const {
+	return FollowAnnouncementChannel{
+		m_rate_limiter_make_request, channel_id, webhook_channel_id};
+}
+
 PinMessage HttpClient::pin_message(Snowflake channel_id,
 								   Snowflake message_id) const {
 	return PinMessage{m_rate_limiter_make_request, channel_id, message_id};
