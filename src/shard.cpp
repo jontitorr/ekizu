@@ -1,3 +1,4 @@
+#include <boost/asio/deadline_timer.hpp>
 #include <boost/asio/detached.hpp>
 #include <boost/outcome/try.hpp>
 #include <ekizu/shard.hpp>
@@ -253,17 +254,9 @@ void Shard::log(std::string_view msg, LogLevel level) const {
 
 Result<net::WebSocketMessage> Shard::next_message(
 	const boost::asio::yield_context &yield) {
-	static uint8_t reconnect_attempts{};
-	static constexpr uint8_t max_reconnect_attempts{5};
-
 	while (true) {
-		if (reconnect_attempts >= max_reconnect_attempts) {
-			return boost::system::errc::not_connected;
-		}
-
 		if (!m_ws || !m_ws->is_open()) {
 			BOOST_OUTCOME_TRY(auto r, reconnect(yield));
-			reconnect_attempts++;
 		}
 
 		auto res = m_ws->read(yield);
@@ -284,6 +277,12 @@ Result<net::WebSocketMessage> Shard::next_message(
 }
 
 Result<> Shard::reconnect(const boost::asio::yield_context &yield) {
+	boost::asio::deadline_timer t{yield.get_executor()};
+	t.expires_from_now(boost::posix_time::seconds(std::min(
+		static_cast<uint64_t>(std::pow(2, m_reconnect_attempts)),
+		uint64_t{128})));
+	t.async_wait(yield);
+
 	auto url = m_resume_gateway_url
 				   ? fmt::format("{}/{}", *m_resume_gateway_url,
 								 GATEWAY_JSON_ZLIB_QUERY)
@@ -291,8 +290,19 @@ Result<> Shard::reconnect(const boost::asio::yield_context &yield) {
 	log(fmt::format(
 		"{}connecting to {}", m_resume_gateway_url ? "re" : "", url));
 
-	BOOST_OUTCOME_TRY(auto ws, net::WebSocketClient::connect(url, yield));
-	m_ws.emplace(std::move(ws));
+	auto res = net::WebSocketClient::connect(url, yield);
+
+	if (!res) {
+		log(fmt::format(
+				"failed to connect to {} | error={} | reconnect_attempts={}",
+				url, res.error().message(), m_reconnect_attempts),
+			LogLevel::Error);
+		++m_reconnect_attempts;
+		m_resume_gateway_url.reset();
+		return res.error();
+	}
+
+	m_ws.emplace(std::move(res.value()));
 
 	if (m_config.compression) {
 		BOOST_OUTCOME_TRY(auto inflater, Inflater::create());

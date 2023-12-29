@@ -125,6 +125,7 @@ struct Shard {
 	std::optional<Session> m_session;
 	std::optional<std::string> m_resume_gateway_url;
 	std::optional<net::WebSocketClient> m_ws;
+	uint64_t m_reconnect_attempts{};
 };
 }  // namespace ekizu
 
