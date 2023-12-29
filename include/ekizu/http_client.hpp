@@ -24,67 +24,84 @@
 #include <ekizu/request/get_channel_message.hpp>
 #include <ekizu/request/get_channel_messages.hpp>
 #include <ekizu/request/get_current_user.hpp>
+#include <ekizu/request/get_pinned_messages.hpp>
 #include <ekizu/request/get_reactions.hpp>
 #include <ekizu/request/get_user.hpp>
 #include <ekizu/request/modify_channel.hpp>
 #include <ekizu/request/modify_current_user.hpp>
 #include <ekizu/request/pin_message.hpp>
+#include <ekizu/request/trigger_typing_indicator.hpp>
 #include <ekizu/request/unpin_message.hpp>
 
 namespace ekizu {
 struct HttpClient {
-	explicit HttpClient(std::string_view token);
+	EKIZU_EXPORT explicit HttpClient(std::string_view token);
 
-	[[nodiscard]] GetChannel get_channel(Snowflake channel_id) const;
-	[[nodiscard]] ModifyChannel modify_channel(Snowflake channel_id) const;
-	[[nodiscard]] DeleteChannel delete_channel(Snowflake channel_id) const;
-	[[nodiscard]] GetChannelMessages get_channel_messages(
+	// https://discord.com/developers/docs/resources/channel
+
+	EKIZU_EXPORT [[nodiscard]] GetChannel get_channel(
 		Snowflake channel_id) const;
-	[[nodiscard]] GetChannelMessage get_channel_message(
+	EKIZU_EXPORT [[nodiscard]] ModifyChannel modify_channel(
+		Snowflake channel_id) const;
+	EKIZU_EXPORT [[nodiscard]] DeleteChannel delete_channel(
+		Snowflake channel_id) const;
+	EKIZU_EXPORT [[nodiscard]] GetChannelMessages get_channel_messages(
+		Snowflake channel_id) const;
+	EKIZU_EXPORT [[nodiscard]] GetChannelMessage get_channel_message(
 		Snowflake channel_id, Snowflake message_id) const;
-	[[nodiscard]] CreateMessage create_message(Snowflake channel_id) const;
-	[[nodiscard]] CrosspostMessage crosspost_message(
+	EKIZU_EXPORT [[nodiscard]] CreateMessage create_message(
+		Snowflake channel_id) const;
+	EKIZU_EXPORT [[nodiscard]] CrosspostMessage crosspost_message(
 		Snowflake channel_id, Snowflake message_id) const;
-	[[nodiscard]] CreateReaction create_reaction(Snowflake channel_id,
-												 Snowflake message_id,
-												 RequestReaction emoji) const;
-	[[nodiscard]] DeleteOwnReaction delete_own_reaction(
+	EKIZU_EXPORT [[nodiscard]] CreateReaction create_reaction(
 		Snowflake channel_id, Snowflake message_id,
 		RequestReaction emoji) const;
-	[[nodiscard]] DeleteUserReaction delete_user_reaction(
+	EKIZU_EXPORT [[nodiscard]] DeleteOwnReaction delete_own_reaction(
+		Snowflake channel_id, Snowflake message_id,
+		RequestReaction emoji) const;
+	EKIZU_EXPORT [[nodiscard]] DeleteUserReaction delete_user_reaction(
 		Snowflake channel_id, Snowflake message_id, RequestReaction emoji,
 		Snowflake user_id) const;
-	[[nodiscard]] GetReactions get_reactions(Snowflake channel_id,
-											 Snowflake message_id,
-											 RequestReaction emoji) const;
-	[[nodiscard]] DeleteAllReactions delete_all_reactions(
-		Snowflake channel_id, Snowflake message_id) const;
-	[[nodiscard]] DeleteAllReactionsForEmoji delete_all_reactions_for_emoji(
+	EKIZU_EXPORT [[nodiscard]] GetReactions get_reactions(
 		Snowflake channel_id, Snowflake message_id,
 		RequestReaction emoji) const;
-	[[nodiscard]] EditMessage edit_message(Snowflake channel_id,
-										   Snowflake message_id) const;
-	[[nodiscard]] DeleteMessage delete_message(Snowflake channel_id,
-											   Snowflake message_id) const;
-	[[nodiscard]] BulkDeleteMessages bulk_delete_messages(
+	EKIZU_EXPORT [[nodiscard]] DeleteAllReactions delete_all_reactions(
+		Snowflake channel_id, Snowflake message_id) const;
+	EKIZU_EXPORT [[nodiscard]] DeleteAllReactionsForEmoji
+	delete_all_reactions_for_emoji(Snowflake channel_id, Snowflake message_id,
+								   RequestReaction emoji) const;
+	EKIZU_EXPORT [[nodiscard]] EditMessage edit_message(
+		Snowflake channel_id, Snowflake message_id) const;
+	EKIZU_EXPORT [[nodiscard]] DeleteMessage delete_message(
+		Snowflake channel_id, Snowflake message_id) const;
+	EKIZU_EXPORT [[nodiscard]] BulkDeleteMessages bulk_delete_messages(
 		Snowflake channel_id, const std::vector<Snowflake> &message_ids) const;
-	[[nodiscard]] EditChannelPermissions edit_channel_permissions(
+	EKIZU_EXPORT [[nodiscard]] EditChannelPermissions edit_channel_permissions(
 		Snowflake channel_id, const PermissionOverwrite &overwrite) const;
-	[[nodiscard]] GetChannelInvites get_channel_invites(
+	EKIZU_EXPORT [[nodiscard]] GetChannelInvites get_channel_invites(
 		Snowflake channel_id) const;
-	[[nodiscard]] CreateInvite create_invite(Snowflake channel_id) const;
-	[[nodiscard]] DeleteChannelPermission delete_channel_permission(
-		Snowflake channel_id, Snowflake overwrite_id);
-	[[nodiscard]] FollowAnnouncementChannel follow_announcement_channel(
-		Snowflake channel_id, Snowflake webhook_channel_id) const;
-	[[nodiscard]] PinMessage pin_message(Snowflake channel_id,
-										 Snowflake message_id) const;
-	[[nodiscard]] UnpinMessage unpin_message(Snowflake channel_id,
-											 Snowflake message_id) const;
-	[[nodiscard]] GetCurrentUser get_current_user() const;
-	[[nodiscard]] GetUser get_user(Snowflake user_id) const;
-	[[nodiscard]] ModifyCurrentUser modify_current_user() const;
-	[[nodiscard]] CreateDM create_dm(Snowflake user_id) const;
+	EKIZU_EXPORT [[nodiscard]] CreateInvite create_invite(
+		Snowflake channel_id) const;
+	EKIZU_EXPORT [[nodiscard]] DeleteChannelPermission
+	delete_channel_permission(Snowflake channel_id, Snowflake overwrite_id);
+	EKIZU_EXPORT [[nodiscard]] FollowAnnouncementChannel
+	follow_announcement_channel(Snowflake channel_id,
+								Snowflake webhook_channel_id) const;
+	EKIZU_EXPORT [[nodiscard]] TriggerTypingIndicator trigger_typing_indicator(
+		Snowflake channel_id) const;
+	EKIZU_EXPORT [[nodiscard]] GetPinnedMessages get_pinned_messages(
+		Snowflake channel_id) const;
+	EKIZU_EXPORT [[nodiscard]] PinMessage pin_message(
+		Snowflake channel_id, Snowflake message_id) const;
+	EKIZU_EXPORT [[nodiscard]] UnpinMessage unpin_message(
+		Snowflake channel_id, Snowflake message_id) const;
+
+	// https://discord.com/developers/docs/resources/user
+
+	EKIZU_EXPORT [[nodiscard]] GetCurrentUser get_current_user() const;
+	EKIZU_EXPORT [[nodiscard]] GetUser get_user(Snowflake user_id) const;
+	EKIZU_EXPORT [[nodiscard]] ModifyCurrentUser modify_current_user() const;
+	EKIZU_EXPORT [[nodiscard]] CreateDM create_dm(Snowflake user_id) const;
 
    private:
 	/// Function which sends an HTTP request. This is wrapped around a

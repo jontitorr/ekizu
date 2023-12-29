@@ -43,7 +43,7 @@ DeleteUserReaction::operator net::HttpRequest() const {
 	return {net::HttpMethod::delete_, url, 11};
 }
 
-Result<void> DeleteUserReaction::send(const asio::yield_context& yield) const {
+Result<> DeleteUserReaction::send(const asio::yield_context& yield) const {
 	if (!m_make_request) {
 		return boost::system::errc::operation_not_permitted;
 	}

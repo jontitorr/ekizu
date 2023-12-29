@@ -6,6 +6,8 @@
 #pragma warning(disable : 4242)
 #endif
 
+#include <ekizu/export.h>
+
 #include <boost/asio/spawn.hpp>
 #include <boost/beast/http.hpp>
 #include <boost/outcome/try.hpp>
@@ -31,16 +33,16 @@ struct HttpConnection {
 	HttpConnection &operator=(const HttpConnection &) = delete;
 	HttpConnection(HttpConnection &&) noexcept;
 	HttpConnection &operator=(HttpConnection &&) noexcept;
-	~HttpConnection();
+	EKIZU_EXPORT ~HttpConnection();
 
-	[[nodiscard]] static Result<HttpConnection> connect(
+	EKIZU_EXPORT [[nodiscard]] static Result<HttpConnection> connect(
 		std::string_view url, const asio::yield_context &yield);
 
-	Result<HttpResponse> request(const HttpRequest &req,
-								 const asio::yield_context &yield);
+	EKIZU_EXPORT Result<HttpResponse> request(const HttpRequest &req,
+											  const asio::yield_context &yield);
 
-	static Result<HttpResponse> get(std::string_view url,
-									const asio::yield_context &yield);
+	EKIZU_EXPORT static Result<HttpResponse> get(
+		std::string_view url, const asio::yield_context &yield);
 
    private:
 	struct Impl;

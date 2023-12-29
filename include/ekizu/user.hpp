@@ -50,7 +50,7 @@ enum class UserFlags : uint32_t {
  * @see https://discord.com/developers/docs/resources/user#user-object
  */
 struct User {
-	[[nodiscard]] std::string display_avatar_url() const;
+	EKIZU_EXPORT [[nodiscard]] std::string display_avatar_url() const;
 
 	/// The user's id.
 	Snowflake id;

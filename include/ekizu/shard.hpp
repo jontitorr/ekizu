@@ -76,13 +76,14 @@ struct Shard {
 		bool is_bot{true};
 	};
 
-	Shard(ShardId id, std::string_view token, Intents intents);
+	EKIZU_EXPORT Shard(ShardId id, std::string_view token, Intents intents);
 
 	[[nodiscard]] uint64_t id() const { return m_id; }
 
-	void attach_logger(std::function<void(Log)> on_log);
-	Result<> close(CloseFrame reason, const boost::asio::yield_context &yield);
-	[[nodiscard]] Result<Event> next_event(
+	EKIZU_EXPORT void attach_logger(std::function<void(Log)> on_log);
+	EKIZU_EXPORT Result<> close(CloseFrame reason,
+								const boost::asio::yield_context &yield);
+	EKIZU_EXPORT [[nodiscard]] Result<Event> next_event(
 		const boost::asio::yield_context &yield);
 
    private:

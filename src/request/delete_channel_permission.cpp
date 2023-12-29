@@ -16,8 +16,7 @@ DeleteChannelPermission::operator net::HttpRequest() const {
 			11};
 }
 
-Result<void> DeleteChannelPermission::send(
-	const asio::yield_context &yield) const {
+Result<> DeleteChannelPermission::send(const asio::yield_context &yield) const {
 	if (!m_make_request) {
 		return boost::system::errc::operation_not_permitted;
 	}

@@ -32,7 +32,7 @@ struct ModifyCurrentUser {
 		return *this;
 	}
 
-	Result<User> send(const asio::yield_context &yield) const;
+	EKIZU_EXPORT Result<User> send(const asio::yield_context &yield) const;
 
    private:
 	ModifyCurrentUserFields m_fields;

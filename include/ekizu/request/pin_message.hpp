@@ -26,7 +26,7 @@ struct PinMessage {
 	 *
 	 * @return The result of the request as an HTTP response.
 	 */
-	Result<> send(const asio::yield_context &yield) const;
+	EKIZU_EXPORT Result<> send(const asio::yield_context &yield) const;
 
    private:
 	Snowflake m_channel_id;

@@ -1,28 +1,19 @@
-#ifndef EKIZU_REQUEST_GET_CHANNEL_HPP
-#define EKIZU_REQUEST_GET_CHANNEL_HPP
+#ifndef EKIZU_REQUEST_GET_PINNED_MESSAGES_HPP
+#define EKIZU_REQUEST_GET_PINNED_MESSAGES_HPP
 
-#include <ekizu/channel.hpp>
 #include <ekizu/http.hpp>
-#include <ekizu/snowflake.hpp>
+#include <ekizu/message.hpp>
 
 namespace ekizu {
-/**
- * @brief Represents the Get Channel REST API endpoint.
- */
-struct GetChannel {
-	GetChannel(
+struct GetPinnedMessages {
+	GetPinnedMessages(
 		const std::function<Result<net::HttpResponse>(
 			net::HttpRequest, const asio::yield_context &)> &make_request,
 		Snowflake channel_id);
 
-	/**
-	 * @brief Converts the GetChannel to an HTTP request.
-	 *
-	 * @return The HTTP request.
-	 */
 	operator net::HttpRequest() const;
 
-	EKIZU_EXPORT [[nodiscard]] Result<Channel> send(
+	EKIZU_EXPORT [[nodiscard]] Result<std::vector<Message>> send(
 		const asio::yield_context &yield) const;
 
    private:
@@ -33,4 +24,4 @@ struct GetChannel {
 };
 }  // namespace ekizu
 
-#endif	// EKIZU_REQUEST_GET_CHANNEL_HPP
+#endif	// EKIZU_REQUEST_GET_PINNED_MESSAGES_HPP

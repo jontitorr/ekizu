@@ -42,7 +42,7 @@ DeleteAllReactionsForEmoji::operator net::HttpRequest() const {
 			11};
 }
 
-Result<void> DeleteAllReactionsForEmoji::send(
+Result<> DeleteAllReactionsForEmoji::send(
 	const asio::yield_context& yield) const {
 	if (!m_make_request) {
 		return boost::system::errc::operation_not_permitted;

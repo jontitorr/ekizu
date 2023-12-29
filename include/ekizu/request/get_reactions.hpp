@@ -22,7 +22,7 @@ struct GetReactions {
 		return *this;
 	}
 
-	[[nodiscard]] Result<std::vector<User>> send(
+	EKIZU_EXPORT [[nodiscard]] Result<std::vector<User>> send(
 		const asio::yield_context& yield) const;
 
    private:

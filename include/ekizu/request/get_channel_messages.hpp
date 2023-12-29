@@ -10,7 +10,7 @@ struct GetChannelMessages;
 struct GetChannelMessagesConfigured {
 	enum class Type { Around, Before, After };
 
-	GetChannelMessagesConfigured(
+	EKIZU_EXPORT GetChannelMessagesConfigured(
 		const std::function<Result<net::HttpResponse>(
 			net::HttpRequest, const asio::yield_context &)> &make_request,
 		Snowflake channel_id, std::optional<uint16_t> limit, Type type,
@@ -23,7 +23,7 @@ struct GetChannelMessagesConfigured {
 		return *this;
 	}
 
-	[[nodiscard]] Result<std::vector<Message>> send(
+	EKIZU_EXPORT [[nodiscard]] Result<std::vector<Message>> send(
 		const asio::yield_context &yield) const;
 
    private:
@@ -37,7 +37,7 @@ struct GetChannelMessagesConfigured {
 };
 
 struct GetChannelMessages {
-	GetChannelMessages(
+	EKIZU_EXPORT GetChannelMessages(
 		const std::function<Result<net::HttpResponse>(
 			net::HttpRequest, const asio::yield_context &)> &make_request,
 		Snowflake channel_id);
@@ -76,7 +76,7 @@ struct GetChannelMessages {
 		return *this;
 	}
 
-	[[nodiscard]] Result<std::vector<Message>> send(
+	EKIZU_EXPORT [[nodiscard]] Result<std::vector<Message>> send(
 		const asio::yield_context &yield) const;
 
    private:

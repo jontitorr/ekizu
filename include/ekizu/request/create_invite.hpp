@@ -62,7 +62,8 @@ struct CreateInvite {
 		return *this;
 	}
 
-	[[nodiscard]] Result<Invite> send(const asio::yield_context &yield) const;
+	EKIZU_EXPORT [[nodiscard]] Result<Invite> send(
+		const asio::yield_context &yield) const;
 
    private:
 	Snowflake m_channel_id;

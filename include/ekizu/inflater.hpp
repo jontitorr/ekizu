@@ -1,6 +1,8 @@
 #ifndef EKIZU_INFLATER_HPP
 #define EKIZU_INFLATER_HPP
 
+#include <ekizu/export.h>
+
 #include <boost/core/span.hpp>
 #include <ekizu/util.hpp>
 #include <memory>
@@ -16,11 +18,12 @@ struct Inflater {
 	Inflater &operator=(const Inflater &) = delete;
 	Inflater(Inflater &&) noexcept;
 	Inflater &operator=(Inflater &&) noexcept;
-	~Inflater();
+	EKIZU_EXPORT ~Inflater();
 
-	static Result<Inflater> create();
+	EKIZU_EXPORT static Result<Inflater> create();
 
-	[[nodiscard]] Result<std::string> inflate(boost::span<const char> data);
+	EKIZU_EXPORT [[nodiscard]] Result<std::string> inflate(
+		boost::span<const char> data);
 
    private:
 	struct Impl;

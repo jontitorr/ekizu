@@ -35,7 +35,7 @@ FollowAnnouncementChannel::operator net::HttpRequest() const {
 	return req;
 }
 
-Result<void> FollowAnnouncementChannel::send(
+Result<> FollowAnnouncementChannel::send(
 	const asio::yield_context &yield) const {
 	if (!m_make_request) {
 		return boost::system::errc::operation_not_permitted;

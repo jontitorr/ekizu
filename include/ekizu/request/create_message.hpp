@@ -86,7 +86,7 @@ struct CreateMessage {
 		return *this;
 	}
 
-	Result<Message> send(const asio::yield_context &yield) const;
+	EKIZU_EXPORT Result<Message> send(const asio::yield_context &yield) const;
 
    private:
 	Snowflake m_channel_id;

@@ -1,6 +1,8 @@
 #ifndef EKIZU_WS_HPP
 #define EKIZU_WS_HPP
 
+#include <ekizu/export.h>
+
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/spawn.hpp>
 #include <boost/beast/core/tcp_stream.hpp>
@@ -30,12 +32,15 @@ struct WebSocketMessage {
 };
 
 struct WebSocketClient {
-	[[nodiscard]] static Result<WebSocketClient> connect(
+	EKIZU_EXPORT [[nodiscard]] static Result<WebSocketClient> connect(
 		std::string_view url, const asio::yield_context &yield);
-	[[nodiscard]] bool is_open() const;
-	Result<> close(ws::close_reason reason, const asio::yield_context &yield);
-	Result<WebSocketMessage> read(const asio::yield_context &yield);
-	Result<> send(std::string_view message, const asio::yield_context &yield);
+	EKIZU_EXPORT [[nodiscard]] bool is_open() const;
+	EKIZU_EXPORT Result<> close(ws::close_reason reason,
+								const asio::yield_context &yield);
+	EKIZU_EXPORT Result<WebSocketMessage> read(
+		const asio::yield_context &yield);
+	EKIZU_EXPORT Result<> send(std::string_view message,
+							   const asio::yield_context &yield);
 
    private:
 	friend WebSocketClientBuilder;

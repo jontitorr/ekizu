@@ -126,6 +126,15 @@ FollowAnnouncementChannel HttpClient::follow_announcement_channel(
 		m_rate_limiter_make_request, channel_id, webhook_channel_id};
 }
 
+TriggerTypingIndicator HttpClient::trigger_typing_indicator(
+	Snowflake channel_id) const {
+	return TriggerTypingIndicator{m_rate_limiter_make_request, channel_id};
+}
+
+GetPinnedMessages HttpClient::get_pinned_messages(Snowflake channel_id) const {
+	return GetPinnedMessages{m_rate_limiter_make_request, channel_id};
+}
+
 PinMessage HttpClient::pin_message(Snowflake channel_id,
 								   Snowflake message_id) const {
 	return PinMessage{m_rate_limiter_make_request, channel_id, message_id};

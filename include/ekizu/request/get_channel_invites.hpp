@@ -13,7 +13,7 @@ struct GetChannelInvites {
 
 	operator net::HttpRequest() const;
 
-	[[nodiscard]] Result<std::vector<Invite>> send(
+	EKIZU_EXPORT [[nodiscard]] Result<std::vector<Invite>> send(
 		const asio::yield_context &yield) const;
 
    private:
