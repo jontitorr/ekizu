@@ -116,6 +116,10 @@ struct MessageInteraction {
 	std::optional<PartialMember> member;
 };
 
+/**
+ * @see
+ * https://discord.com/developers/docs/resources/channel#message-reference-object-message-reference-structure
+ */
 struct MessageReference {
 	/// The ID of the originating message.
 	std::optional<Snowflake> message_id;

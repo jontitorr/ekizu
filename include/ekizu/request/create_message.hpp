@@ -76,6 +76,11 @@ struct CreateMessage {
 		return *this;
 	}
 
+	CreateMessage &reply(Snowflake message_id) {
+		m_fields.message_reference = {message_id, m_channel_id};
+		return *this;
+	}
+
 	CreateMessage &sticker_ids(const std::vector<Snowflake> &sticker_ids) {
 		m_fields.sticker_ids = sticker_ids;
 		return *this;
