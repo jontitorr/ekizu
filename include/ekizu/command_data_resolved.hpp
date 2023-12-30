@@ -3,6 +3,7 @@
 
 #include <ekizu/member_flags.hpp>
 #include <ekizu/message.hpp>
+#include <unordered_map>
 
 namespace ekizu {
 struct InteractionChannel {

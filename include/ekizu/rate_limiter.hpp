@@ -8,6 +8,7 @@
 #include <ekizu/http.hpp>
 #include <ekizu/util.hpp>
 #include <mutex>
+#include <unordered_map>
 
 namespace ekizu {
 /**
