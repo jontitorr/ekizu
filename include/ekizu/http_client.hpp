@@ -39,69 +39,69 @@ struct HttpClient {
 
 	// https://discord.com/developers/docs/resources/channel
 
-	EKIZU_EXPORT [[nodiscard]] GetChannel get_channel(
-		Snowflake channel_id) const;
-	EKIZU_EXPORT [[nodiscard]] ModifyChannel modify_channel(
-		Snowflake channel_id) const;
-	EKIZU_EXPORT [[nodiscard]] DeleteChannel delete_channel(
-		Snowflake channel_id) const;
-	EKIZU_EXPORT [[nodiscard]] GetChannelMessages get_channel_messages(
-		Snowflake channel_id) const;
-	EKIZU_EXPORT [[nodiscard]] GetChannelMessage get_channel_message(
-		Snowflake channel_id, Snowflake message_id) const;
-	EKIZU_EXPORT [[nodiscard]] CreateMessage create_message(
-		Snowflake channel_id) const;
-	EKIZU_EXPORT [[nodiscard]] CrosspostMessage crosspost_message(
-		Snowflake channel_id, Snowflake message_id) const;
-	EKIZU_EXPORT [[nodiscard]] CreateReaction create_reaction(
+	[[nodiscard]] EKIZU_EXPORT GetChannel
+	get_channel(Snowflake channel_id) const;
+	[[nodiscard]] EKIZU_EXPORT ModifyChannel
+	modify_channel(Snowflake channel_id) const;
+	[[nodiscard]] EKIZU_EXPORT DeleteChannel
+	delete_channel(Snowflake channel_id) const;
+	[[nodiscard]] EKIZU_EXPORT GetChannelMessages
+	get_channel_messages(Snowflake channel_id) const;
+	[[nodiscard]] EKIZU_EXPORT GetChannelMessage
+	get_channel_message(Snowflake channel_id, Snowflake message_id) const;
+	[[nodiscard]] EKIZU_EXPORT CreateMessage
+	create_message(Snowflake channel_id) const;
+	[[nodiscard]] EKIZU_EXPORT CrosspostMessage
+	crosspost_message(Snowflake channel_id, Snowflake message_id) const;
+	[[nodiscard]] EKIZU_EXPORT CreateReaction
+	create_reaction(Snowflake channel_id, Snowflake message_id,
+					RequestReaction emoji) const;
+	[[nodiscard]] EKIZU_EXPORT DeleteOwnReaction delete_own_reaction(
 		Snowflake channel_id, Snowflake message_id,
 		RequestReaction emoji) const;
-	EKIZU_EXPORT [[nodiscard]] DeleteOwnReaction delete_own_reaction(
-		Snowflake channel_id, Snowflake message_id,
-		RequestReaction emoji) const;
-	EKIZU_EXPORT [[nodiscard]] DeleteUserReaction delete_user_reaction(
+	[[nodiscard]] EKIZU_EXPORT DeleteUserReaction delete_user_reaction(
 		Snowflake channel_id, Snowflake message_id, RequestReaction emoji,
 		Snowflake user_id) const;
-	EKIZU_EXPORT [[nodiscard]] GetReactions get_reactions(
-		Snowflake channel_id, Snowflake message_id,
-		RequestReaction emoji) const;
-	EKIZU_EXPORT [[nodiscard]] DeleteAllReactions delete_all_reactions(
-		Snowflake channel_id, Snowflake message_id) const;
-	EKIZU_EXPORT [[nodiscard]] DeleteAllReactionsForEmoji
+	[[nodiscard]] EKIZU_EXPORT GetReactions
+	get_reactions(Snowflake channel_id, Snowflake message_id,
+				  RequestReaction emoji) const;
+	[[nodiscard]] EKIZU_EXPORT DeleteAllReactions
+	delete_all_reactions(Snowflake channel_id, Snowflake message_id) const;
+	[[nodiscard]] EKIZU_EXPORT DeleteAllReactionsForEmoji
 	delete_all_reactions_for_emoji(Snowflake channel_id, Snowflake message_id,
 								   RequestReaction emoji) const;
-	EKIZU_EXPORT [[nodiscard]] EditMessage edit_message(
-		Snowflake channel_id, Snowflake message_id) const;
-	EKIZU_EXPORT [[nodiscard]] DeleteMessage delete_message(
-		Snowflake channel_id, Snowflake message_id) const;
-	EKIZU_EXPORT [[nodiscard]] BulkDeleteMessages bulk_delete_messages(
+	[[nodiscard]] EKIZU_EXPORT EditMessage
+	edit_message(Snowflake channel_id, Snowflake message_id) const;
+	[[nodiscard]] EKIZU_EXPORT DeleteMessage
+	delete_message(Snowflake channel_id, Snowflake message_id) const;
+	[[nodiscard]] EKIZU_EXPORT BulkDeleteMessages bulk_delete_messages(
 		Snowflake channel_id, const std::vector<Snowflake> &message_ids) const;
-	EKIZU_EXPORT [[nodiscard]] EditChannelPermissions edit_channel_permissions(
+	[[nodiscard]] EKIZU_EXPORT EditChannelPermissions edit_channel_permissions(
 		Snowflake channel_id, const PermissionOverwrite &overwrite) const;
-	EKIZU_EXPORT [[nodiscard]] GetChannelInvites get_channel_invites(
-		Snowflake channel_id) const;
-	EKIZU_EXPORT [[nodiscard]] CreateInvite create_invite(
-		Snowflake channel_id) const;
-	EKIZU_EXPORT [[nodiscard]] DeleteChannelPermission
+	[[nodiscard]] EKIZU_EXPORT GetChannelInvites
+	get_channel_invites(Snowflake channel_id) const;
+	[[nodiscard]] EKIZU_EXPORT CreateInvite
+	create_invite(Snowflake channel_id) const;
+	[[nodiscard]] EKIZU_EXPORT DeleteChannelPermission
 	delete_channel_permission(Snowflake channel_id, Snowflake overwrite_id);
-	EKIZU_EXPORT [[nodiscard]] FollowAnnouncementChannel
+	[[nodiscard]] EKIZU_EXPORT FollowAnnouncementChannel
 	follow_announcement_channel(Snowflake channel_id,
 								Snowflake webhook_channel_id) const;
-	EKIZU_EXPORT [[nodiscard]] TriggerTypingIndicator trigger_typing_indicator(
-		Snowflake channel_id) const;
-	EKIZU_EXPORT [[nodiscard]] GetPinnedMessages get_pinned_messages(
-		Snowflake channel_id) const;
-	EKIZU_EXPORT [[nodiscard]] PinMessage pin_message(
-		Snowflake channel_id, Snowflake message_id) const;
-	EKIZU_EXPORT [[nodiscard]] UnpinMessage unpin_message(
-		Snowflake channel_id, Snowflake message_id) const;
+	[[nodiscard]] EKIZU_EXPORT TriggerTypingIndicator
+	trigger_typing_indicator(Snowflake channel_id) const;
+	[[nodiscard]] EKIZU_EXPORT GetPinnedMessages
+	get_pinned_messages(Snowflake channel_id) const;
+	[[nodiscard]] EKIZU_EXPORT PinMessage
+	pin_message(Snowflake channel_id, Snowflake message_id) const;
+	[[nodiscard]] EKIZU_EXPORT UnpinMessage
+	unpin_message(Snowflake channel_id, Snowflake message_id) const;
 
 	// https://discord.com/developers/docs/resources/user
 
-	EKIZU_EXPORT [[nodiscard]] GetCurrentUser get_current_user() const;
-	EKIZU_EXPORT [[nodiscard]] GetUser get_user(Snowflake user_id) const;
-	EKIZU_EXPORT [[nodiscard]] ModifyCurrentUser modify_current_user() const;
-	EKIZU_EXPORT [[nodiscard]] CreateDM create_dm(Snowflake user_id) const;
+	[[nodiscard]] EKIZU_EXPORT GetCurrentUser get_current_user() const;
+	[[nodiscard]] EKIZU_EXPORT GetUser get_user(Snowflake user_id) const;
+	[[nodiscard]] EKIZU_EXPORT ModifyCurrentUser modify_current_user() const;
+	[[nodiscard]] EKIZU_EXPORT CreateDM create_dm(Snowflake user_id) const;
 
    private:
 	/// Function which sends an HTTP request. This is wrapped around a

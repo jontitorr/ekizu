@@ -22,7 +22,7 @@ struct GetChannel {
 	 */
 	operator net::HttpRequest() const;
 
-	EKIZU_EXPORT [[nodiscard]] Result<Channel> send(
+	[[nodiscard]] EKIZU_EXPORT Result<Channel> send(
 		const asio::yield_context &yield) const;
 
    private:

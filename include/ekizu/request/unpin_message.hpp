@@ -26,7 +26,7 @@ struct UnpinMessage {
 	 *
 	 * @return The result of the request as an HTTP response.
 	 */
-	EKIZU_EXPORT [[nodiscard]] Result<> send(
+	[[nodiscard]] EKIZU_EXPORT Result<> send(
 		const asio::yield_context &yield) const;
 
    private:

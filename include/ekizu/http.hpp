@@ -35,7 +35,7 @@ struct HttpConnection {
 	HttpConnection &operator=(HttpConnection &&) noexcept;
 	EKIZU_EXPORT ~HttpConnection();
 
-	EKIZU_EXPORT [[nodiscard]] static Result<HttpConnection> connect(
+	[[nodiscard]] EKIZU_EXPORT static Result<HttpConnection> connect(
 		std::string_view url, const asio::yield_context &yield);
 
 	EKIZU_EXPORT Result<HttpResponse> request(const HttpRequest &req,

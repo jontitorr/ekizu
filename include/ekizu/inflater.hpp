@@ -22,7 +22,7 @@ struct Inflater {
 
 	EKIZU_EXPORT static Result<Inflater> create();
 
-	EKIZU_EXPORT [[nodiscard]] Result<std::string> inflate(
+	[[nodiscard]] EKIZU_EXPORT Result<std::string> inflate(
 		boost::span<const char> data);
 
    private:

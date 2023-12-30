@@ -62,7 +62,7 @@ struct CreateInvite {
 		return *this;
 	}
 
-	EKIZU_EXPORT [[nodiscard]] Result<Invite> send(
+	[[nodiscard]] EKIZU_EXPORT Result<Invite> send(
 		const asio::yield_context &yield) const;
 
    private:

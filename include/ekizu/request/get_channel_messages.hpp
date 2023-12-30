@@ -23,7 +23,7 @@ struct GetChannelMessagesConfigured {
 		return *this;
 	}
 
-	EKIZU_EXPORT [[nodiscard]] Result<std::vector<Message>> send(
+	[[nodiscard]] EKIZU_EXPORT Result<std::vector<Message>> send(
 		const asio::yield_context &yield) const;
 
    private:
@@ -76,7 +76,7 @@ struct GetChannelMessages {
 		return *this;
 	}
 
-	EKIZU_EXPORT [[nodiscard]] Result<std::vector<Message>> send(
+	[[nodiscard]] EKIZU_EXPORT Result<std::vector<Message>> send(
 		const asio::yield_context &yield) const;
 
    private:

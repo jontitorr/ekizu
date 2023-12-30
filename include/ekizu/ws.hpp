@@ -32,9 +32,9 @@ struct WebSocketMessage {
 };
 
 struct WebSocketClient {
-	EKIZU_EXPORT [[nodiscard]] static Result<WebSocketClient> connect(
+	[[nodiscard]]  EKIZU_EXPORT static Result<WebSocketClient> connect(
 		std::string_view url, const asio::yield_context &yield);
-	EKIZU_EXPORT [[nodiscard]] bool is_open() const;
+	[[nodiscard]]  EKIZU_EXPORT bool is_open() const;
 	EKIZU_EXPORT Result<> close(ws::close_reason reason,
 								const asio::yield_context &yield);
 	EKIZU_EXPORT Result<WebSocketMessage> read(
@@ -62,4 +62,4 @@ struct WebSocketClient {
 };
 }  // namespace ekizu::net
 
-#endif	// EKIZU_WS_HPP
+#endif // EKIZU_WS_HPP

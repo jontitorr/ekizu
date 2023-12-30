@@ -13,7 +13,7 @@ struct BulkDeleteMessages {
 
 	operator net::HttpRequest() const;
 
-	EKIZU_EXPORT [[nodiscard]] Result<> send(
+	[[nodiscard]] EKIZU_EXPORT Result<> send(
 		const asio::yield_context &yield) const;
 
    private:
