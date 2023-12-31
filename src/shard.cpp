@@ -262,15 +262,15 @@ Result<net::WebSocketMessage> Shard::next_message(
 		auto res = m_ws->read(yield);
 
 		if (res) { return res.value(); }
-		const auto ec = res.error().value();
+		const auto ec = res.error();
 
-		log(fmt::format(
-				"read error | ec={}, msg={}", ec, res.error().message()),
+		log(fmt::format("read error | ec={}, msg={}", ec.value(), ec.message()),
 			LogLevel::Error);
 
 		if (ec != boost::asio::error::operation_aborted &&
 			ec != boost::asio::error::eof &&
-			ec != boost::asio::error::connection_reset) {
+			ec != boost::asio::error::connection_reset &&
+			ec != net::ws::error::closed) {
 			return res.error();
 		}
 	}
