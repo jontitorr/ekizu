@@ -31,8 +31,8 @@ using HttpStatus = http::status;
 struct HttpConnection {
 	HttpConnection(const HttpConnection &) = delete;
 	HttpConnection &operator=(const HttpConnection &) = delete;
-	HttpConnection(HttpConnection &&) noexcept;
-	HttpConnection &operator=(HttpConnection &&) noexcept;
+	EKIZU_EXPORT HttpConnection(HttpConnection &&) noexcept;
+	EKIZU_EXPORT HttpConnection &operator=(HttpConnection &&) noexcept;
 	EKIZU_EXPORT ~HttpConnection();
 
 	[[nodiscard]] EKIZU_EXPORT static Result<HttpConnection> connect(
