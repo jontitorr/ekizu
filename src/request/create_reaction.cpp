@@ -36,7 +36,7 @@ CreateReaction::operator net::HttpRequest() const {
 		},
 		m_emoji);
 
-	return {net::HttpMethod::put, std::move(url), 11};
+	return {net::HttpMethod::put, url, 11};
 }
 
 Result<> CreateReaction::send(const asio::yield_context& yield) const {

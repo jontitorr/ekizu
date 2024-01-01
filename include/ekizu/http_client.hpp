@@ -1,10 +1,13 @@
 #ifndef EKIZU_HTTP_CLIENT_HPP
 #define EKIZU_HTTP_CLIENT_HPP
 
-#include <ekizu/http.hpp>
 #include <ekizu/rate_limiter.hpp>
+#include <ekizu/request/add_guild_member.hpp>
+#include <ekizu/request/add_guild_member_role.hpp>
 #include <ekizu/request/bulk_delete_messages.hpp>
 #include <ekizu/request/create_dm.hpp>
+#include <ekizu/request/create_guild.hpp>
+#include <ekizu/request/create_guild_channel.hpp>
 #include <ekizu/request/create_invite.hpp>
 #include <ekizu/request/create_message.hpp>
 #include <ekizu/request/create_reaction.hpp>
@@ -13,6 +16,7 @@
 #include <ekizu/request/delete_all_reactions_for_emoji.hpp>
 #include <ekizu/request/delete_channel.hpp>
 #include <ekizu/request/delete_channel_permission.hpp>
+#include <ekizu/request/delete_guild.hpp>
 #include <ekizu/request/delete_message.hpp>
 #include <ekizu/request/delete_own_reaction.hpp>
 #include <ekizu/request/delete_user_reaction.hpp>
@@ -24,14 +28,31 @@
 #include <ekizu/request/get_channel_message.hpp>
 #include <ekizu/request/get_channel_messages.hpp>
 #include <ekizu/request/get_current_user.hpp>
+#include <ekizu/request/get_guild.hpp>
+#include <ekizu/request/get_guild_ban.hpp>
+#include <ekizu/request/get_guild_bans.hpp>
+#include <ekizu/request/get_guild_channels.hpp>
+#include <ekizu/request/get_guild_invites.hpp>
+#include <ekizu/request/get_guild_member.hpp>
+#include <ekizu/request/get_guild_preview.hpp>
 #include <ekizu/request/get_pinned_messages.hpp>
 #include <ekizu/request/get_reactions.hpp>
 #include <ekizu/request/get_user.hpp>
+#include <ekizu/request/list_active_guild_threads.hpp>
+#include <ekizu/request/list_guild_members.hpp>
 #include <ekizu/request/modify_channel.hpp>
+#include <ekizu/request/modify_current_member.hpp>
 #include <ekizu/request/modify_current_user.hpp>
+#include <ekizu/request/modify_guild.hpp>
+#include <ekizu/request/modify_guild_channel_positions.hpp>
+#include <ekizu/request/modify_guild_member.hpp>
 #include <ekizu/request/pin_message.hpp>
+#include <ekizu/request/remove_guild_member.hpp>
+#include <ekizu/request/remove_guild_member_role.hpp>
+#include <ekizu/request/search_guild_members.hpp>
 #include <ekizu/request/trigger_typing_indicator.hpp>
 #include <ekizu/request/unpin_message.hpp>
+#include <ekizu/snowflake.hpp>
 
 namespace ekizu {
 struct HttpClient {
@@ -95,6 +116,53 @@ struct HttpClient {
 	pin_message(Snowflake channel_id, Snowflake message_id) const;
 	[[nodiscard]] EKIZU_EXPORT UnpinMessage
 	unpin_message(Snowflake channel_id, Snowflake message_id) const;
+
+	// https://discord.com/developers/docs/resources/guild
+
+	[[nodiscard]] EKIZU_EXPORT CreateGuild
+	create_guild(std::string_view name) const;
+	[[nodiscard]] EKIZU_EXPORT GetGuild get_guild(Snowflake guild_id) const;
+	[[nodiscard]] EKIZU_EXPORT GetGuildPreview
+	get_guild_preview(Snowflake guild_id) const;
+	[[nodiscard]] EKIZU_EXPORT ModifyGuild
+	modify_guild(Snowflake guild_id) const;
+	[[nodiscard]] EKIZU_EXPORT DeleteGuild
+	delete_guild(Snowflake guild_id) const;
+	[[nodiscard]] EKIZU_EXPORT GetGuildChannels
+	get_guild_channels(Snowflake guild_id) const;
+	[[nodiscard]] EKIZU_EXPORT CreateGuildChannel
+	create_guild_channel(Snowflake guild_id, std::string_view name) const;
+	[[nodiscard]] EKIZU_EXPORT ModifyGuildChannelPositions
+	modify_guild_channel_positions(
+		Snowflake guild_id,
+		std::vector<ModifyGuildChannelPosition> channels) const;
+	[[nodiscard]] EKIZU_EXPORT ListActiveGuildThreads
+	list_active_guild_threads(Snowflake guild_id) const;
+	[[nodiscard]] EKIZU_EXPORT GetGuildMember
+	get_guild_member(Snowflake guild_id, Snowflake user_id) const;
+	[[nodiscard]] EKIZU_EXPORT ListGuildMembers
+	list_guild_members(Snowflake guild_id) const;
+	[[nodiscard]] EKIZU_EXPORT SearchGuildMembers
+	search_guild_members(Snowflake guild_id) const;
+	[[nodiscard]] EKIZU_EXPORT AddGuildMember
+	add_guild_member(Snowflake guild_id, Snowflake user_id,
+					 std::string_view access_token) const;
+	[[nodiscard]] EKIZU_EXPORT ModifyGuildMember
+	modify_guild_member(Snowflake guild_id, Snowflake user_id) const;
+	[[nodiscard]] EKIZU_EXPORT ModifyCurrentMember
+	modify_current_member(Snowflake guild_id) const;
+	[[nodiscard]] EKIZU_EXPORT AddGuildMemberRole add_guild_member_role(
+		Snowflake guild_id, Snowflake user_id, Snowflake role_id) const;
+	[[nodiscard]] EKIZU_EXPORT RemoveGuildMemberRole remove_guild_member_role(
+		Snowflake guild_id, Snowflake user_id, Snowflake role_id) const;
+	[[nodiscard]] EKIZU_EXPORT RemoveGuildMember
+	remove_guild_member(Snowflake guild_id, Snowflake user_id) const;
+	[[nodiscard]] EKIZU_EXPORT GetGuildBans
+	get_guild_bans(Snowflake guild_id) const;
+	[[nodiscard]] EKIZU_EXPORT GetGuildBan
+	get_guild_ban(Snowflake guild_id, Snowflake user_id) const;
+	[[nodiscard]] EKIZU_EXPORT GetGuildInvites
+	get_guild_invites(Snowflake guild_id) const;
 
 	// https://discord.com/developers/docs/resources/user
 

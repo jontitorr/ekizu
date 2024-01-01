@@ -34,6 +34,8 @@ EKIZU_EXPORT void from_json(const nlohmann::json &j, InviteGuild &i);
 enum class TargetType : uint8_t { Stream = 1, EmbeddedApplication = 2 };
 
 struct Invite {
+	[[nodiscard]] EKIZU_EXPORT std::string url() const;
+
 	std::string code;
 	std::optional<InviteGuild> guild;
 	InviteChannel channel;

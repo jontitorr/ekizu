@@ -145,6 +145,107 @@ UnpinMessage HttpClient::unpin_message(Snowflake channel_id,
 	return UnpinMessage{m_rate_limiter_make_request, channel_id, message_id};
 }
 
+CreateGuild HttpClient::create_guild(std::string_view name) const {
+	return CreateGuild{m_rate_limiter_make_request, name};
+}
+
+GetGuild HttpClient::get_guild(Snowflake guild_id) const {
+	return GetGuild{m_rate_limiter_make_request, guild_id};
+}
+
+GetGuildPreview HttpClient::get_guild_preview(Snowflake guild_id) const {
+	return GetGuildPreview{m_rate_limiter_make_request, guild_id};
+}
+
+ModifyGuild HttpClient::modify_guild(Snowflake guild_id) const {
+	return ModifyGuild{m_rate_limiter_make_request, guild_id};
+}
+
+DeleteGuild HttpClient::delete_guild(Snowflake guild_id) const {
+	return DeleteGuild{m_rate_limiter_make_request, guild_id};
+}
+
+GetGuildChannels HttpClient::get_guild_channels(Snowflake guild_id) const {
+	return GetGuildChannels{m_rate_limiter_make_request, guild_id};
+}
+
+CreateGuildChannel HttpClient::create_guild_channel(
+	Snowflake guild_id, std::string_view name) const {
+	return CreateGuildChannel{m_rate_limiter_make_request, guild_id, name};
+}
+
+ModifyGuildChannelPositions HttpClient::modify_guild_channel_positions(
+	Snowflake guild_id,
+	std::vector<ModifyGuildChannelPosition> channels) const {
+	return ModifyGuildChannelPositions{
+		m_rate_limiter_make_request, guild_id, std::move(channels)};
+}
+
+ListActiveGuildThreads HttpClient::list_active_guild_threads(
+	Snowflake guild_id) const {
+	return ListActiveGuildThreads{m_rate_limiter_make_request, guild_id};
+}
+
+GetGuildMember HttpClient::get_guild_member(Snowflake guild_id,
+											Snowflake user_id) const {
+	return GetGuildMember{m_rate_limiter_make_request, guild_id, user_id};
+}
+
+ListGuildMembers HttpClient::list_guild_members(Snowflake guild_id) const {
+	return ListGuildMembers{m_rate_limiter_make_request, guild_id};
+}
+
+SearchGuildMembers HttpClient::search_guild_members(Snowflake guild_id) const {
+	return SearchGuildMembers{m_rate_limiter_make_request, guild_id};
+}
+
+AddGuildMember HttpClient::add_guild_member(
+	Snowflake guild_id, Snowflake user_id,
+	std::string_view access_token) const {
+	return AddGuildMember{
+		m_rate_limiter_make_request, guild_id, user_id, access_token};
+}
+
+ModifyGuildMember HttpClient::modify_guild_member(Snowflake guild_id,
+												  Snowflake user_id) const {
+	return ModifyGuildMember{m_rate_limiter_make_request, guild_id, user_id};
+}
+
+ModifyCurrentMember HttpClient::modify_current_member(
+	Snowflake guild_id) const {
+	return ModifyCurrentMember{m_rate_limiter_make_request, guild_id};
+}
+
+AddGuildMemberRole HttpClient::add_guild_member_role(
+	Snowflake guild_id, Snowflake user_id, Snowflake role_id) const {
+	return AddGuildMemberRole{
+		m_rate_limiter_make_request, guild_id, user_id, role_id};
+}
+
+RemoveGuildMemberRole HttpClient::remove_guild_member_role(
+	Snowflake guild_id, Snowflake user_id, Snowflake role_id) const {
+	return RemoveGuildMemberRole{
+		m_rate_limiter_make_request, guild_id, user_id, role_id};
+}
+
+RemoveGuildMember HttpClient::remove_guild_member(Snowflake guild_id,
+												  Snowflake user_id) const {
+	return RemoveGuildMember{m_rate_limiter_make_request, guild_id, user_id};
+}
+
+GetGuildBans HttpClient::get_guild_bans(Snowflake guild_id) const {
+	return GetGuildBans{m_rate_limiter_make_request, guild_id};
+}
+
+GetGuildBan HttpClient::get_guild_ban(Snowflake guild_id,
+									  Snowflake user_id) const {
+	return GetGuildBan{m_rate_limiter_make_request, guild_id, user_id};
+}
+
+GetGuildInvites HttpClient::get_guild_invites(Snowflake guild_id) const {
+	return GetGuildInvites{m_rate_limiter_make_request, guild_id};
+}
+
 GetCurrentUser HttpClient::get_current_user() const {
 	return GetCurrentUser{m_rate_limiter_make_request};
 }

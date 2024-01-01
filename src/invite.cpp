@@ -66,4 +66,8 @@ void from_json(const nlohmann::json &j, Invite &i) {
 	deserialize(j, "approximate_member_count", i.approximate_member_count);
 	deserialize(j, "expires_at", i.expires_at);
 }
+
+std::string Invite::url() const {
+	return fmt::format("https://discord.com/invite/{}", code);
+}
 }  // namespace ekizu
