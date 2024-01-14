@@ -25,28 +25,7 @@ env:
   TAG_SUFFIX: ${{ github.ref == 'refs/heads/dev' && '-dev' || '' }}
 
 jobs:
-  changes:
-    runs-on: ubuntu-22.04
-    outputs:
-      build: ${{ steps.filter.outputs.src }}
-
-    steps:
-      - name: Checkout
-        if: github.event_name == 'push'
-        uses: actions/checkout@v3
-
-      - uses: dorny/paths-filter@v2
-        id: filter
-        with:
-          base: ${{ env.BRANCH_NAME }}
-          filters: |
-            src:
-              - '**/*.cpp'
-              - '**/*.hpp'
-              - '**/CMakeLists.txt'
-
   linux:
-    needs: changes
     name: Linux ${{ matrix.arch }} (${{ matrix.gcc-version }})
     runs-on: ${{ matrix.os }}
     strategy:
@@ -55,7 +34,6 @@ jobs:
         arch: [amd64]
         gcc-version: ["g++-9", "g++-10", "g++-12"]
         os: ["ubuntu-22.04"]
-    if: needs.changes.outputs.build == 'true'
 
     steps:
       - name: Checkout
@@ -103,7 +81,6 @@ jobs:
           path: "${{ github.workspace }}/build/*.rpm"
 
   windows:
-    needs: changes
     strategy:
       fail-fast: false
       matrix:
@@ -112,7 +89,6 @@ jobs:
         vs:
           - { name: 2019, version: 16, os: windows-2019 }
           - { name: 2022, version: 17, os: windows-2022 }
-    if: needs.changes.outputs.build == 'true'
 
     name: "Windows ${{ matrix.arch }}-${{ matrix.config }}-vs${{ matrix.vs.name }}"
     runs-on: ${{ matrix.vs.os }}
