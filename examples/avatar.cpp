@@ -98,16 +98,14 @@ struct Flags {
 };
 
 async_main_with_args(int argc, char *argv[], const asio::yield_context &yield) {
-	BOOST_OUTCOME_TRY(
-		[[maybe_unused]] auto r, Flags{}.init({argv, argv + argc}));
+	EKIZU_TRY([[maybe_unused]] auto r, Flags{}.init({argv, argv + argc}));
 
 	HttpClient http{bot_token};
 	std::string base64img;
 	std::string content_type;
 
 	if (!avatar_url.empty()) {
-		BOOST_OUTCOME_TRY(
-			auto res, net::HttpConnection::get(avatar_url, yield));
+		EKIZU_TRY(auto res, net::HttpConnection::get(avatar_url, yield));
 		auto img = res.body();
 		content_type = res.base()["content-type"];
 		base64img = base64_encode(img);
@@ -126,7 +124,7 @@ async_main_with_args(int argc, char *argv[], const asio::yield_context &yield) {
 		content_type = mime_type(avatar_filename);
 	}
 
-	BOOST_OUTCOME_TRY(
+	EKIZU_TRY(
 		auto user,
 		http.modify_current_user()
 			.avatar(fmt::format("data:{};base64,{}", content_type, base64img))

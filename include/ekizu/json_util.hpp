@@ -10,7 +10,6 @@
 #pragma GCC diagnostic pop
 #endif
 
-#include <boost/outcome/try.hpp>
 #include <ekizu/util.hpp>
 #include <optional>
 #include <type_traits>
@@ -22,7 +21,7 @@ template <typename T>
 struct IsOptional : std::false_type {};
 
 template <typename T>
-struct IsOptional<std::optional<T> > : std::true_type {};
+struct IsOptional<std::optional<T>> : std::true_type {};
 
 template <typename T>
 constexpr bool IS_OPTIONAL_V = IsOptional<T>::value;
@@ -31,7 +30,7 @@ template <typename T>
 struct IsVariant : std::false_type {};
 
 template <typename... Ts>
-struct IsVariant<std::variant<Ts...> > : std::true_type {};
+struct IsVariant<std::variant<Ts...>> : std::true_type {};
 
 template <typename T>
 constexpr bool IS_VARIANT_V = IsVariant<T>::value;
@@ -40,13 +39,25 @@ template <typename T>
 struct IsVector : std::false_type {};
 
 template <typename T>
-struct IsVector<std::vector<T> > : std::true_type {};
+struct IsVector<std::vector<T>> : std::true_type {};
 
 template <typename T>
 constexpr bool IS_VECTOR_V = IsVector<T>::value;
 
+template <typename T, typename = void>
+struct has_to_json : std::false_type {};
+
+template <typename T>
+struct has_to_json<
+	T, std::void_t<decltype(to_json(
+		   std::declval<nlohmann::json &>(), std::declval<const T &>()))>>
+	: std::true_type {};
+
+template <typename T>
+constexpr bool HAS_TO_JSON_V = has_to_json<T>::value;
+
 template <typename... Types, std::size_t... I>
-std::optional<std::variant<Types...> > variant_from_json_impl(
+std::optional<std::variant<Types...>> variant_from_json_impl(
 	const nlohmann::json &j, std::index_sequence<I...>) {
 	std::variant<Types...> result;
 
@@ -69,7 +80,7 @@ std::optional<std::variant<Types...> > variant_from_json_impl(
 }
 
 template <typename... Types>
-std::optional<std::variant<Types...> > variant_from_json(
+std::optional<std::variant<Types...>> variant_from_json(
 	const nlohmann::json &j) {
 	return variant_from_json_impl<Types...>(
 		j, std::index_sequence_for<Types...>{});
@@ -77,7 +88,7 @@ std::optional<std::variant<Types...> > variant_from_json(
 
 template <typename... Types>
 void deserialize_variant_impl(const nlohmann::json &data,
-							  std::optional<std::variant<Types...> > &v) {
+							  std::optional<std::variant<Types...>> &v) {
 	v = variant_from_json<Types...>(data);
 }
 
@@ -112,7 +123,7 @@ void deserialize_impl(const nlohmann::json &value, T &dest) {
 
 template <typename... Types>
 void from_json(const nlohmann::json &j, std::variant<Types...> &v) {
-	std::optional<std::variant<Types...> > temp;
+	std::optional<std::variant<Types...>> temp;
 	deserialize_variant_impl(j, temp);
 
 	if (temp) { v = std::move(*temp); }
@@ -169,16 +180,18 @@ inline bool not_null_recursive(const nlohmann::json &data, T &&key,
  */
 template <typename T>
 void serialize(nlohmann::json &data, std::string_view key, const T &value) {
-	if constexpr (std::is_enum_v<T>) {
-		data[key] = static_cast<std::underlying_type_t<T> >(value);
-	} else if constexpr (detail::IS_OPTIONAL_V<T>) {
-		if (!value) { return; }
-
-		return serialize(data, key, *value);
-	} else if constexpr (detail::IS_VARIANT_V<T>) {
+	if constexpr (detail::IS_VARIANT_V<T>) {
 		return std::visit(
 			[&data, &key](const auto &v) { return serialize(data, key, v); },
 			value);
+	}
+
+	if constexpr (detail::HAS_TO_JSON_V<T>) {
+		to_json(data[key], value);
+	} else if constexpr (detail::IS_OPTIONAL_V<T>) {
+		if (value) { return serialize(data, key, *value); }
+	} else if constexpr (std::is_enum_v<T>) {
+		data[key] = static_cast<std::underlying_type_t<T>>(value);
 	} else {
 		data[key] = value;
 	}
@@ -187,7 +200,8 @@ void serialize(nlohmann::json &data, std::string_view key, const T &value) {
 /**
  * @brief Sets value from JSON accessed by key to a variable, if it exists.
  *
- * @tparam T The type of the variable, automatically deduced by the compiler.
+ * @tparam T The type of the variable, automatically deduced by the
+ * compiler.
  * @param data The JSON data.
  * @param key The key to access the value.
  * @param value The variable to set the value to.
@@ -215,8 +229,8 @@ bool deserialize(const nlohmann::json &data, std::string_view key, T &value) {
 }
 
 /**
- * @brief Gets a value from JSON accessed by key, or a default value if it does
- * not exist.
+ * @brief Gets a value from JSON accessed by key, or a default value if it
+ * does not exist.
  *
  * @tparam T The type of the value.
  * @param data The JSON data.
@@ -240,7 +254,7 @@ inline Result<nlohmann::json> try_parse(std::string_view str) {
 
 template <typename T>
 Result<T> deserialize(std::string_view str) {
-	BOOST_OUTCOME_TRY(auto j, try_parse(str));
+	EKIZU_TRY(auto j, try_parse(str));
 
 	try {
 		return j.get<T>();

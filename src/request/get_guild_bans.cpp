@@ -40,7 +40,7 @@ Result<std::vector<Ban>> GetGuildBans::send(
 		return boost::system::errc::operation_not_permitted;
 	}
 
-	BOOST_OUTCOME_TRY(auto res, m_make_request(*this, yield));
+	EKIZU_TRY(auto res, m_make_request(*this, yield));
 
 	return json_util::deserialize<std::vector<Ban>>(res.body());
 }

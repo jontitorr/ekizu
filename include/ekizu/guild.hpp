@@ -5,6 +5,7 @@
 #include <ekizu/guild_feature.hpp>
 #include <ekizu/role.hpp>
 #include <ekizu/sticker.hpp>
+#include <ekizu/voice_state.hpp>
 
 namespace ekizu {
 enum class DefaultMessageNotificationLevel : uint8_t {
@@ -185,6 +186,8 @@ struct Guild {
 	/// The id of the channel where admins and moderators of Community guilds
 	/// receive safety alerts from Discord.
 	std::optional<Snowflake> safety_alerts_channel_id;
+	/// Voice states in the guild.
+	std::vector<VoiceState> voice_states;
 };
 
 EKIZU_EXPORT void to_json(nlohmann::json &j, const Guild &g);

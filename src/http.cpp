@@ -3,7 +3,6 @@
 #include <boost/beast/core/tcp_stream.hpp>
 #include <boost/beast/ssl/ssl_stream.hpp>
 #include <boost/certify/https_verification.hpp>
-#include <boost/outcome/try.hpp>
 #include <boost/url/parse.hpp>
 #include <ekizu/http.hpp>
 
@@ -105,7 +104,7 @@ HttpConnection::~HttpConnection() = default;
 
 Result<HttpConnection> HttpConnection::connect(
 	std::string_view url, const asio::yield_context &yield) {
-	BOOST_OUTCOME_TRY(auto uri, boost::urls::parse_uri(url));
+	EKIZU_TRY(auto uri, boost::urls::parse_uri(url));
 
 	if (uri.scheme() != "http" && uri.scheme() != "https") {
 		return boost::system::errc::not_supported;
@@ -125,17 +124,16 @@ Result<HttpConnection> HttpConnection::connect(
 
 	auto impl = std::make_shared<Impl>(yield.get_executor(), ctx);
 
-	BOOST_OUTCOME_TRY(
-		auto r,
-		impl->run(uri.host(), uri.scheme() == "http" ? "80" : "443", yield));
+	EKIZU_TRY(auto r, impl->run(uri.host(),
+								uri.scheme() == "http" ? "80" : "443", yield));
 
 	return HttpConnection{std::move(impl)};
 }
 
 Result<HttpResponse> HttpConnection::get(std::string_view url,
 										 const asio::yield_context &yield) {
-	BOOST_OUTCOME_TRY(auto uri, boost::urls::parse_uri(url));
-	BOOST_OUTCOME_TRY(auto conn, connect(url, yield));
+	EKIZU_TRY(auto uri, boost::urls::parse_uri(url));
+	EKIZU_TRY(auto conn, connect(url, yield));
 
 	HttpRequest req{
 		http::verb::get, uri.path().empty() ? "/" : uri.encoded_path(), 11};

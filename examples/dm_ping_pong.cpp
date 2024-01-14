@@ -47,9 +47,9 @@ Result<> handle_event(const Event &ev, const HttpClient &http,
 				const Message &msg = msg_a;
 
 				if (msg.content == "ping") {
-					BOOST_OUTCOME_TRY(
+					EKIZU_TRY(
 						auto dm, http.create_dm(msg.author.id).send(yield));
-					BOOST_OUTCOME_TRY(
+					EKIZU_TRY(
 						auto m,
 						http.create_message(dm.id).content("pong").send(yield));
 				}

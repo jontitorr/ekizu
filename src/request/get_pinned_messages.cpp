@@ -1,7 +1,6 @@
 #include <ekizu/json_util.hpp>
 #include <ekizu/request/get_pinned_messages.hpp>
 
-
 namespace ekizu {
 GetPinnedMessages::GetPinnedMessages(
 	const std::function<Result<net::HttpResponse>(
@@ -23,7 +22,7 @@ Result<std::vector<Message>> GetPinnedMessages::send(
 		return boost::system::errc::operation_not_permitted;
 	}
 
-	BOOST_OUTCOME_TRY(auto res, m_make_request(*this, yield));
+	EKIZU_TRY(auto res, m_make_request(*this, yield));
 	return json_util::deserialize<std::vector<Message>>(res.body());
 }
 }  // namespace ekizu

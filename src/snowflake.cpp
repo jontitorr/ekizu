@@ -2,7 +2,9 @@
 #include <nlohmann/json.hpp>
 
 namespace ekizu {
-void to_json(nlohmann::json &j, const Snowflake &s) { j = s.id; }
+void to_json(nlohmann::json &j, const Snowflake &s) {
+	j = std::to_string(s.id);
+}
 
 void from_json(const nlohmann::json &j, Snowflake &s) {
 	// If using an inconsistent API version such as v6, you usually get various

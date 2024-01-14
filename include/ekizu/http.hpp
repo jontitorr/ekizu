@@ -10,7 +10,6 @@
 
 #include <boost/asio/spawn.hpp>
 #include <boost/beast/http.hpp>
-#include <boost/outcome/try.hpp>
 #include <ekizu/util.hpp>
 
 #ifdef _WIN32

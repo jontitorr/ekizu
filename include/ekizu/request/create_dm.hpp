@@ -12,7 +12,7 @@ struct CreateDM {
 
 	operator net::HttpRequest() const;
 
-	Result<Channel> send(const asio::yield_context &yield) const;
+	EKIZU_EXPORT Result<Channel> send(const asio::yield_context &yield) const;
 
    private:
 	Snowflake m_user_id;

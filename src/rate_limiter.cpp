@@ -32,7 +32,7 @@ Result<net::HttpResponse> RateLimiter::send(
 
 	if (!m_send_fn) { return boost::system::errc::operation_not_permitted; }
 
-	BOOST_OUTCOME_TRY(auto res, m_send_fn(req.inner, yield));
+	EKIZU_TRY(auto res, m_send_fn(req.inner, yield));
 
 	std::lock_guard lk{m_mtx};
 	auto &rate_limits = m_rate_limits[req.inner.method()];

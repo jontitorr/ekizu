@@ -6,6 +6,8 @@
 #define BOOST_NO_IOSTREAM
 #include <boost/blank.hpp>
 #include <boost/outcome/result.hpp>
+#include <boost/outcome/try.hpp>
+#define EKIZU_TRY BOOST_OUTCOME_TRY
 
 namespace ekizu {
 template <typename T = boost::blank>

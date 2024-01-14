@@ -78,7 +78,7 @@ Result<Channel> CreateGuildChannel::send(
 		return boost::system::errc::operation_not_permitted;
 	}
 
-	BOOST_OUTCOME_TRY(auto res, m_make_request(*this, yield));
+	EKIZU_TRY(auto res, m_make_request(*this, yield));
 
 	fmt::println("Body: {}", res.body());
 

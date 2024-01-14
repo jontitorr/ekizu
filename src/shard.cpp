@@ -1,8 +1,7 @@
 #include <boost/asio/deadline_timer.hpp>
 #include <boost/asio/detached.hpp>
-#include <boost/outcome/try.hpp>
+#include <ekizu/json_util.hpp>
 #include <ekizu/shard.hpp>
-#include <nlohmann/json.hpp>
 
 namespace {
 // TODO: Add gateway url customization
@@ -82,6 +81,20 @@ ekizu::Result<ekizu::Event> event_from_str(std::string_view event_type,
 }  // namespace
 
 namespace ekizu {
+void to_json(nlohmann::json &j, const UpdatePresence &p) {
+	using json_util::serialize;
+
+	if (p.idle_since) {
+		j["since"] = *p.idle_since;
+	} else {
+		j["since"] = nullptr;
+	}
+
+	serialize(j, "activities", p.activities);
+	serialize(j, "status", p.status);
+	serialize(j, "afk", p.afk);
+}
+
 Shard::Shard(ShardId id, std::string_view token, Intents intents)
 	: m_id{id.id}, m_config{std::string{token}, intents, id.total} {}
 
@@ -110,15 +123,66 @@ Result<> Shard::close(CloseFrame reason,
 		yield);
 }
 
+Result<> Shard::join_voice_channel(Snowflake guild_id, Snowflake channel_id,
+								   const boost::asio::yield_context &yield) {
+	nlohmann::json payload{
+		{"op", static_cast<uint8_t>(GatewayOpcode::VoiceStateUpdate)},
+		{"d",
+		 {
+			 {"guild_id", guild_id},
+			 {"channel_id", channel_id},
+			 {"self_mute", false},
+			 {"self_deaf", false},
+		 }},
+	};
+
+	log(fmt::format(
+		"joining voice channel | guild_id={}, channel_id={}, raw={}", guild_id,
+		channel_id, payload.dump()));
+
+	return m_ws->send(payload.dump(), yield);
+}
+
+Result<> Shard::leave_voice_channel(Snowflake guild_id,
+									const boost::asio::yield_context &yield) {
+	nlohmann::json payload{
+		{"op", static_cast<uint8_t>(GatewayOpcode::VoiceStateUpdate)},
+		{"d",
+		 {
+			 {"guild_id", guild_id},
+			 {"channel_id", nullptr},
+			 {"self_mute", false},
+			 {"self_deaf", false},
+		 }},
+	};
+
+	log(fmt::format("leaving voice channel | guild_id={}, raw={}", guild_id,
+					payload.dump()));
+
+	return m_ws->send(payload.dump(), yield);
+}
+
 Result<Event> Shard::next_event(const boost::asio::yield_context &yield) {
-	BOOST_OUTCOME_TRY(auto msg, next_message(yield));
+	EKIZU_TRY(auto msg, next_message(yield));
 
 	if (m_inflater && msg.is_binary) {
-		BOOST_OUTCOME_TRY(auto inflated, m_inflater->inflate(msg.payload));
+		EKIZU_TRY(auto inflated, m_inflater->inflate(msg.payload));
 		msg.payload = inflated;
 	}
 
 	return handle_event(msg.payload, yield);
+}
+
+Result<> Shard::update_presence(UpdatePresence presence,
+								const boost::asio::yield_context &yield) {
+	nlohmann::json payload{
+		{"op", static_cast<uint8_t>(GatewayOpcode::PresenceUpdate)},
+		{"d", presence},
+	};
+
+	log(fmt::format("updating presence | raw={}", payload.dump()));
+
+	return m_ws->send(payload.dump(), yield);
 }
 
 Result<Event> Shard::handle_event(std::string_view data,
@@ -130,26 +194,26 @@ Result<Event> Shard::handle_event(std::string_view data,
 		return boost::system::errc::invalid_argument;
 	}
 
-	switch (static_cast<ekizu::GatewayOpcode>(json["op"].get<uint8_t>())) {
-		case ekizu::GatewayOpcode::Dispatch: return handle_dispatch(json);
-		case ekizu::GatewayOpcode::Heartbeat: {
+	switch (static_cast<GatewayOpcode>(json["op"].get<uint8_t>())) {
+		case GatewayOpcode::Dispatch: return handle_dispatch(json);
+		case GatewayOpcode::Heartbeat: {
 			// https://discord.com/developers/docs/topics/gateway#heartbeat-requests
-			BOOST_OUTCOME_TRY(auto r, send_heartbeat(yield));
+			EKIZU_TRY(auto r, send_heartbeat(yield));
 			break;
 		}
-		case ekizu::GatewayOpcode::Reconnect: {
-			BOOST_OUTCOME_TRY(auto r, handle_reconnect(yield));
+		case GatewayOpcode::Reconnect: {
+			EKIZU_TRY(auto r, handle_reconnect(yield));
 			break;
 		}
-		case ekizu::GatewayOpcode::InvalidSession: {
-			BOOST_OUTCOME_TRY(auto r, handle_invalid_session(json, yield));
+		case GatewayOpcode::InvalidSession: {
+			EKIZU_TRY(auto r, handle_invalid_session(json, yield));
 			break;
 		}
-		case ekizu::GatewayOpcode::Hello: {
-			BOOST_OUTCOME_TRY(auto r, handle_hello(json, yield));
+		case GatewayOpcode::Hello: {
+			EKIZU_TRY(auto r, handle_hello(json, yield));
 			break;
 		}
-		case ekizu::GatewayOpcode::HeartbeatAck: {
+		case GatewayOpcode::HeartbeatAck: {
 			handle_heartbeat_ack();
 			break;
 		}
@@ -232,7 +296,7 @@ Result<> Shard::handle_hello(const nlohmann::json &data,
 	log(fmt::format(
 		"received hello | heartbeat_interval={}", heartbeat_interval));
 
-	BOOST_OUTCOME_TRY(
+	EKIZU_TRY(
 		auto r, start_heartbeat(heartbeat_interval, yield.get_executor()));
 
 	return m_session ? send_resume(yield) : send_identify(yield);
@@ -255,9 +319,7 @@ void Shard::log(std::string_view msg, LogLevel level) const {
 Result<net::WebSocketMessage> Shard::next_message(
 	const boost::asio::yield_context &yield) {
 	while (true) {
-		if (!m_ws || !m_ws->is_open()) {
-			BOOST_OUTCOME_TRY(auto r, reconnect(yield));
-		}
+		if (!m_ws || !m_ws->is_open()) { EKIZU_TRY(auto r, reconnect(yield)); }
 
 		auto res = m_ws->read(yield);
 
@@ -305,7 +367,7 @@ Result<> Shard::reconnect(const boost::asio::yield_context &yield) {
 	m_ws.emplace(std::move(res.value()));
 
 	if (m_config.compression) {
-		BOOST_OUTCOME_TRY(auto inflater, Inflater::create());
+		EKIZU_TRY(auto inflater, Inflater::create());
 		m_inflater.emplace(std::move(inflater));
 	}
 

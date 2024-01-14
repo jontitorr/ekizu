@@ -32,9 +32,9 @@ struct WebSocketMessage {
 };
 
 struct WebSocketClient {
-	[[nodiscard]]  EKIZU_EXPORT static Result<WebSocketClient> connect(
+	[[nodiscard]] EKIZU_EXPORT static Result<WebSocketClient> connect(
 		std::string_view url, const asio::yield_context &yield);
-	[[nodiscard]]  EKIZU_EXPORT bool is_open() const;
+	[[nodiscard]] EKIZU_EXPORT bool is_open() const;
 	EKIZU_EXPORT Result<> close(ws::close_reason reason,
 								const asio::yield_context &yield);
 	EKIZU_EXPORT Result<WebSocketMessage> read(
@@ -50,6 +50,9 @@ struct WebSocketClient {
 		std::variant<ws::stream<tcp_stream>, ws::stream<ssl_stream>> ws,
 		std::string host, std::string path, bool ssl);
 
+	Result<> do_send(std::string_view message,
+					 const asio::yield_context &yield);
+
 	boost::optional<asio::io_context &> m_ctx;
 	std::optional<tcp::resolver> m_resolver;
 	std::variant<ws::stream<tcp_stream>, ws::stream<ssl_stream>> m_stream;
@@ -57,9 +60,10 @@ struct WebSocketClient {
 	std::string m_host;
 	std::string m_path;
 	bool m_ssl{};
-	std::deque<std::string> m_queue;
 	bool m_closing{};
+	uint64_t m_tasks{};
+	std::optional<asio::deadline_timer> m_timer;
 };
 }  // namespace ekizu::net
 
-#endif // EKIZU_WS_HPP
+#endif	// EKIZU_WS_HPP

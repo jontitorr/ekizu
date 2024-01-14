@@ -8,7 +8,7 @@ using json_util::serialize;
 
 Result<std::string> Attachment::download(
 	const boost::asio::yield_context &yield) const {
-	BOOST_OUTCOME_TRY(auto res, net::HttpConnection::get(url, yield));
+	EKIZU_TRY(auto res, net::HttpConnection::get(url, yield));
 	return res.body();
 }
 

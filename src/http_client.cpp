@@ -1,4 +1,3 @@
-#include <boost/outcome/try.hpp>
 #include <ekizu/http_client.hpp>
 #include <utility>
 
@@ -271,14 +270,14 @@ Result<net::HttpResponse> HttpClient::send(net::HttpRequest req,
 	req.target(fmt::format("/api/v10{}", boost::to_string(req.target())));
 
 	if (!m_http) {
-		BOOST_OUTCOME_TRY(auto http, net::HttpConnection::connect(
-										 "https://discord.com", yield));
+		EKIZU_TRY(auto http,
+				  net::HttpConnection::connect("https://discord.com", yield));
 		m_http = std::move(http);
 	}
 
 	if (auto res = m_http->request(req, yield); res) { return res; }
 
-	BOOST_OUTCOME_TRY(
+	EKIZU_TRY(
 		auto http, net::HttpConnection::connect("https://discord.com", yield));
 	m_http = std::move(http);
 

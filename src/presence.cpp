@@ -4,14 +4,21 @@
 namespace {
 ekizu::Status from_str(std::string_view str) {
 	if (str == "online") { return ekizu::Status::Online; }
-
 	if (str == "dnd") { return ekizu::Status::DoNotDisturb; }
-
 	if (str == "idle") { return ekizu::Status::Idle; }
-
 	if (str == "offline") { return ekizu::Status::Offline; }
 
 	return ekizu::Status::Unknown;
+}
+
+std::string to_str(ekizu::Status status) {
+	switch (status) {
+		case ekizu::Status::Online: return "online";
+		case ekizu::Status::DoNotDisturb: return "dnd";
+		case ekizu::Status::Idle: return "idle";
+		case ekizu::Status::Offline: return "offline";
+		default: return "unknown";
+	}
 }
 }  // namespace
 
@@ -123,9 +130,7 @@ void from_json(const nlohmann::json &j, Activity &a) {
 	deserialize(j, "buttons", a.buttons);
 }
 
-void to_json(nlohmann::json &j, const Status &s) {
-	serialize(j, "status", static_cast<uint8_t>(s));
-}
+void to_json(nlohmann::json &j, const Status &s) { j = to_str(s); }
 
 void from_json(const nlohmann::json &j, Status &s) {
 	if (!j.is_string()) { s = Status::Unknown; }

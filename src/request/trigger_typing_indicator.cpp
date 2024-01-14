@@ -17,7 +17,7 @@ Result<> TriggerTypingIndicator::send(const asio::yield_context &yield) const {
 		return boost::system::errc::operation_not_permitted;
 	}
 
-	BOOST_OUTCOME_TRY(auto res, m_make_request(*this, yield));
+	EKIZU_TRY(auto res, m_make_request(*this, yield));
 
 	if (res.result() == net::HttpStatus::no_content) {
 		return outcome::success();

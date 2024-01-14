@@ -165,6 +165,21 @@ endif()
 
 cpmaddpackage(NAME certify GITHUB_REPOSITORY "Xminent/certify" GIT_TAG "master")
 
+cpmaddpackage(NAME Opus GITHUB_REPOSITORY "xiph/opus" GIT_TAG "master")
+cpmaddpackage(
+    NAME
+    Sodium
+    GITHUB_REPOSITORY
+    "Xminent/libsodium-cmake"
+    GIT_TAG
+    "master"
+    OPTIONS
+    "SODIUM_DISABLE_TESTS ON"
+    "SODIUM_MINIMAL ON"
+)
+
+install(TARGETS opus sodium EXPORT ${PROJECT_NAME}Targets)
+
 set(SEPARATE_DEPENDENCIES
     "${SEPARATE_DEPENDENCIES}Threads;;Boost;coroutine,date_time,filesystem,system,thread,url"
 )
@@ -223,7 +238,7 @@ endif()
 target_link_libraries(
     ${PROJECT_NAME}
     PUBLIC certify::core Boost::coroutine Boost::thread fmt::fmt nlohmann_json
-    PRIVATE Boost::url ZLIB::ZLIB
+    PRIVATE Boost::url ZLIB::ZLIB opus sodium
 )
 
 include(GenerateExportHeader)

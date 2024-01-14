@@ -1,6 +1,7 @@
 #ifndef EKIZU_LRU_CACHE_HPP
 #define EKIZU_LRU_CACHE_HPP
 
+#include <boost/optional/optional.hpp>
 #include <cstddef>
 #include <ekizu/snowflake.hpp>
 #include <list>
@@ -35,8 +36,9 @@ struct LruCache {
 		static_assert(std::is_same_v<std::decay_t<Value>, V>);
 
 		m_cache_list.emplace_front(
-			std::piecewise_construct, std::forward_as_tuple(key),
-			std::forward_as_tuple(value));
+			std::piecewise_construct,
+			std::forward_as_tuple(std::forward<Key>(key)),
+			std::forward_as_tuple(std::forward<Value>(value)));
 
 		update_lru(key);
 	}
@@ -59,26 +61,27 @@ struct LruCache {
 			std::piecewise_construct, std::forward_as_tuple(key),
 			std::forward_as_tuple(std::forward<Args>(args)...));
 
-		update_lru(key);
+		update_lru(std::forward<Key>(key));
 	}
 
 	/**
-	 * @brief Gets a value from the cache. If found, the value will be passed to
-	 * a provided callback.
+	 * @brief Gets a value from the cache.
 	 *
 	 * @tparam Callback The callback type.
 	 * @param key The key.
 	 * @param cb The callback to call if the value is found.
 	 */
-	template <typename Callback>
-	void get(const K &key, Callback &&cb) {
+	boost::optional<V &> get(const K &key) {
 		auto it = m_cache_map.find(key);
 
-		if (it == m_cache_map.end()) { return; }
+		if (it == m_cache_map.end()) { return boost::none; }
 
 		m_cache_list.splice(m_cache_list.begin(), m_cache_list, it->second);
-		cb(it->second->second);
+
+		return it->second->second;
 	}
+
+	boost::optional<V &> operator[](const K &key) { return get(key); }
 
 	/**
 	 * @brief Removed a key-value pair from the cache.
@@ -140,7 +143,8 @@ struct LruCache {
 			m_cache_map.erase(it);
 		}
 
-		m_cache_map.insert_or_assign(key, m_cache_list.begin());
+		m_cache_map.insert_or_assign(
+			std::forward<Key>(key), m_cache_list.begin());
 
 		if (m_cache_map.size() > m_capacity) {
 			m_cache_map.erase(m_cache_list.back().first);

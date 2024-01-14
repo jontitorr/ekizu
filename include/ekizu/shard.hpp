@@ -63,6 +63,15 @@ struct ShardId {
 
 inline const ShardId ShardId::ONE{0, 1};
 
+struct UpdatePresence {
+	std::optional<uint64_t> idle_since{};
+	std::vector<Activity> activities{};
+	Status status{};
+	bool afk{};
+};
+
+EKIZU_EXPORT void to_json(nlohmann::json &j, const UpdatePresence &p);
+
 /**
  * @brief Represents a Discord shard, which is a connection to the Discord
  * gateway.
@@ -83,8 +92,15 @@ struct Shard {
 	EKIZU_EXPORT void attach_logger(std::function<void(Log)> on_log);
 	EKIZU_EXPORT Result<> close(CloseFrame reason,
 								const boost::asio::yield_context &yield);
+	EKIZU_EXPORT Result<> join_voice_channel(
+		Snowflake guild_id, Snowflake channel_id,
+		const boost::asio::yield_context &yield);
+	EKIZU_EXPORT Result<> leave_voice_channel(
+		Snowflake guild_id, const boost::asio::yield_context &yield);
 	[[nodiscard]] EKIZU_EXPORT Result<Event> next_event(
 		const boost::asio::yield_context &yield);
+	EKIZU_EXPORT Result<> update_presence(
+		UpdatePresence presence, const boost::asio::yield_context &yield);
 
    private:
 	struct Session {

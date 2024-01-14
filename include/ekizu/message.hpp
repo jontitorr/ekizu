@@ -188,7 +188,7 @@ struct Message {
 	/// The ID of the channel the message was sent in.
 	Snowflake channel_id;
 	/// The ID of the guild the message was sent in.
-	Snowflake guild_id;
+	std::optional<Snowflake> guild_id;
 	/// The author of this message (not guaranteed to be a valid user, see
 	/// below).
 	User author;

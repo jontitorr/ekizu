@@ -72,7 +72,7 @@ struct ActivityParty {
 	/// Party id
 	std::optional<std::string> id;
 	/// Party size
-	std::optional<std::array<uint64_t, 2> > size;
+	std::optional<std::array<uint64_t, 2>> size;
 };
 
 EKIZU_EXPORT void to_json(nlohmann::json &j, const ActivityParty &p);
@@ -118,32 +118,32 @@ struct Activity {
 	/// Activity type
 	ActivityType type;
 	/// Stream URL, is validated when type is 1
-	std::optional<std::string> url;
+	std::optional<std::string> url{};
 	/// Unix timestamp (in milliseconds) of when the activity was added to the
 	/// user's session
-	std::optional<uint64_t> created_at;
+	std::optional<uint64_t> created_at{};
 	/// Unix timestamps for start and/or end of the game
-	std::optional<ActivityTimestamps> timestamps;
+	std::optional<ActivityTimestamps> timestamps{};
 	/// Application ID for the game
-	std::optional<Snowflake> application_id;
+	std::optional<Snowflake> application_id{};
 	/// What the player is currently doing
-	std::optional<std::string> details;
+	std::optional<std::string> details{};
 	/// User's current party status, or text used for a custom status
-	std::optional<std::string> state;
+	std::optional<std::string> state{};
 	/// Emoji used for a custom status
-	std::optional<ActivityEmoji> emoji;
+	std::optional<ActivityEmoji> emoji{};
 	/// Information for the current party of the player
-	std::optional<ActivityParty> party;
+	std::optional<ActivityParty> party{};
 	/// Images for the presence and their hover texts
-	std::optional<ActivityAssets> assets;
+	std::optional<ActivityAssets> assets{};
 	/// Secrets for Rich Presence joining and spectating
-	std::optional<ActivitySecrets> secrets;
+	std::optional<ActivitySecrets> secrets{};
 	/// Whether or not the activity is an instanced game session
-	std::optional<bool> instance;
+	std::optional<bool> instance{};
 	/// Activity flags ORed together, describes what the payload includes
-	std::optional<ActivityFlags> flags;
+	std::optional<ActivityFlags> flags{};
 	/// Custom buttons shown in the Rich Presence (max 2)
-	std::vector<ActivityButton> buttons;
+	std::optional<std::vector<ActivityButton>> buttons{};
 };
 
 EKIZU_EXPORT void to_json(nlohmann::json &j, const Activity &a);
