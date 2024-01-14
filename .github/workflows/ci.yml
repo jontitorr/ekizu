@@ -53,7 +53,7 @@ jobs:
       fail-fast: false
       matrix:
         arch: [amd64]
-        gcc-version: ["g++-9"]
+        gcc-version: ["g++-9", "g++-10", "g++-12"]
         os: ["ubuntu-22.04"]
     if: needs.changes.outputs.build == 'true'
 
@@ -103,57 +103,57 @@ jobs:
           path: "${{ github.workspace }}/build/*.rpm"
 
   windows:
-    # needs: changes
-    # strategy:
-    #   fail-fast: false
-    #   matrix:
-    #     arch: [x64, x86]
-    #     config: [Release, Debug]
-    #     vs:
-    #       - { name: 2019, version: 16, os: windows-2019 }
-    #       - { name: 2022, version: 17, os: windows-2022 }
-    # if: needs.changes.outputs.build == 'true'
+    needs: changes
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x64, x86]
+        config: [Release, Debug]
+        vs:
+          - { name: 2019, version: 16, os: windows-2019 }
+          - { name: 2022, version: 17, os: windows-2022 }
+    if: needs.changes.outputs.build == 'true'
 
-    # name: "Windows ${{ matrix.arch }}-${{ matrix.config }}-vs${{ matrix.vs.name }}"
+    name: "Windows ${{ matrix.arch }}-${{ matrix.config }}-vs${{ matrix.vs.name }}"
     runs-on: ${{ matrix.vs.os }}
-    # steps:
-    #   - name: Checkout
-    #     uses: actions/checkout@v3
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
 
-    #   - name: Add MSBuild to PATH
-    #     uses: microsoft/setup-msbuild@v1.1
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@v1.1
 
-    #   - name: Install OpenSSL
-    #     uses: johnwason/vcpkg-action@v5
-    #     id: vcpkg
-    #     with:
-    #       pkgs: openssl zlib
-    #       triplet: ${{ matrix.arch }}-windows-static
-    #       cache-key: ${{ runner.os }}-${{ matrix.arch }}-vcpkg
-    #       token: ${{ github.token }}
+      - name: Install OpenSSL
+        uses: johnwason/vcpkg-action@v5
+        id: vcpkg
+        with:
+          pkgs: openssl zlib
+          triplet: ${{ matrix.arch }}-windows-static
+          cache-key: ${{ runner.os }}-${{ matrix.arch }}-vcpkg
+          token: ${{ github.token }}
 
-    #   - name: Configure CMake (x64)
-    #     if: ${{ matrix.arch == 'x64' }}
-    #     run: cmake ${{ steps.vcpkg.outputs.vcpkg-cmake-config }} -S . -B build -G "Visual Studio ${{ matrix.vs.version }} ${{ matrix.vs.name }}" -A x64 -T host=x64
+      - name: Configure CMake (x64)
+        if: ${{ matrix.arch == 'x64' }}
+        run: cmake ${{ steps.vcpkg.outputs.vcpkg-cmake-config }} -S . -B build -G "Visual Studio ${{ matrix.vs.version }} ${{ matrix.vs.name }}" -A x64 -T host=x64
 
-    #   - name: Configure CMake (x86)
-    #     if: ${{ matrix.arch == 'x86' }}
-    #     run: cmake ${{ steps.vcpkg.outputs.vcpkg-cmake-config }} -S . -B build -G "Visual Studio ${{ matrix.vs.version }} ${{ matrix.vs.name }}" -A Win32 -T host=x86
+      - name: Configure CMake (x86)
+        if: ${{ matrix.arch == 'x86' }}
+        run: cmake ${{ steps.vcpkg.outputs.vcpkg-cmake-config }} -S . -B build -G "Visual Studio ${{ matrix.vs.version }} ${{ matrix.vs.name }}" -A Win32 -T host=x86
 
-    #   - name: Build
-    #     run: cmake --build build --config ${{ matrix.config }}
+      - name: Build
+        run: cmake --build build --config ${{ matrix.config }}
 
-    #   - name: Package
-    #     run: cd build && cpack -C ${{ matrix.config }} --verbose
+      - name: Package
+        run: cd build && cpack -C ${{ matrix.config }} --verbose
 
-    #   - name: Upload Binary
-    #     uses: actions/upload-artifact@v3
-    #     with:
-    #       name: "libekizu - Windows ${{ matrix.arch }}-${{ matrix.config }}-vs${{ matrix.vs.name }}"
-    #       path: "${{ github.workspace }}/build/*.zip"
+      - name: Upload Binary
+        uses: actions/upload-artifact@v3
+        with:
+          name: "libekizu - Windows ${{ matrix.arch }}-${{ matrix.config }}-vs${{ matrix.vs.name }}"
+          path: "${{ github.workspace }}/build/*.zip"
 
   release:
-    # needs: [linux, windows]
+    needs: [linux, windows]
     runs-on: ubuntu-22.04
     if: github.event_name == 'push'
 
@@ -161,20 +161,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Get tags
-        run: git fetch --tags origin
-
       - name: Get Latest Tag
         id: latest-tag
         run: |
-          echo "BRANCH_NAME: $BRANCH_NAME"
-          if [[ "$BRANCH_NAME" == 'dev' ]]; then
+          if [[ "${{ github.ref }}" == 'refs/heads/dev' ]]; then
             latest_tag=$(git tag -l | grep "\-dev" | sort -V | tail -n 1 || true)
+            latest_tag=${latest_tag%-dev}
           else
             latest_tag=$(git tag -l | grep -v "\-dev" | sort -V | tail -n 1 || true)
           fi
 
-          echo "Current Tag: $latest_tag"
+          if [[ -z $latest_tag ]]; then
+            latest_tag=""
+          fi
+
           echo "::set-output name=tag::$latest_tag"
         shell: bash
 
@@ -203,7 +203,7 @@ jobs:
         with:
           token: ${{ github.token }}
           fromTag: ${{ steps.semver.outputs.next }}${{ env.TAG_SUFFIX }}
-          toTag: ${{ steps.latest-tag.outputs.tag }}
+          toTag: ${{ steps.semver.outputs.current }}${{ env.TAG_SUFFIX }}
           writeToFile: false
 
       - name: Create Release
