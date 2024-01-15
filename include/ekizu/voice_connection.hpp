@@ -110,6 +110,7 @@ struct VoiceConnection {
 	bool m_disconnected{};
 	bool m_speaking{};
 	std::function<void(Log)> m_on_log;
+	std::optional<asio::steady_timer> m_send_timer;
 };
 
 struct VoiceConnectionConfig {

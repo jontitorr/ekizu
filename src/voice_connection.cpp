@@ -191,6 +191,7 @@ Result<> VoiceConnection::run(const asio::yield_context &yield) {
 Result<> VoiceConnection::send_opus(boost::span<const std::byte> data,
 									const asio::yield_context &yield) {
 	if (data.empty()) { return boost::system::errc::invalid_argument; }
+	if (!m_channel) { return boost::system::errc::operation_not_permitted; }
 
 	const auto samples = opus_packet_get_samples_per_frame(
 		reinterpret_cast<const uint8_t *>(data.data()), SAMPLE_RATE);
@@ -214,6 +215,8 @@ Result<> VoiceConnection::send_opus(boost::span<const std::byte> data,
 Result<> VoiceConnection::send_raw(boost::span<const std::byte> data,
 								   const asio::yield_context &yield) {
 	if (data.empty()) { return boost::system::errc::invalid_argument; }
+	if (!m_channel) { return boost::system::errc::operation_not_permitted; }
+
 	std::vector<std::byte> encoded_audio(data.size());
 	EKIZU_TRY(auto encoded, m_codec->encode(data, encoded_audio));
 	encoded_audio.resize(encoded);
@@ -380,6 +383,7 @@ Result<> VoiceConnection::opus_receiver(const asio::yield_context &yield) {
 
 Result<> VoiceConnection::opus_sender(const asio::yield_context &yield) {
 	m_ready_chan->async_send(boost::system::error_code{}, {}, yield);
+	m_send_timer.emplace(yield.get_executor());
 
 	std::array<std::byte,
 			   RTP_HEADER_SIZE + crypto_secretbox_MACBYTES + MAX_PACKET_SIZE>
@@ -389,6 +393,7 @@ Result<> VoiceConnection::opus_sender(const asio::yield_context &yield) {
 	std::array<std::byte, 24> nonce{};
 	boost::endian::big_uint32_t ssrc{m_ssrc};
 	std::memcpy(payload.data() + 8, ssrc.data(), 4);
+	auto now = std::chrono::steady_clock::now();
 
 	while (m_channel && m_udp) {
 		boost::system::error_code ec;
@@ -425,6 +430,11 @@ Result<> VoiceConnection::opus_sender(const asio::yield_context &yield) {
 			sent += more;
 		} while (sent < payload_span.size());
 
+		auto wait =
+			std::chrono::milliseconds(frame_count / (SAMPLE_RATE / 1000));
+		m_send_timer->expires_at(now + wait);
+		now += wait;
+		m_send_timer->async_wait(yield);
 		sequence = (sequence + 1) % (std::numeric_limits<uint16_t>::max() + 1U);
 		timestamp = (timestamp + frame_count) %
 					(std::numeric_limits<uint32_t>::max() + 1ULL);
@@ -442,7 +452,7 @@ Result<> VoiceConnection::setup_udp(const nlohmann::json &data,
 	EKIZU_TRY(m_udp, net::UdpClient::create(ip, std::to_string(port), yield));
 
 	// https://discord.com/developers/docs/topics/voice-connections#ip-discovery
-	std::string packet(74, '\0');
+	std::vector<std::byte> packet(74);
 	boost::endian::big_uint16_buf_t type(0x1);
 	boost::endian::big_uint16_buf_t length(70);
 	boost::endian::big_uint32_buf_t ssrc(m_ssrc);
@@ -450,8 +460,7 @@ Result<> VoiceConnection::setup_udp(const nlohmann::json &data,
 	std::memcpy(&packet[2], &length, sizeof(length));
 	std::memcpy(&packet[4], &ssrc, sizeof(ssrc));
 
-	EKIZU_TRY(
-		auto sent, m_udp->send(boost::as_bytes(boost::span{packet}), yield));
+	EKIZU_TRY(auto sent, m_udp->send(packet, yield));
 	EKIZU_TRY(auto res, m_udp->receive(yield));
 	if (res.length() < 8) { return boost::system::errc::message_size; }
 
