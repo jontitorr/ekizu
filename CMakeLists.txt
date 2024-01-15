@@ -13,11 +13,11 @@ if(PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR)
     )
 endif()
 
-if(NOT DEFINED ${PROJECT_NAME}_MASTER_PROJECT)
-    set(${PROJECT_NAME}_MASTER_PROJECT OFF)
+if(NOT DEFINED ekizu_MASTER_PROJECT)
+    set(ekizu_MASTER_PROJECT OFF)
 
     if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
-        set(${PROJECT_NAME}_MASTER_PROJECT ON)
+        set(ekizu_MASTER_PROJECT ON)
         message(STATUS "CMake version: ${CMAKE_VERSION}")
     endif()
 endif()
@@ -26,20 +26,14 @@ if(UNIX)
     add_compile_options("$<$<CONFIG:DEBUG>:-D_DEBUG>")
 endif()
 
-string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWERCASE)
-string(TOUPPER ${PROJECT_NAME} PROJECT_NAME_UPPERCASE)
-
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
-option(${PROJECT_NAME}_INSTALL "Generate the install target" ON)
-option(${PROJECT_NAME}_WARNINGS_AS_ERRORS "Treat compiler warnings as errors"
-       OFF
-)
+option(ekizu_INSTALL "Generate the install target" ON)
+option(ekizu_WARNINGS_AS_ERRORS "Treat compiler warnings as errors" OFF)
 
 include(CMakeDependentOption)
 
 cmake_dependent_option(
-    ${PROJECT_NAME}_BUILD_EXAMPLES "Build the examples" ON
-    "${PROJECT_NAME}_MASTER_PROJECT" OFF
+    ekizu_BUILD_EXAMPLES "Build the examples" ON "ekizu_MASTER_PROJECT" OFF
 )
 
 if(BUILD_SHARED_LIBS)
@@ -52,23 +46,21 @@ include(cmake/CPM.cmake)
 
 file(GLOB_RECURSE sources CONFIGURE_DEPENDS "include/*.hpp" "src/*.cpp")
 
-add_library(${PROJECT_NAME} ${sources})
-add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
+add_library(ekizu ${sources})
+add_library(ekizu::ekizu ALIAS ekizu)
 
 target_compile_definitions(
-    ${PROJECT_NAME}
-    PUBLIC
-        $<$<NOT:$<BOOL:${BUILD_SHARED_LIBS}>>:${PROJECT_NAME_UPPERCASE}_STATIC_DEFINE>
+    ekizu PUBLIC $<$<NOT:$<BOOL:${BUILD_SHARED_LIBS}>>:EKIZU_STATIC_DEFINE>
 )
 
-target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
+target_compile_features(ekizu PUBLIC cxx_std_17)
 target_compile_options(
-    ${PROJECT_NAME} PUBLIC "$<$<COMPILE_LANG_AND_ID:CXX,MSVC>:/permissive->"
-                           "$<$<PLATFORM_ID:Windows>:/bigobj>"
+    ekizu PUBLIC "$<$<COMPILE_LANG_AND_ID:CXX,MSVC>:/permissive->"
+                 "$<$<PLATFORM_ID:Windows>:/bigobj>"
 )
 
 target_include_directories(
-    ${PROJECT_NAME}
+    ekizu
     PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
            $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/export>
            $<INSTALL_INTERFACE:include>
@@ -76,7 +68,7 @@ target_include_directories(
 
 if(MSVC)
     target_compile_definitions(
-        ${PROJECT_NAME}
+        ekizu
         PUBLIC -D_WIN32_WINNT=0x0601
                -D_SCL_SECURE_NO_WARNINGS=1
                -D_CRT_SECURE_NO_WARNINGS=1
@@ -87,7 +79,7 @@ endif()
 
 include(cmake/CompilerWarnings.cmake)
 
-set_project_warnings(${PROJECT_NAME})
+set_project_warnings(ekizu)
 
 set(TRY_BOOST_VERSION "1.81.0")
 set(BOOST_NOT_HEADER_ONLY_COMPONENTS_THAT_YOU_NEED
@@ -144,7 +136,7 @@ cpmfindpackage(
 if(OpenSSL_ADDED)
     add_library(OpenSSL::Crypto ALIAS crypto)
     add_library(OpenSSL::SSL ALIAS ssl)
-    install(TARGETS crypto ssl EXPORT ${PROJECT_NAME}Targets)
+    install(TARGETS crypto ssl EXPORT ekizuTargets)
 else()
     set(SEPARATE_DEPENDENCIES "OpenSSL;SSL;")
 endif()
@@ -152,7 +144,7 @@ endif()
 cpmfindpackage(NAME "fmt" GITHUB_REPOSITORY "fmtlib/fmt" GIT_TAG "13156e5")
 
 if(fmt_ADDED)
-    install(TARGETS fmt EXPORT ${PROJECT_NAME}Targets)
+    install(TARGETS fmt EXPORT ekizuTargets)
 
     if(WIN32)
         target_compile_definitions(
@@ -178,18 +170,16 @@ cpmaddpackage(
     "SODIUM_MINIMAL ON"
 )
 
-install(TARGETS opus sodium EXPORT ${PROJECT_NAME}Targets)
+install(TARGETS sodium EXPORT ekizuTargets)
 
 set(SEPARATE_DEPENDENCIES
     "${SEPARATE_DEPENDENCIES}Threads;;Boost;coroutine,date_time,filesystem,system,thread,url"
 )
 
 if(${IS_BOOST_LOCAL})
-    target_link_libraries(${PROJECT_NAME} PUBLIC Boost::boost)
+    target_link_libraries(ekizu PUBLIC Boost::boost)
 else()
-    target_link_libraries(
-        ${PROJECT_NAME} PUBLIC Boost::asio Boost::beast Boost::outcome
-    )
+    target_link_libraries(ekizu PUBLIC Boost::asio Boost::beast Boost::outcome)
 endif()
 
 cpmaddpackage(
@@ -210,7 +200,7 @@ target_include_directories(
               $<INSTALL_INTERFACE:include>
 )
 
-install(TARGETS core nlohmann_json EXPORT ${PROJECT_NAME}Targets)
+install(TARGETS core nlohmann_json EXPORT ekizuTargets)
 
 find_package(ZLIB)
 
@@ -231,32 +221,30 @@ else()
     )
 
     add_library(ZLIB::ZLIB ALIAS zlib)
-    list(APPEND ${PROJECT_NAME}_TARGETS zlib)
-    install(TARGETS zlib EXPORT ${PROJECT_NAME}Targets)
+    list(APPEND ekizu_TARGETS zlib)
+    install(TARGETS zlib EXPORT ekizuTargets)
 endif()
 
 target_link_libraries(
-    ${PROJECT_NAME}
+    ekizu
     PUBLIC certify::core Boost::coroutine Boost::thread fmt::fmt nlohmann_json
     PRIVATE Boost::url ZLIB::ZLIB opus sodium
 )
 
 include(GenerateExportHeader)
 
-generate_export_header(
-    ${PROJECT_NAME} EXPORT_FILE_NAME export/${PROJECT_NAME_LOWERCASE}/export.h
-)
+generate_export_header(ekizu EXPORT_FILE_NAME export/ekizu/export.h)
 
-if(${PROJECT_NAME}_BUILD_EXAMPLES)
+if(ekizu_BUILD_EXAMPLES)
     add_subdirectory(examples)
 endif()
 
-if(${PROJECT_NAME}_INSTALL)
+if(ekizu_INSTALL)
     include(GNUInstallDirs)
 
     install(
-        TARGETS ${PROJECT_NAME}
-        EXPORT ${PROJECT_NAME}Targets
+        TARGETS ekizu
+        EXPORT ekizuTargets
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -266,10 +254,10 @@ if(${PROJECT_NAME}_INSTALL)
     )
 
     install(
-        EXPORT ${PROJECT_NAME}Targets
-        FILE ${PROJECT_NAME}Targets.cmake
-        NAMESPACE ${PROJECT_NAME}::
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+        EXPORT ekizuTargets
+        FILE ekizuTargets.cmake
+        NAMESPACE ekizu::
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/ekizu
     )
 
     install(DIRECTORY ${nlohmann_json_SOURCE_DIR}/include/nlohmann
@@ -277,39 +265,36 @@ if(${PROJECT_NAME}_INSTALL)
     )
 
     configure_file(
-        ${CMAKE_CURRENT_SOURCE_DIR}/cmake/version.h.in
-        include/${PROJECT_NAME_LOWERCASE}/version.h @ONLY
+        ${CMAKE_CURRENT_SOURCE_DIR}/cmake/version.h.in include/ekizu/version.h
+        @ONLY
     )
 
-    install(
-        FILES
-            ${CMAKE_CURRENT_BINARY_DIR}/export/${PROJECT_NAME_LOWERCASE}/export.h
-            ${CMAKE_CURRENT_BINARY_DIR}/include/${PROJECT_NAME_LOWERCASE}/version.h
-        DESTINATION include/${PROJECT_NAME_LOWERCASE}
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/export/ekizu/export.h
+                  ${CMAKE_CURRENT_BINARY_DIR}/include/ekizu/version.h
+            DESTINATION include/ekizu
     )
 
-    install(
-        DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME_LOWERCASE}
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+    install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/ekizu
+            DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
     )
 
     include(CMakePackageConfigHelpers)
 
     write_basic_package_version_file(
-        ${PROJECT_NAME}ConfigVersion.cmake
+        ekizuConfigVersion.cmake
         VERSION ${PROJECT_VERSION}
         COMPATIBILITY SameMajorVersion
     )
 
     configure_package_config_file(
         ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Config.cmake.in
-        ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
-        INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+        ${CMAKE_CURRENT_BINARY_DIR}/ekizuConfig.cmake
+        INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/ekizu
     )
 
-    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
-                  ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
-            DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/ekizuConfig.cmake
+                  ${CMAKE_CURRENT_BINARY_DIR}/ekizuConfigVersion.cmake
+            DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/ekizu
     )
 
     set(CPACK_PACKAGE_VENDOR Xminent)
@@ -329,5 +314,5 @@ if(${PROJECT_NAME}_INSTALL)
     include(CPack)
 endif()
 
-# target_compile_options(${PROJECT_NAME} PUBLIC -fsanitize=thread)
-# target_link_options(${PROJECT_NAME} PUBLIC -fsanitize=thread)
+# target_compile_options(ekizu PUBLIC -fsanitize=thread)
+# target_link_options(ekizu PUBLIC -fsanitize=thread)
