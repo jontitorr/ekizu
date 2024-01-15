@@ -3,7 +3,7 @@
 #include <ekizu/udp.hpp>
 
 namespace ekizu::net {
-using boost::asio::ip::udp;
+using asio::ip::udp;
 
 struct UdpClient::Impl {
 	Impl(udp::socket socket, udp::endpoint ep)
@@ -18,18 +18,18 @@ struct UdpClient::Impl {
 	}
 
 	Result<size_t> send(boost::span<const std::byte> data,
-						const boost::asio::yield_context& yield) {
+						const asio::yield_context& yield) {
 		boost::system::error_code ec;
-		auto sent = m_socket.async_send_to(
-			boost::asio::buffer(data), m_endpoint, yield[ec]);
+		auto sent =
+			m_socket.async_send_to(asio::buffer(data), m_endpoint, yield[ec]);
 		if (ec) { return ec; }
 		return sent;
 	}
 
-	Result<std::string> receive(const boost::asio::yield_context& yield) {
+	Result<std::string> receive(const asio::yield_context& yield) {
 		boost::system::error_code ec;
 		auto received = m_socket.async_receive_from(
-			boost::asio::buffer(m_buffer), m_endpoint, yield[ec]);
+			asio::buffer(m_buffer), m_endpoint, yield[ec]);
 		if (ec) { return ec; }
 
 		return {m_buffer.data(), received};
@@ -49,7 +49,7 @@ UdpClient::~UdpClient() = default;
 
 Result<UdpClient> UdpClient::create(std::string_view host,
 									std::string_view port,
-									const boost::asio::yield_context& yield) {
+									const asio::yield_context& yield) {
 	boost::system::error_code ec;
 	udp::resolver resolver{yield.get_executor()};
 	const auto results = resolver.async_resolve(host, port, yield[ec]);
@@ -64,12 +64,11 @@ Result<UdpClient> UdpClient::create(std::string_view host,
 Result<> UdpClient::close() { return m_impl->close(); }
 
 Result<size_t> UdpClient::send(boost::span<const std::byte> data,
-							   const boost::asio::yield_context& yield) {
+							   const asio::yield_context& yield) {
 	return m_impl->send(data, yield);
 }
 
-Result<std::string> UdpClient::receive(
-	const boost::asio::yield_context& yield) {
+Result<std::string> UdpClient::receive(const asio::yield_context& yield) {
 	return m_impl->receive(yield);
 }
 }  // namespace ekizu::net

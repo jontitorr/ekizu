@@ -1,7 +1,7 @@
 #ifndef EKIZU_SHARD_HPP
 #define EKIZU_SHARD_HPP
 
-#include <boost/asio/deadline_timer.hpp>
+#include <boost/asio/steady_timer.hpp>
 #include <ekizu/event.hpp>
 #include <ekizu/inflater.hpp>
 #include <ekizu/intents.hpp>
@@ -131,7 +131,7 @@ struct Shard {
 	Result<> send_identify(const boost::asio::yield_context &yield);
 	Result<> send_resume(const boost::asio::yield_context &yield);
 
-	std::optional<boost::asio::deadline_timer> m_timer;
+	std::optional<boost::asio::steady_timer> m_timer;
 	uint64_t m_id;
 	Config m_config;
 	bool m_last_heartbeat_acked{true};

@@ -8,6 +8,8 @@
 #include <ekizu/util.hpp>
 
 namespace ekizu::net {
+namespace asio = boost::asio;
+
 struct UdpClient {
 	UdpClient(const UdpClient&) = delete;
 	UdpClient& operator=(const UdpClient&) = delete;
@@ -17,15 +19,14 @@ struct UdpClient {
 
 	[[nodiscard]] EKIZU_EXPORT static Result<UdpClient> create(
 		std::string_view host, std::string_view port,
-		const boost::asio::yield_context& yield);
+		const asio::yield_context& yield);
 
 	EKIZU_EXPORT Result<> close();
 
 	EKIZU_EXPORT Result<size_t> send(boost::span<const std::byte> data,
-									 const boost::asio::yield_context& yield);
+									 const asio::yield_context& yield);
 
-	EKIZU_EXPORT Result<std::string> receive(
-		const boost::asio::yield_context& yield);
+	EKIZU_EXPORT Result<std::string> receive(const asio::yield_context& yield);
 
    private:
 	struct Impl;

@@ -1,16 +1,16 @@
 #include <fmt/core.h>
 
 #include <boost/asio/detached.hpp>
-#include <boost/beast/core/buffers_to_string.hpp>
 #include <boost/certify/https_verification.hpp>
 #include <boost/url/parse.hpp>
 #include <ekizu/ws.hpp>
 
 namespace {
+using namespace ekizu;
 using namespace ekizu::net;
 namespace http = beast::http;
 namespace outcome = boost::outcome_v2;
-namespace ssl = boost::asio::ssl;
+namespace ssl = asio::ssl;
 
 template <typename F>
 struct defer {
@@ -126,35 +126,44 @@ Result<WebSocketClient> WebSocketClient::connect(
 	if (path.empty()) { path = "/"; }
 
 	EKIZU_TRY(auto stream, create_stream(ssl, yield.get_executor()));
-	EKIZU_TRY(auto r, std::visit(
-						  [&host, &path, &yield, &resolver, ssl](auto &&s) {
-							  return connect_stream(
-								  resolver, s, host, path, ssl, yield);
-						  },
-						  stream));
+	EKIZU_TRY(std::visit(
+		[&host, &path, &yield, &resolver, ssl](auto &&s) {
+			return connect_stream(resolver, s, host, path, ssl, yield);
+		},
+		stream));
 
 	return WebSocketClient{std::move(resolver), std::move(stream),
-						   std::move(host), std::move(path), ssl};
+						   std::move(host), std::move(path)};
 }
 bool WebSocketClient::is_open() const {
 	return std::visit([](auto &&s) { return s.is_open(); }, m_stream);
 }
 
 Result<WebSocketMessage> WebSocketClient::read(
-	const boost::asio::yield_context &yield) {
+	const asio::yield_context &yield) {
 	boost::system::error_code ec;
+
+	// This is necessary for when connection idles to prevent automatic
+	// disconnection from Discord.
+	if (!m_ping_timer) {
+		m_ping_timer.emplace(yield.get_executor());
+
+		asio::spawn(
+			yield, [this](auto y) { (void)pinger(y); }, asio::detached);
+	}
 
 	auto is_binary = std::visit(
 		[this, &yield, &ec](auto &&stream) {
 			stream.async_read(m_buffer, yield[ec]);
+			if (ec == ws::error::closed) { m_close_reason = stream.reason(); }
 			return stream.got_binary();
 		},
 		m_stream);
 
 	if (ec) { return ec; }
 
-	std::string ret{boost::asio::buffer_cast<const char *>(m_buffer.data()),
-					m_buffer.size()};
+	std::string ret{
+		asio::buffer_cast<const char *>(m_buffer.data()), m_buffer.size()};
 
 	m_buffer.consume(m_buffer.size());
 
@@ -162,13 +171,14 @@ Result<WebSocketMessage> WebSocketClient::read(
 }
 
 Result<> WebSocketClient::close(ws::close_reason reason,
-								const boost::asio::yield_context &yield) {
+								const asio::yield_context &yield) {
 	if (m_closing) { return boost::system::errc::operation_in_progress; }
 
 	return std::visit(
 		[this, r = std::move(reason), &yield](auto &&stream) -> Result<> {
 			boost::system::error_code ec;
 			m_closing = true;
+			m_ping_timer.reset();
 			stream.async_close(r, yield[ec]);
 			m_closing = false;
 			if (ec) { return ec; }
@@ -178,7 +188,7 @@ Result<> WebSocketClient::close(ws::close_reason reason,
 }
 
 Result<> WebSocketClient::do_send(std::string_view message,
-								  const boost::asio::yield_context &yield) {
+								  const asio::yield_context &yield) {
 	defer timer_d{[this] {
 		--m_tasks;
 		m_timer->cancel_one();
@@ -187,7 +197,7 @@ Result<> WebSocketClient::do_send(std::string_view message,
 	boost::system::error_code ec;
 	std::visit(
 		[this, message, &yield, &ec](auto &&stream) {
-			stream.async_write(boost::asio::buffer(message), yield[ec]);
+			stream.async_write(asio::buffer(message), yield[ec]);
 		},
 		m_stream);
 	if (ec) { return ec; }
@@ -195,8 +205,26 @@ Result<> WebSocketClient::do_send(std::string_view message,
 	return outcome::success();
 }
 
+Result<> WebSocketClient::pinger(const asio::yield_context &yield) {
+	boost::system::error_code ec;
+
+	while (m_ping_timer) {
+		std::visit([this, &yield,
+					&ec](auto &&stream) { stream.async_ping({}, yield[ec]); },
+				   m_stream);
+		if (ec) { return ec; }
+
+		// For now 30s seems to work.
+		m_ping_timer->expires_after(std::chrono::seconds(30));
+		m_ping_timer->async_wait(yield[ec]);
+		if (ec) { return ec; }
+	}
+
+	return outcome::success();
+}
+
 Result<> WebSocketClient::send(std::string_view message,
-							   const boost::asio::yield_context &yield) {
+							   const asio::yield_context &yield) {
 	++m_tasks;
 
 	if (m_tasks == 1) {
@@ -213,10 +241,9 @@ Result<> WebSocketClient::send(std::string_view message,
 WebSocketClient::WebSocketClient(
 	tcp::resolver resolver,
 	std::variant<ws::stream<tcp_stream>, ws::stream<ssl_stream>> ws,
-	std::string host, std::string path, bool ssl)
+	std::string host, std::string path)
 	: m_resolver{std::move(resolver)},
 	  m_stream{std::move(ws)},
-	  m_host(std::move(host)),
-	  m_path(std::move(path)),
-	  m_ssl(ssl) {}
+	  m_host{std::move(host)},
+	  m_path{std::move(path)} {}
 }  // namespace ekizu::net

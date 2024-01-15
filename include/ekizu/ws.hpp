@@ -8,13 +8,14 @@
 #include <boost/beast/core/tcp_stream.hpp>
 #include <boost/beast/ssl.hpp>
 #include <boost/beast/websocket.hpp>
-#include <boost/core/span.hpp>
-#include <deque>
 #include <ekizu/util.hpp>
 #include <variant>
 
-namespace ekizu::net {
+namespace ekizu {
 namespace asio = boost::asio;
+}  // namespace ekizu
+
+namespace ekizu::net {
 namespace beast = boost::beast;
 using asio::ip::tcp;
 namespace ws = beast::websocket;
@@ -34,7 +35,14 @@ struct WebSocketMessage {
 struct WebSocketClient {
 	[[nodiscard]] EKIZU_EXPORT static Result<WebSocketClient> connect(
 		std::string_view url, const asio::yield_context &yield);
+
+	[[nodiscard]] EKIZU_EXPORT std::optional<ws::close_reason> close_reason()
+		const {
+		return m_close_reason;
+	}
+
 	[[nodiscard]] EKIZU_EXPORT bool is_open() const;
+
 	EKIZU_EXPORT Result<> close(ws::close_reason reason,
 								const asio::yield_context &yield);
 	EKIZU_EXPORT Result<WebSocketMessage> read(
@@ -48,10 +56,11 @@ struct WebSocketClient {
 	explicit WebSocketClient(
 		tcp::resolver resolver,
 		std::variant<ws::stream<tcp_stream>, ws::stream<ssl_stream>> ws,
-		std::string host, std::string path, bool ssl);
+		std::string host, std::string path);
 
 	Result<> do_send(std::string_view message,
 					 const asio::yield_context &yield);
+	Result<> pinger(const asio::yield_context &yield);
 
 	boost::optional<asio::io_context &> m_ctx;
 	std::optional<tcp::resolver> m_resolver;
@@ -59,10 +68,11 @@ struct WebSocketClient {
 	beast::flat_buffer m_buffer;
 	std::string m_host;
 	std::string m_path;
-	bool m_ssl{};
 	bool m_closing{};
 	uint64_t m_tasks{};
 	std::optional<asio::deadline_timer> m_timer;
+	std::optional<ws::close_reason> m_close_reason;
+	std::optional<asio::steady_timer> m_ping_timer;
 };
 }  // namespace ekizu::net
 

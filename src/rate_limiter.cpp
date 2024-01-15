@@ -1,5 +1,4 @@
-#include <boost/asio/deadline_timer.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/asio/steady_timer.hpp>
 #include <ekizu/json_util.hpp>
 #include <ekizu/rate_limiter.hpp>
 
@@ -18,12 +17,11 @@ Result<net::HttpResponse> RateLimiter::send(
 		if (rate_limits.find(req.inner.target()) != rate_limits.end()) {
 			auto &rate_limit = rate_limits[req.inner.target()];
 
-			if (rate_limit.remaining == 0 &&
-				boost::posix_time::microsec_clock::universal_time() <
-					rate_limit.reset_time) {
+			if (auto now = std::chrono::system_clock::now();
+				rate_limit.remaining == 0 && now < rate_limit.reset_time) {
 				lk.unlock();
-				asio::deadline_timer t{yield.get_executor()};
-				t.expires_at(rate_limit.reset_time);
+				asio::steady_timer t{yield.get_executor()};
+				t.expires_after(rate_limit.reset_time - now);
 				t.async_wait(yield);
 				lk.lock();
 			}
@@ -47,7 +45,7 @@ Result<net::HttpResponse> RateLimiter::send(
 						  std::stoul(headers.at("X-RateLimit-Limit"))),
 					  static_cast<uint16_t>(
 						  std::stoul(headers.at("X-RateLimit-Remaining"))),
-					  boost::posix_time::from_time_t(
+					  std::chrono::system_clock::from_time_t(
 						  std::stol(headers.at("X-RateLimit-Reset")))});
 	}
 

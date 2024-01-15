@@ -4,7 +4,6 @@
 #include <ekizu/export.h>
 
 #include <boost/asio/spawn.hpp>
-#include <boost/date_time/posix_time/ptime.hpp>
 #include <ekizu/http.hpp>
 #include <ekizu/util.hpp>
 #include <mutex>
@@ -43,7 +42,7 @@ struct RateLimiter {
 	struct RateLimit {
 		uint16_t limit{};
 		uint16_t remaining{};
-		boost::posix_time::ptime reset_time;
+		std::chrono::system_clock::time_point reset_time;
 	};
 
 	std::mutex m_mtx;

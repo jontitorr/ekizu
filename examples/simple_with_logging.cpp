@@ -64,8 +64,7 @@ async_main(const asio::yield_context &yield) {
 	asio::spawn(
 		yield,
 		[&shard](auto y) {
-			asio::deadline_timer timer{
-				y.get_executor(), boost::posix_time::seconds(5)};
+			asio::steady_timer timer{y.get_executor(), std::chrono::seconds(5)};
 			timer.async_wait(y);
 			get_logger()->info("Shutting down");
 			(void)shard.close(CloseFrame::NORMAL, y);

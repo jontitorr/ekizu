@@ -95,7 +95,7 @@ EKIZU_EXPORT void VoiceConnection::attach_logger(
 	m_on_log = std::move(on_log);
 }
 
-Result<> VoiceConnection::close(const boost::asio::yield_context &yield) {
+Result<> VoiceConnection::close(const asio::yield_context &yield) {
 	m_channel.reset();
 	m_heartbeat_timer.reset();
 	m_ready_chan.reset();
@@ -117,7 +117,7 @@ Result<> VoiceConnection::close(const boost::asio::yield_context &yield) {
 	return outcome::success();
 }
 
-Result<> VoiceConnection::reconnect(const boost::asio::yield_context &yield) {
+Result<> VoiceConnection::reconnect(const asio::yield_context &yield) {
 	if (!m_ws) { return boost::system::errc::operation_not_permitted; }
 
 	nlohmann::json payload{
@@ -133,7 +133,7 @@ Result<> VoiceConnection::reconnect(const boost::asio::yield_context &yield) {
 	return m_ws->send(payload.dump(), yield);
 }
 
-Result<> VoiceConnection::run(const boost::asio::yield_context &yield) {
+Result<> VoiceConnection::run(const asio::yield_context &yield) {
 	if (m_ready_chan) {
 		// Already running.
 		return outcome::success();
@@ -182,14 +182,14 @@ Result<> VoiceConnection::run(const boost::asio::yield_context &yield) {
 					LogLevel::Error);
 			}
 		},
-		boost::asio::detached);
+		asio::detached);
 
 	m_ready_chan->async_receive(yield);
 	return outcome::success();
 }
 
 Result<> VoiceConnection::send_opus(boost::span<const std::byte> data,
-									const boost::asio::yield_context &yield) {
+									const asio::yield_context &yield) {
 	if (data.empty()) { return boost::system::errc::invalid_argument; }
 
 	const auto samples = opus_packet_get_samples_per_frame(
@@ -212,7 +212,7 @@ Result<> VoiceConnection::send_opus(boost::span<const std::byte> data,
 }
 
 Result<> VoiceConnection::send_raw(boost::span<const std::byte> data,
-								   const boost::asio::yield_context &yield) {
+								   const asio::yield_context &yield) {
 	if (data.empty()) { return boost::system::errc::invalid_argument; }
 	std::vector<std::byte> encoded_audio(data.size());
 	EKIZU_TRY(auto encoded, m_codec->encode(data, encoded_audio));
@@ -220,12 +220,12 @@ Result<> VoiceConnection::send_raw(boost::span<const std::byte> data,
 	return send_opus(encoded_audio, yield);
 }
 
-Result<> VoiceConnection::silence(const boost::asio::yield_context &yield) {
+Result<> VoiceConnection::silence(const asio::yield_context &yield) {
 	return send_opus(SILENCE_FRAME, yield);
 }
 
 Result<> VoiceConnection::speak(SpeakerFlag flags,
-								const boost::asio::yield_context &yield) {
+								const asio::yield_context &yield) {
 	if (!m_ws) { return boost::system::errc::operation_not_permitted; }
 
 	nlohmann::json payload{
@@ -253,28 +253,26 @@ VoiceConnection::VoiceConnection(net::WebSocketClient ws, VoiceState state,
 	  m_codec{std::move(codec)} {}
 
 Result<> VoiceConnection::handle_session_description(
-	const nlohmann::json &data, const boost::asio::yield_context &yield) {
+	const nlohmann::json &data, const asio::yield_context &yield) {
 	m_secret_key = data["d"]["secret_key"];
 	m_channel.emplace(yield.get_executor());
 
 	spawn(
-		yield, [this](auto y) { (void)opus_sender(y); }, boost::asio::detached);
+		yield, [this](auto y) { (void)opus_sender(y); }, asio::detached);
 	spawn(
-		yield, [this](auto y) { (void)opus_receiver(y); },
-		boost::asio::detached);
+		yield, [this](auto y) { (void)opus_receiver(y); }, asio::detached);
 
 	return outcome::success();
 }
 
-Result<> VoiceConnection::setup_heartbeat(
-	const nlohmann::json &data, const boost::asio::yield_context &yield) {
+Result<> VoiceConnection::setup_heartbeat(const nlohmann::json &data,
+										  const asio::yield_context &yield) {
 	if (m_heartbeat_timer) { return outcome::success(); }
 
 	uint32_t heartbeat_interval = data["d"]["heartbeat_interval"];
 
 	m_heartbeat_timer.emplace(
-		yield.get_executor(),
-		boost::posix_time::milliseconds(heartbeat_interval));
+		yield.get_executor(), std::chrono::milliseconds(heartbeat_interval));
 
 	spawn(
 		yield,
@@ -287,7 +285,7 @@ Result<> VoiceConnection::setup_heartbeat(
 
 				m_last_heartbeat_acked = false;
 				m_heartbeat_timer->expires_from_now(
-					boost::posix_time::milliseconds(heartbeat_interval));
+					std::chrono::milliseconds(heartbeat_interval));
 
 				if (auto r = send_heartbeat(y); !r) {
 					log(fmt::format("Failed to send heartbeat: {}",
@@ -297,13 +295,12 @@ Result<> VoiceConnection::setup_heartbeat(
 				}
 			}
 		},
-		boost::asio::detached);
+		asio::detached);
 
 	return outcome::success();
 }
 
-Result<> VoiceConnection::send_heartbeat(
-	const boost::asio::yield_context &yield) {
+Result<> VoiceConnection::send_heartbeat(const asio::yield_context &yield) {
 	if (!m_ws) { return outcome::success(); }
 
 	nlohmann::json payload{
@@ -314,8 +311,7 @@ Result<> VoiceConnection::send_heartbeat(
 	return m_ws->send(payload.dump(), yield);
 }
 
-Result<> VoiceConnection::opus_receiver(
-	const boost::asio::yield_context &yield) {
+Result<> VoiceConnection::opus_receiver(const asio::yield_context &yield) {
 	m_recv_chan.emplace(yield.get_executor());
 
 	std::array<std::byte, MAX_PACKET_SIZE> decrypyted{};
@@ -382,7 +378,7 @@ Result<> VoiceConnection::opus_receiver(
 	return outcome::success();
 }
 
-Result<> VoiceConnection::opus_sender(const boost::asio::yield_context &yield) {
+Result<> VoiceConnection::opus_sender(const asio::yield_context &yield) {
 	m_ready_chan->async_send(boost::system::error_code{}, {}, yield);
 
 	std::array<std::byte,
@@ -438,7 +434,7 @@ Result<> VoiceConnection::opus_sender(const boost::asio::yield_context &yield) {
 }
 
 Result<> VoiceConnection::setup_udp(const nlohmann::json &data,
-									const boost::asio::yield_context &yield) {
+									const asio::yield_context &yield) {
 	m_ssrc = data["d"]["ssrc"];
 	std::string ip = data["d"]["ip"];
 	uint16_t port = data["d"]["port"];
@@ -481,7 +477,7 @@ Result<> VoiceConnection::setup_udp(const nlohmann::json &data,
 	return m_ws->send(payload.dump(), yield);
 }
 
-Result<> VoiceConnection::ws_listen(const boost::asio::yield_context &yield) {
+Result<> VoiceConnection::ws_listen(const asio::yield_context &yield) {
 	while (m_ws) {
 		EKIZU_TRY(auto msg, m_ws->read(yield));
 		EKIZU_TRY(auto data, json_util::try_parse(msg.payload));
@@ -518,7 +514,7 @@ void VoiceConnection::log(std::string_view msg, LogLevel level) const {
 }
 
 Result<VoiceConnection> VoiceConnectionConfig::connect(
-	const boost::asio::yield_context &yield) const {
+	const asio::yield_context &yield) const {
 	if (!state || !state->guild_id || !endpoint || !token) {
 		return boost::system::errc::invalid_argument;
 	}

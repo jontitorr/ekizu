@@ -3,11 +3,10 @@
 
 #include <boost/asio/experimental/channel.hpp>
 #include <boost/asio/steady_timer.hpp>
+#include <ekizu/log.hpp>
 #include <ekizu/udp.hpp>
 #include <ekizu/voice_state.hpp>
 #include <ekizu/ws.hpp>
-
-#include "ekizu/log.hpp"
 
 namespace ekizu {
 /// An RTP packet the server send to the client containing the voice data.
@@ -47,23 +46,23 @@ struct VoiceConnection {
 	VoiceConnection &operator=(VoiceConnection &&) noexcept = delete;
 	EKIZU_EXPORT ~VoiceConnection();
 
-	std::optional<boost::asio::experimental::channel<
-		void(boost::system::error_code, Packet)>> &
+	std::optional<
+		asio::experimental::channel<void(boost::system::error_code, Packet)>> &
 	recv_chan() {
 		return m_recv_chan;
 	}
 
 	EKIZU_EXPORT void attach_logger(std::function<void(Log)> on_log);
-	EKIZU_EXPORT Result<> close(const boost::asio::yield_context &yield);
-	EKIZU_EXPORT Result<> reconnect(const boost::asio::yield_context &yield);
-	EKIZU_EXPORT Result<> run(const boost::asio::yield_context &yield);
+	EKIZU_EXPORT Result<> close(const asio::yield_context &yield);
+	EKIZU_EXPORT Result<> reconnect(const asio::yield_context &yield);
+	EKIZU_EXPORT Result<> run(const asio::yield_context &yield);
 	EKIZU_EXPORT Result<> send_opus(boost::span<const std::byte> data,
-									const boost::asio::yield_context &yield);
+									const asio::yield_context &yield);
 	EKIZU_EXPORT Result<> send_raw(boost::span<const std::byte> data,
-								   const boost::asio::yield_context &yield);
-	EKIZU_EXPORT Result<> silence(const boost::asio::yield_context &yield);
+								   const asio::yield_context &yield);
+	EKIZU_EXPORT Result<> silence(const asio::yield_context &yield);
 	EKIZU_EXPORT Result<> speak(SpeakerFlag flags,
-								const boost::asio::yield_context &yield);
+								const asio::yield_context &yield);
 
    private:
 	friend struct VoiceConnectionConfig;
@@ -72,16 +71,16 @@ struct VoiceConnection {
 	VoiceConnection(net::WebSocketClient ws, VoiceState state, std::string url,
 					std::string_view token, std::unique_ptr<Codec> codec);
 
-	Result<> handle_session_description(
-		const nlohmann::json &data, const boost::asio::yield_context &yield);
+	Result<> handle_session_description(const nlohmann::json &data,
+										const asio::yield_context &yield);
 	Result<> setup_heartbeat(const nlohmann::json &data,
-							 const boost::asio::yield_context &yield);
-	Result<> send_heartbeat(const boost::asio::yield_context &yield);
-	Result<> opus_receiver(const boost::asio::yield_context &yield);
-	Result<> opus_sender(const boost::asio::yield_context &yield);
+							 const asio::yield_context &yield);
+	Result<> send_heartbeat(const asio::yield_context &yield);
+	Result<> opus_receiver(const asio::yield_context &yield);
+	Result<> opus_sender(const asio::yield_context &yield);
 	Result<> setup_udp(const nlohmann::json &data,
-					   const boost::asio::yield_context &yield);
-	Result<> ws_listen(const boost::asio::yield_context &yield);
+					   const asio::yield_context &yield);
+	Result<> ws_listen(const asio::yield_context &yield);
 	void log(std::string_view msg, LogLevel level = LogLevel::Debug) const;
 
 	struct AudioPacket {
@@ -93,16 +92,16 @@ struct VoiceConnection {
 	VoiceState m_state;
 	std::string m_url;
 	std::string m_token;
-	std::optional<boost::asio::experimental::channel<void(
+	std::optional<asio::experimental::channel<void(
 		boost::system::error_code, AudioPacket)>>
 		m_channel;
-	std::optional<boost::asio::experimental::channel<void(
+	std::optional<asio::experimental::channel<void(
 		boost::system::error_code, boost::blank)>>
 		m_ready_chan;
-	std::optional<boost::asio::experimental::channel<void(
-		boost::system::error_code, Packet)>>
+	std::optional<
+		asio::experimental::channel<void(boost::system::error_code, Packet)>>
 		m_recv_chan;
-	std::optional<boost::asio::deadline_timer> m_heartbeat_timer;
+	std::optional<asio::steady_timer> m_heartbeat_timer;
 	bool m_last_heartbeat_acked{true};
 	uint32_t m_ssrc{};
 	std::optional<net::UdpClient> m_udp;
@@ -115,7 +114,7 @@ struct VoiceConnection {
 
 struct VoiceConnectionConfig {
 	[[nodiscard]] EKIZU_EXPORT Result<VoiceConnection> connect(
-		const boost::asio::yield_context &yield) const;
+		const asio::yield_context &yield) const;
 
 	std::optional<VoiceState> state{};
 	std::optional<std::string> endpoint{};

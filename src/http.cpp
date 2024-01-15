@@ -124,8 +124,8 @@ Result<HttpConnection> HttpConnection::connect(
 
 	auto impl = std::make_shared<Impl>(yield.get_executor(), ctx);
 
-	EKIZU_TRY(auto r, impl->run(uri.host(),
-								uri.scheme() == "http" ? "80" : "443", yield));
+	EKIZU_TRY(
+		impl->run(uri.host(), uri.scheme() == "http" ? "80" : "443", yield));
 
 	return HttpConnection{std::move(impl)};
 }
