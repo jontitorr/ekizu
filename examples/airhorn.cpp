@@ -211,10 +211,6 @@ Result<> start_voice_connection(const VoiceConnectionConfig &config,
 	EKIZU_TRY(conn.speak(SpeakerFlag::Microphone, yield));
 	for (const auto &s : samples) { EKIZU_TRY(conn.send_opus(s, yield)); }
 	EKIZU_TRY(conn.speak(SpeakerFlag::None, yield));
-
-	asio::steady_timer timer{yield.get_executor(), std::chrono::seconds(5)};
-	timer.async_wait(yield);
-
 	EKIZU_TRY(shard.leave_voice_channel(*config.state->guild_id, yield));
 	EKIZU_TRY(conn.close(yield));
 
