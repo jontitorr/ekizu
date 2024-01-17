@@ -104,6 +104,7 @@ void from_json(const nlohmann::json &j, Guild &g) {
 	deserialize(
 		j, "premium_progress_bar_enabled", g.premium_progress_bar_enabled);
 	deserialize(j, "safety_alerts_channel_id", g.safety_alerts_channel_id);
+	deserialize(j, "members", g.members);
 	deserialize(j, "voice_states", g.voice_states);
 }
 }  // namespace ekizu

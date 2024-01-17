@@ -186,6 +186,8 @@ struct Guild {
 	/// The id of the channel where admins and moderators of Community guilds
 	/// receive safety alerts from Discord.
 	std::optional<Snowflake> safety_alerts_channel_id;
+	/// Members in the guild.
+	std::vector<GuildMember> members;
 	/// Voice states in the guild.
 	std::vector<VoiceState> voice_states;
 };
