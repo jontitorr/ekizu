@@ -33,6 +33,13 @@ EKIZU_EXPORT void from_json(const nlohmann::json &j, Snowflake &s);
 }  // namespace ekizu
 
 template <>
+struct boost::hash<ekizu::Snowflake> {
+	size_t operator()(const ekizu::Snowflake &s) const {
+		return static_cast<size_t>(s.id);
+	}
+};
+
+template <>
 class fmt::formatter<ekizu::Snowflake> {
    public:
 	constexpr auto parse(format_parse_context &ctx) { return ctx.begin(); }
