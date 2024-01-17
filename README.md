@@ -74,7 +74,7 @@ Result<> handle_event(const Event &ev, const HttpClient &http,
 }
 ```
 
-See [examples](https://github.com/Xminent/ekizu/tree/dev/examples).
+See [examples](https://github.com/jontitorr/ekizu/tree/dev/examples).
 
 ## Getting Started
 
@@ -88,7 +88,7 @@ See [examples](https://github.com/Xminent/ekizu/tree/dev/examples).
 This library uses [CPM.cmake](https://github.com/cpm-cmake/CPM.cmake) to manage dependencies. It is an amazing package manager for CMake projects and allows us to install the entire library using the following commands:
 
 ```bash
-  git clone https://www.github.com/xminent/ekizu
+  git clone https://www.github.com/jontitorr/ekizu
   cd ekizu
   cmake -S . -B build
   cmake --build build --target install

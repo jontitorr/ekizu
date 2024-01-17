@@ -117,7 +117,7 @@ if(NOT (${BOOST_FOUND}) OR (NOT DEFINED BOOST_FOUND))
         NAME
         Boost
         URL
-        "https://github.com/Xminent/boost-cmake/releases/download/1.84.0-release/boost-1.84.0.tar.xz"
+        "https://github.com/jontitorr/boost-cmake/releases/download/1.84.0-release/boost-1.84.0.tar.xz"
     )
     set(IS_BOOST_LOCAL OFF)
 endif()
@@ -126,7 +126,7 @@ cpmfindpackage(
     NAME
     "OpenSSL"
     GITHUB_REPOSITORY
-    "Xminent/openssl-cmake"
+    "jontitorr/openssl-cmake"
     GIT_TAG
     "master"
     OPTIONS
@@ -155,14 +155,14 @@ else()
     set(SEPARATE_DEPENDENCIES "${SEPARATE_DEPENDENCIES}fmt;;")
 endif()
 
-cpmaddpackage(NAME certify GITHUB_REPOSITORY "Xminent/certify" GIT_TAG "master")
+cpmaddpackage(NAME certify GITHUB_REPOSITORY "jontitorr/certify" GIT_TAG "master")
 
 cpmaddpackage(NAME Opus GITHUB_REPOSITORY "xiph/opus" GIT_TAG "master")
 cpmaddpackage(
     NAME
     Sodium
     GITHUB_REPOSITORY
-    "Xminent/libsodium-cmake"
+    "jontitorr/libsodium-cmake"
     GIT_TAG
     "master"
     OPTIONS
@@ -297,10 +297,10 @@ if(ekizu_INSTALL)
             DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/ekizu
     )
 
-    set(CPACK_PACKAGE_VENDOR Xminent)
+    set(CPACK_PACKAGE_VENDOR jontitorr)
     set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A Discord library for C++")
     set(CPACK_PACKAGE_DESCRIPTION "A Discord library for C++")
-    set(CPACK_PACKAGE_CONTACT "mail@xminent.com")
+    set(CPACK_PACKAGE_CONTACT "mail@jontitorr.com")
     set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "A Discord library for C++")
 
     if(WIN32)
