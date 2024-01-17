@@ -42,7 +42,7 @@ enum class VoiceOpcode : uint8_t {
 struct VoiceConnection {
 	VoiceConnection(const VoiceConnection &) = delete;
 	VoiceConnection &operator=(const VoiceConnection &) = delete;
-	EKIZU_EXPORT VoiceConnection(VoiceConnection &&) noexcept;
+	EKIZU_EXPORT VoiceConnection(VoiceConnection &&) noexcept(false);
 	VoiceConnection &operator=(VoiceConnection &&) noexcept = delete;
 	EKIZU_EXPORT ~VoiceConnection();
 

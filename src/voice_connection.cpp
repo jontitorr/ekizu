@@ -87,7 +87,7 @@ struct VoiceConnection::Codec {
 	UniqueOpusEncoder m_encoder;
 };
 
-VoiceConnection::VoiceConnection(VoiceConnection &&) noexcept = default;
+VoiceConnection::VoiceConnection(VoiceConnection &&) noexcept(false) = default;
 VoiceConnection::~VoiceConnection() = default;
 
 EKIZU_EXPORT void VoiceConnection::attach_logger(
