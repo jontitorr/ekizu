@@ -98,7 +98,7 @@ void deserialize_int(const std::string &str, T &value) {
 		if constexpr (std::is_signed_v<T>) {
 			value = std::stoi(str);
 		} else if constexpr (std::is_unsigned_v<T>) {
-			value = static_cast<T>(std::stoul(str));
+			value = static_cast<T>(std::stoull(str));
 		}
 	} catch (...) {}
 }
