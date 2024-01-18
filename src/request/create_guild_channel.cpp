@@ -60,8 +60,6 @@ CreateGuildChannel::CreateGuildChannel(
 	  m_make_request{make_request} {}
 
 CreateGuildChannel::operator net::HttpRequest() const {
-	fmt::println("Fields: {}", static_cast<nlohmann::json>(m_fields).dump());
-
 	net::HttpRequest req{
 		net::HttpMethod::post, fmt::format("/guilds/{}/channels", m_guild_id),
 		11, static_cast<nlohmann::json>(m_fields).dump()};
@@ -79,8 +77,6 @@ Result<Channel> CreateGuildChannel::send(
 	}
 
 	EKIZU_TRY(auto res, m_make_request(*this, yield));
-
-	fmt::println("Body: {}", res.body());
 
 	return json_util::deserialize<Channel>(res.body());
 }

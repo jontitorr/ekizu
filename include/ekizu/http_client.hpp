@@ -38,6 +38,7 @@
 #include <ekizu/request/get_pinned_messages.hpp>
 #include <ekizu/request/get_reactions.hpp>
 #include <ekizu/request/get_user.hpp>
+#include <ekizu/request/interaction_client.hpp>
 #include <ekizu/request/list_active_guild_threads.hpp>
 #include <ekizu/request/list_guild_members.hpp>
 #include <ekizu/request/modify_channel.hpp>
@@ -52,7 +53,6 @@
 #include <ekizu/request/search_guild_members.hpp>
 #include <ekizu/request/trigger_typing_indicator.hpp>
 #include <ekizu/request/unpin_message.hpp>
-#include <ekizu/snowflake.hpp>
 
 namespace ekizu {
 struct HttpClient {
@@ -170,6 +170,9 @@ struct HttpClient {
 	[[nodiscard]] EKIZU_EXPORT GetUser get_user(Snowflake user_id) const;
 	[[nodiscard]] EKIZU_EXPORT ModifyCurrentUser modify_current_user() const;
 	[[nodiscard]] EKIZU_EXPORT CreateDM create_dm(Snowflake user_id) const;
+
+	[[nodiscard]] EKIZU_EXPORT InteractionClient
+	interaction(Snowflake application_id) const;
 
    private:
 	/// Function which sends an HTTP request. This is wrapped around a

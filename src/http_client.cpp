@@ -1,5 +1,4 @@
 #include <ekizu/http_client.hpp>
-#include <utility>
 
 namespace ekizu {
 HttpClient::HttpClient(std::string_view token)
@@ -259,6 +258,10 @@ ModifyCurrentUser HttpClient::modify_current_user() const {
 
 CreateDM HttpClient::create_dm(Snowflake user_id) const {
 	return CreateDM{m_rate_limiter_make_request, user_id};
+}
+
+InteractionClient HttpClient::interaction(Snowflake application_id) const {
+	return InteractionClient{m_rate_limiter_make_request, application_id};
 }
 
 Result<net::HttpResponse> HttpClient::send(net::HttpRequest req,
