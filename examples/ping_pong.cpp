@@ -43,8 +43,7 @@ Result<> handle_event(const Event &ev, const HttpClient &http,
 			using T = std::decay_t<decltype(event)>;
 
 			if constexpr (std::is_same_v<T, MessageCreate>) {
-				const auto &[msg_a] = event;
-				const Message &msg = msg_a;
+				const auto &[msg] = event;
 
 				if (msg.content == "ping") {
 					(void)http.create_message(msg.channel_id)

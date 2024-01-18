@@ -12,6 +12,10 @@ A WIP C++ library for Discord applications.
 
 ## Usage/Examples
 
+Ekizu leverages the [asio](https://github.com/chriskohlhoff/asio) library for
+asynchronous I/O. This allows us to achieve concurrency without the need for a
+thread pool. For example:
+
 ```cpp
 #include <ekizu/async_main.hpp>
 #include <ekizu/http_client.hpp>
@@ -58,8 +62,7 @@ Result<> handle_event(const Event &ev, const HttpClient &http,
    using T = std::decay_t<decltype(event)>;
 
    if constexpr (std::is_same_v<T, MessageCreate>) {
-    const auto &[msg_a] = event;
-    const Message &msg = msg_a;
+    const auto &[msg] = event;
 
     if (msg.content == "ping") {
      (void)http.create_message(msg.channel_id)
@@ -74,7 +77,9 @@ Result<> handle_event(const Event &ev, const HttpClient &http,
 }
 ```
 
-See [examples](https://github.com/jontitorr/ekizu/tree/dev/examples).
+> This example makes use of a macro called async_main, which defines a main entrypoint that runs a boost::asio::io_context. It is not mandatory and is optionally included in the `ekizu/async_main.hpp` header.
+
+See [examples](https://github.com/jontitorr/ekizu/tree/dev/examples) for more.
 
 ## Getting Started
 
