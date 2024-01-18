@@ -1,7 +1,10 @@
 #ifndef EKIZU_PERMISSIONS_HPP
 #define EKIZU_PERMISSIONS_HPP
 
+#include <ekizu/export.h>
+
 #include <cstdint>
+#include <nlohmann/json_fwd.hpp>
 #include <type_traits>
 
 namespace ekizu {
@@ -117,6 +120,9 @@ constexpr Permissions operator&(Permissions lhs, Permissions rhs) {
 		static_cast<std::underlying_type_t<Permissions> >(lhs) &
 		static_cast<std::underlying_type_t<Permissions> >(rhs));
 }
+
+EKIZU_EXPORT void to_json(nlohmann::json &j, const Permissions &p);
+EKIZU_EXPORT void from_json(const nlohmann::json &j, Permissions &p);
 }  // namespace ekizu
 
 #endif	// EKIZU_PERMISSIONS_HPP

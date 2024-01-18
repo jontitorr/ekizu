@@ -1,4 +1,4 @@
-#include <ekizu/command_data_resolved.hpp>
+#include <ekizu/application_command_data_resolved.hpp>
 #include <ekizu/json_util.hpp>
 
 namespace ekizu {
@@ -49,21 +49,23 @@ void from_json(const nlohmann::json &j, InteractionMember &m) {
 	deserialize(j, "roles", m.roles);
 }
 
-void to_json(nlohmann::json &j, const CommandInteractionDataResolved &r) {
-	serialize(j, "attachments", r.attachments);
-	serialize(j, "channels", r.channels);
-	serialize(j, "members", r.members);
-	serialize(j, "messages", r.messages);
-	serialize(j, "roles", r.roles);
+void to_json(nlohmann::json &j,
+			 const ApplicationCommandInteractionDataResolved &r) {
 	serialize(j, "users", r.users);
+	serialize(j, "members", r.members);
+	serialize(j, "roles", r.roles);
+	serialize(j, "channels", r.channels);
+	serialize(j, "messages", r.messages);
+	serialize(j, "attachments", r.attachments);
 }
 
-void from_json(const nlohmann::json &j, CommandInteractionDataResolved &r) {
-	deserialize(j, "attachments", r.attachments);
-	deserialize(j, "channels", r.channels);
-	deserialize(j, "members", r.members);
-	deserialize(j, "messages", r.messages);
-	deserialize(j, "roles", r.roles);
+void from_json(const nlohmann::json &j,
+			   ApplicationCommandInteractionDataResolved &r) {
 	deserialize(j, "users", r.users);
+	deserialize(j, "members", r.members);
+	deserialize(j, "roles", r.roles);
+	deserialize(j, "channels", r.channels);
+	deserialize(j, "messages", r.messages);
+	deserialize(j, "attachments", r.attachments);
 }
 }  // namespace ekizu

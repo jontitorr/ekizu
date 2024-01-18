@@ -73,6 +73,9 @@ struct MessageApplication {
 	std::optional<std::string> cover_image;
 };
 
+EKIZU_EXPORT void to_json(nlohmann::json &j, const MessageApplication &a);
+EKIZU_EXPORT void from_json(const nlohmann::json &j, MessageApplication &a);
+
 enum class MessageFlags : uint32_t {
 	/// This message has been published to subscribed channels (via Channel
 	/// Following).
@@ -115,6 +118,9 @@ struct MessageInteraction {
 	/// Member who invoked the interaction in the guild.
 	std::optional<PartialMember> member;
 };
+
+EKIZU_EXPORT void to_json(nlohmann::json &j, const MessageInteraction &i);
+EKIZU_EXPORT void from_json(const nlohmann::json &j, MessageInteraction &i);
 
 /**
  * @see

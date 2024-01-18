@@ -49,6 +49,11 @@ struct CreateMessage {
 		return *this;
 	}
 
+	CreateMessage &components(const std::vector<MessageComponent> &components) {
+		m_fields.components = components;
+		return *this;
+	}
+
 	CreateMessage &content(std::string_view content) {
 		// TODO: Validate content
 		m_fields.content = content;

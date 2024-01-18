@@ -12,9 +12,16 @@ enum class ComponentType : uint8_t {
 	TextInput = 4,
 };
 
+enum class ButtonStyle : uint8_t {
+	Primary = 1,
+	Secondary = 2,
+	Success = 3,
+	Danger = 4,
+	Link = 5
+};
+
 struct Button {
-	ComponentType type{ComponentType::Button};
-	uint8_t style{};
+	ButtonStyle style{};
 	std::optional<std::string> label;
 	std::optional<PartialEmoji> emoji;
 	std::optional<std::string> custom_id;
@@ -24,6 +31,38 @@ struct Button {
 
 EKIZU_EXPORT void to_json(nlohmann::json &j, const Button &b);
 EKIZU_EXPORT void from_json(const nlohmann::json &j, Button &b);
+
+struct ButtonBuilder {
+	[[nodiscard]] Button build() const { return m_button; }
+
+	[[nodiscard]] ButtonBuilder &style(ButtonStyle style) {
+		m_button.style = style;
+		return *this;
+	}
+
+	[[nodiscard]] ButtonBuilder &label(std::string label) {
+		m_button.label = std::move(label);
+		return *this;
+	}
+
+	[[nodiscard]] ButtonBuilder &emoji(PartialEmoji emoji) {
+		m_button.emoji = std::move(emoji);
+		return *this;
+	}
+
+	[[nodiscard]] ButtonBuilder &custom_id(std::string custom_id) {
+		m_button.custom_id = std::move(custom_id);
+		return *this;
+	}
+
+	[[nodiscard]] ButtonBuilder &url(std::string url) {
+		m_button.url = std::move(url);
+		return *this;
+	}
+
+   private:
+	Button m_button;
+};
 
 struct SelectOptions {
 	std::string label;
@@ -37,8 +76,6 @@ EKIZU_EXPORT void to_json(nlohmann::json &j, const SelectOptions &o);
 EKIZU_EXPORT void from_json(const nlohmann::json &j, SelectOptions &o);
 
 struct SelectMenu {
-	/// The type of the component.
-	ComponentType type{ComponentType::SelectMenu};
 	/// A unique identifier for the component (max 100 characters).
 	std::string custom_id;
 	/// The options for the select menu (max 25).
@@ -74,7 +111,6 @@ EKIZU_EXPORT void from_json(const nlohmann::json &j, ActionRowComponent &c);
  * @param data The JSON data to create this Action Row with.
  */
 struct ActionRow {
-	ComponentType type{ComponentType::ActionRow};
 	std::vector<ActionRowComponent> components{};
 };
 

@@ -1,14 +1,15 @@
 #ifndef EKIZU_INTERACTION_HPP
 #define EKIZU_INTERACTION_HPP
 
-#include <ekizu/command_data.hpp>
+#include <ekizu/application_command_data.hpp>
 #include <ekizu/message.hpp>
+#include <ekizu/message_component_data.hpp>
 
 namespace ekizu {
-using InteractionData = std::variant<CommandData>;
+using InteractionData =
+	std::variant<ApplicationCommandData, MessageComponentData>;
 
 EKIZU_EXPORT void to_json(nlohmann::json &j, const InteractionData &i);
-EKIZU_EXPORT void from_json(const nlohmann::json &j, InteractionData &i);
 
 struct Interaction {
 	/// ID of the interaction.

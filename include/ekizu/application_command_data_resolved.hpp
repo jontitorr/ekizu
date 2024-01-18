@@ -49,27 +49,28 @@ struct InteractionMember {
 EKIZU_EXPORT void to_json(nlohmann::json &j, const InteractionMember &m);
 EKIZU_EXPORT void from_json(const nlohmann::json &j, InteractionMember &m);
 
-struct CommandInteractionDataResolved {
-	/// Map of resolved attachments.
-	std::unordered_map<Snowflake, Attachment> attachments;
-	/// Map of resolved channels.
-	std::unordered_map<Snowflake, InteractionChannel> channels;
+/// https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-resolved-data-structure
+struct ApplicationCommandInteractionDataResolved {
+	/// Map of resolved users.
+	std::unordered_map<Snowflake, User> users;
 	/// Map of resolved members.
 	///
 	/// Resolved members' ID will map to a resolved user as well.
 	std::unordered_map<Snowflake, InteractionMember> members;
-	/// Map of resolved messages.
-	std::unordered_map<Snowflake, Message> messages;
 	/// Map of resolved roles.
 	std::unordered_map<Snowflake, Role> roles;
-	/// Map of resolved users.
-	std::unordered_map<Snowflake, User> users;
+	/// Map of resolved channels.
+	std::unordered_map<Snowflake, InteractionChannel> channels;
+	/// Map of resolved messages.
+	std::unordered_map<Snowflake, Message> messages;
+	/// Map of resolved attachments.
+	std::unordered_map<Snowflake, Attachment> attachments;
 };
 
 EKIZU_EXPORT void to_json(nlohmann::json &j,
-						  const CommandInteractionDataResolved &r);
+						  const ApplicationCommandInteractionDataResolved &r);
 EKIZU_EXPORT void from_json(const nlohmann::json &j,
-							CommandInteractionDataResolved &r);
+							ApplicationCommandInteractionDataResolved &r);
 }  // namespace ekizu
 
 #endif	// EKIZU_COMMAND_DATA_RESOLVED_HPP

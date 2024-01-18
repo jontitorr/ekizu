@@ -6,7 +6,7 @@ using json_util::deserialize;
 using json_util::serialize;
 
 void to_json(nlohmann::json &j, const Button &b) {
-	serialize(j, "type", b.type);
+	serialize(j, "type", ComponentType::Button);
 	serialize(j, "style", b.style);
 	serialize(j, "label", b.label);
 	serialize(j, "emoji", b.emoji);
@@ -16,7 +16,6 @@ void to_json(nlohmann::json &j, const Button &b) {
 }
 
 void from_json(const nlohmann::json &j, Button &b) {
-	deserialize(j, "type", b.type);
 	deserialize(j, "style", b.style);
 	deserialize(j, "label", b.label);
 	deserialize(j, "emoji", b.emoji);
@@ -42,7 +41,7 @@ void from_json(const nlohmann::json &j, SelectOptions &o) {
 }
 
 void to_json(nlohmann::json &j, const SelectMenu &s) {
-	serialize(j, "type", s.type);
+	serialize(j, "type", ComponentType::SelectMenu);
 	serialize(j, "custom_id", s.custom_id);
 	serialize(j, "options", s.options);
 	serialize(j, "placeholder", s.placeholder);
@@ -52,7 +51,6 @@ void to_json(nlohmann::json &j, const SelectMenu &s) {
 }
 
 void from_json(const nlohmann::json &j, SelectMenu &s) {
-	deserialize(j, "type", s.type);
 	deserialize(j, "custom_id", s.custom_id);
 	deserialize(j, "options", s.options);
 	deserialize(j, "placeholder", s.placeholder);
@@ -70,12 +68,11 @@ void from_json(const nlohmann::json &j, ActionRowComponent &c) {
 }
 
 void to_json(nlohmann::json &j, const ActionRow &a) {
-	serialize(j, "type", a.type);
+	serialize(j, "type", ComponentType::ActionRow);
 	serialize(j, "components", a.components);
 }
 
 void from_json(const nlohmann::json &j, ActionRow &a) {
-	deserialize(j, "type", a.type);
 	deserialize(j, "components", a.components);
 }
 
