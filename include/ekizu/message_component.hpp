@@ -35,27 +35,27 @@ EKIZU_EXPORT void from_json(const nlohmann::json &j, Button &b);
 struct ButtonBuilder {
 	[[nodiscard]] Button build() const { return m_button; }
 
-	[[nodiscard]] ButtonBuilder &style(ButtonStyle style) {
+	ButtonBuilder &style(ButtonStyle style) {
 		m_button.style = style;
 		return *this;
 	}
 
-	[[nodiscard]] ButtonBuilder &label(std::string label) {
+	ButtonBuilder &label(std::string label) {
 		m_button.label = std::move(label);
 		return *this;
 	}
 
-	[[nodiscard]] ButtonBuilder &emoji(PartialEmoji emoji) {
+	ButtonBuilder &emoji(PartialEmoji emoji) {
 		m_button.emoji = std::move(emoji);
 		return *this;
 	}
 
-	[[nodiscard]] ButtonBuilder &custom_id(std::string custom_id) {
+	ButtonBuilder &custom_id(std::string custom_id) {
 		m_button.custom_id = std::move(custom_id);
 		return *this;
 	}
 
-	[[nodiscard]] ButtonBuilder &url(std::string url) {
+	ButtonBuilder &url(std::string url) {
 		m_button.url = std::move(url);
 		return *this;
 	}
@@ -75,6 +75,38 @@ struct SelectOptions {
 EKIZU_EXPORT void to_json(nlohmann::json &j, const SelectOptions &o);
 EKIZU_EXPORT void from_json(const nlohmann::json &j, SelectOptions &o);
 
+struct SelectOptionsBuilder {
+	[[nodiscard]] SelectOptions build() const { return m_options; }
+
+	SelectOptionsBuilder &label(std::string_view label) {
+		m_options.label = label;
+		return *this;
+	}
+
+	SelectOptionsBuilder &value(std::string_view value) {
+		m_options.value = value;
+		return *this;
+	}
+
+	SelectOptionsBuilder &description(std::string_view description) {
+		m_options.description = description;
+		return *this;
+	}
+
+	SelectOptionsBuilder &emoji(PartialEmoji emoji) {
+		m_options.emoji = std::move(emoji);
+		return *this;
+	}
+
+	SelectOptionsBuilder &default_(bool default_) {
+		m_options.default_ = default_;
+		return *this;
+	}
+
+   private:
+	SelectOptions m_options;
+};
+
 struct SelectMenu {
 	/// A unique identifier for the component (max 100 characters).
 	std::string custom_id;
@@ -93,6 +125,43 @@ struct SelectMenu {
 
 EKIZU_EXPORT void to_json(nlohmann::json &j, const SelectMenu &s);
 EKIZU_EXPORT void from_json(const nlohmann::json &j, SelectMenu &s);
+
+struct SelectMenuBuilder {
+	[[nodiscard]] SelectMenu build() const { return m_select_menu; }
+
+	SelectMenuBuilder &custom_id(std::string_view custom_id) {
+		m_select_menu.custom_id = custom_id;
+		return *this;
+	}
+
+	SelectMenuBuilder &options(std::vector<SelectOptions> options) {
+		m_select_menu.options = std::move(options);
+		return *this;
+	}
+
+	SelectMenuBuilder &placeholder(std::string_view placeholder) {
+		m_select_menu.placeholder = placeholder;
+		return *this;
+	}
+
+	SelectMenuBuilder &min_values(uint8_t min_values) {
+		m_select_menu.min_values = min_values;
+		return *this;
+	}
+
+	SelectMenuBuilder &max_values(uint8_t max_values) {
+		m_select_menu.max_values = max_values;
+		return *this;
+	}
+
+	SelectMenuBuilder &disabled(bool disabled) {
+		m_select_menu.disabled = disabled;
+		return *this;
+	}
+
+   private:
+	SelectMenu m_select_menu;
+};
 
 using ActionRowComponent = std::variant<Button, SelectMenu>;
 
@@ -116,6 +185,18 @@ struct ActionRow {
 
 EKIZU_EXPORT void to_json(nlohmann::json &j, const ActionRow &a);
 EKIZU_EXPORT void from_json(const nlohmann::json &j, ActionRow &a);
+
+struct ActionRowBuilder {
+	[[nodiscard]] ActionRow build() const { return m_action_row; }
+
+	ActionRowBuilder &components(std::vector<ActionRowComponent> components) {
+		m_action_row.components = std::move(components);
+		return *this;
+	}
+
+   private:
+	ActionRow m_action_row;
+};
 
 using MessageComponent = std::variant<ActionRow, Button, SelectMenu>;
 
