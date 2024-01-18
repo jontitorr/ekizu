@@ -155,7 +155,9 @@ else()
     set(SEPARATE_DEPENDENCIES "${SEPARATE_DEPENDENCIES}fmt;;")
 endif()
 
-cpmaddpackage(NAME certify GITHUB_REPOSITORY "jontitorr/certify" GIT_TAG "master")
+cpmaddpackage(
+    NAME certify GITHUB_REPOSITORY "jontitorr/certify" GIT_TAG "master"
+)
 
 cpmaddpackage(NAME Opus GITHUB_REPOSITORY "xiph/opus" GIT_TAG "master")
 cpmaddpackage(
@@ -297,10 +299,10 @@ if(ekizu_INSTALL)
             DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/ekizu
     )
 
-    set(CPACK_PACKAGE_VENDOR jontitorr)
+    set(CPACK_PACKAGE_VENDOR jontitor)
     set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A Discord library for C++")
     set(CPACK_PACKAGE_DESCRIPTION "A Discord library for C++")
-    set(CPACK_PACKAGE_CONTACT "mail@jontitorr.com")
+    set(CPACK_PACKAGE_CONTACT "mail@jontitor.com")
     set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "A Discord library for C++")
 
     if(WIN32)
