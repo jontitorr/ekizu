@@ -13,4 +13,9 @@ CreateResponse InteractionClient::create_response(
 	return {
 		m_make_request, interaction_id, interaction_token, std::move(response)};
 }
+
+GetOriginalResponse InteractionClient::get_original_response(
+	Snowflake interaction_id, std::string_view interaction_token) const {
+	return {m_make_request, m_application_id, interaction_token};
+}
 }  // namespace ekizu

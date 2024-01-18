@@ -1,5 +1,5 @@
-#ifndef EKIZU_COMMAND_DATA_HPP
-#define EKIZU_COMMAND_DATA_HPP
+#ifndef EKIZU_APPLICATION_COMMAND_DATA_HPP
+#define EKIZU_APPLICATION_COMMAND_DATA_HPP
 
 #include <ekizu/application_command_data_resolved.hpp>
 
@@ -43,4 +43,4 @@ EKIZU_EXPORT void to_json(nlohmann::json &j, const ApplicationCommandData &c);
 EKIZU_EXPORT void from_json(const nlohmann::json &j, ApplicationCommandData &c);
 }  // namespace ekizu
 
-#endif	// EKIZU_COMMAND_DATA_HPP
+#endif	// EKIZU_APPLICATION_COMMAND_DATA_HPP
