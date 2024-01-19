@@ -52,6 +52,7 @@ jobs:
 
       - name: Build documentation
         run: |
+          doxide build
           mkdocs build --clean
           mkdocs --version
         working-directory: docs
