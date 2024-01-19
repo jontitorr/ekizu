@@ -7,6 +7,8 @@ void to_json(nlohmann::json &j, const Permissions &p) {
 }
 
 void from_json(const nlohmann::json &j, Permissions &p) {
-	json_util::detail::deserialize_impl(j, p);
+	uint64_t i{};
+	json_util::detail::deserialize_impl(j, i);
+	p = static_cast<Permissions>(i);
 }
 }  // namespace ekizu
