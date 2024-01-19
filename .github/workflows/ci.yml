@@ -23,6 +23,9 @@ env:
   BRANCH_NAME: ${{ github.ref == 'refs/heads/dev' && 'dev' || 'main' }}
   PRERELEASE: ${{ github.ref == 'refs/heads/dev' && 'true' || 'false' }}
 
+permissions:
+  contents: write
+
 jobs:
   linux:
     name: Linux ${{ matrix.arch }} (${{ matrix.gcc-version }})
