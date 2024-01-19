@@ -1,0 +1,73 @@
+name: documentation
+on:
+  push:
+    branches:
+      - main
+
+env:
+  PYTHON_VERSION: 3.x
+
+permissions:
+  contents: write
+  id-token: write
+  pages: write
+
+jobs:
+  documentation:
+    name: Build documentation
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python runtime
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Set up build cache
+        uses: actions/cache/restore@v3
+        with:
+          key: ekizu-${{ hashfiles('.cache/**') }}
+          path: .cache
+          restore-keys: |
+            ekizu-
+
+      - name: Install Doxide
+        run: |
+          echo 'deb http://download.indii.org/deb jammy main' | sudo tee /etc/apt/sources.list.d/indii.org.list
+          curl -fsSL https://download.indii.org/deb/Release.key | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/indii.org.gpg > /dev/null
+          sudo apt-get update && sudo apt-get install doxide
+
+      - name: Install Python dependencies
+        run: pip install mkdocs mkdocs-material
+
+      - name: Build documentation
+        run: |
+          mkdocs build --clean
+          mkdocs --version
+        working-directory: docs
+
+      - name: Adjust permissions
+        run: |
+          chmod -c -R +rX site/ | while read line; do
+            echo "::warning title=Invalid file permissions automatically fixed::$line"
+          done
+        working-directory: docs
+
+      - name: Upload to GitHub Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/site
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
+
+      - name: Save build cache
+        uses: actions/cache/save@v3
+        with:
+          key: ekizu-${{ hashfiles('.cache/**') }}
+          path: .cache

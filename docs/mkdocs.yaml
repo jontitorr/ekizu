@@ -1,0 +1,91 @@
+# Project information
+site_name: Discord Library for C++
+site_author: Jonathan Martinez
+site_url: https://json.nlohmann.me/
+
+# Repository
+repo_name: jontitorr/ekizu
+repo_url: https://github.com/jontitorr/ekizu
+edit_uri: edit/develop/docs/mkdocs/docs
+
+# Copyright
+copyright: Copyright &copy; 2023 - 2024 Jonathan Martinez
+
+theme:
+  name: material
+  custom_dir: material/overrides
+  language: en
+  features:
+    - content.code.copy
+    - content.tabs.link
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.indexes
+    - navigation.top
+    - search.share
+    - search.suggest
+    - toc.follow
+  palette:
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/link
+        name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/toggle-switch
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: black
+      accent: indigo
+      toggle:
+        icon: material/toggle-switch-off
+        name: Switch to system preference
+  font:
+    text: Roboto
+    code: JetBrains Mono
+  favicon: assets/images/favicon.png
+  logo: assets/images/favicon.png
+
+extra:
+  generator: false
+
+markdown_extensions:
+  - def_list
+  - attr_list
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+
+plugins:
+  - search
+
+# extra_javascript:
+#   - https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.2/highlight.min.js
+#   - javascripts/highlight.js
+# extra_css:
+#   - https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.2/styles/default.min.css
+
+# Page tree
+nav:
+  - Home: index.md
+  - Getting started:
+      - Installation: getting-started.md
+      - Creating a Discord Bot: creating-a-discord-bot.md
+  - API Reference: api/ekizu/index.md
