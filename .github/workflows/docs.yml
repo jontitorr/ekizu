@@ -5,6 +5,7 @@ on:
       - main
       - dev
     paths:
+      - "**docs.yml"
       - "**.hpp"
       - "docs/**"
   workflow_dispatch:
