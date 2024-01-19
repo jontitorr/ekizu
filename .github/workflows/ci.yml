@@ -28,14 +28,18 @@ permissions:
 
 jobs:
   linux:
-    name: Linux ${{ matrix.arch }} (${{ matrix.gcc-version }})
+    name: linux-${{ matrix.arch }}-${{ matrix.config }}-${{ matrix.gcc-version }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         arch: [amd64]
+        config: [Release, Debug]
         gcc-version: ["g++-9", "g++-10", "g++-12"]
         os: ["ubuntu-22.04"]
+
+    env:
+      OUTPUT_NAME: ekizu-linux${{ matrix.arch }}-${{ matrix.config }}-${{ matrix.gcc-version }}
 
     steps:
       - name: Checkout
@@ -51,36 +55,33 @@ jobs:
           boost_version: 1.81.0
 
       - name: Configure CMake
-        run: cmake -S . -B build -G Ninja
-        if: matrix.gcc-version != 'g++-12'
-        env:
-          BOOST_ROOT: ${{ steps.install-boost.outputs.BOOST_ROOT }}
-          CXX: ${{ matrix.gcc-version }}
-
-      - name: Configure CMake (g++-12)
-        run: cmake -S . -B build -G Ninja -Dekizu_WARNINGS_AS_ERRORS=OFF
-        if: matrix.gcc-version == 'g++-12'
+        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.config }}
         env:
           BOOST_ROOT: ${{ steps.install-boost.outputs.BOOST_ROOT }}
           CXX: ${{ matrix.gcc-version }}
 
       - name: Build
-        run: cmake --build build --config Release
+        run: cmake --build build --config ${{ matrix.config }}
 
       - name: Package
-        run: cd build && cpack --verbose
+        run: cd build && cpack -C ${{ matrix.config }} --verbose
+
+      - name: Rename Packages
+        run: |
+          mv build/*.deb build/${{ env.OUTPUT_NAME }}.deb
+          mv build/*.rpm build/${{ env.OUTPUT_NAME }}.rpm
 
       - name: Upload Binary (DEB)
         uses: actions/upload-artifact@v3
         with:
-          name: "libekizu - Debian Package ${{ matrix.arch }}"
-          path: "${{ github.workspace }}/build/*.deb"
+          name: ${{ env.OUTPUT_NAME }}.deb
+          path: build/*.deb
 
       - name: Upload Binary (RPM)
         uses: actions/upload-artifact@v3
         with:
-          name: "libekizu - RPM Package ${{ matrix.arch }}"
-          path: "${{ github.workspace }}/build/*.rpm"
+          name: ${{ env.OUTPUT_NAME }}.rpm
+          path: build/*.rpm
 
   windows:
     strategy:
@@ -92,8 +93,12 @@ jobs:
           - { name: 2019, version: 16, os: windows-2019 }
           - { name: 2022, version: 17, os: windows-2022 }
 
-    name: "Windows ${{ matrix.arch }}-${{ matrix.config }}-vs${{ matrix.vs.name }}"
+    name: windows-${{ matrix.arch }}-${{ matrix.config }}-vs${{ matrix.vs.name }}
     runs-on: ${{ matrix.vs.os }}
+
+    env:
+      OUTPUT_NAME: ekizu-windows-${{ matrix.arch }}-${{ matrix.config }}-vs${{ matrix.vs.name }}.zip
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -124,11 +129,14 @@ jobs:
       - name: Package
         run: cd build && cpack -C ${{ matrix.config }} --verbose
 
-      - name: Upload Binary
+      - name: Rename Package
+        run: mv build/*.zip build/${{ env.OUTPUT_NAME }}
+
+      - name: Upload Package
         uses: actions/upload-artifact@v3
         with:
-          name: "libekizu - Windows ${{ matrix.arch }}-${{ matrix.config }}-vs${{ matrix.vs.name }}"
-          path: "${{ github.workspace }}/build/*.zip"
+          name: ${{ env.OUTPUT_NAME }}
+          path: build/${{ env.OUTPUT_NAME }}
 
   release:
     needs: [linux, windows]
