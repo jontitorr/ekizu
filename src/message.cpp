@@ -115,6 +115,7 @@ void to_json(nlohmann::json &j, const Message &m) {
 	serialize(j, "flags", m.flags);
 	serialize(j, "referenced_message", m.referenced_message);
 	serialize(j, "interaction", m.interaction);
+	serialize(j, "components", m.components);
 }
 
 void from_json(const nlohmann::json &j, Message &m) {
@@ -143,5 +144,6 @@ void from_json(const nlohmann::json &j, Message &m) {
 	deserialize(j, "flags", m.flags);
 	deserialize(j, "referenced_message", m.referenced_message);
 	deserialize(j, "interaction", m.interaction);
+	deserialize(j, "components", m.components);
 }
 }  // namespace ekizu
