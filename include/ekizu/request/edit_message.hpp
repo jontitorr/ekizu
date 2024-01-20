@@ -46,9 +46,15 @@ struct EditMessage {
 		return *this;
 	}
 
-	EditMessage &embeds(const std::vector<Embed> &embeds) {
+	EditMessage &components(std::vector<MessageComponent> components) {
+		// TODO: Validate components
+		m_fields.components = std::move(components);
+		return *this;
+	}
+
+	EditMessage &embeds(std::vector<Embed> embeds) {
 		// TODO: Validate embeds
-		m_fields.embeds = embeds;
+		m_fields.embeds = std::move(embeds);
 		return *this;
 	}
 
