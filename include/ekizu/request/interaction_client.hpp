@@ -18,7 +18,7 @@ struct InteractionClient {
 		InteractionResponse response) const;
 
 	[[nodiscard]] EKIZU_EXPORT GetOriginalResponse get_original_response(
-		Snowflake interaction_id, std::string_view interaction_token) const;
+		Snowflake application_id, std::string_view interaction_token) const;
 
    private:
 	Snowflake m_application_id;
