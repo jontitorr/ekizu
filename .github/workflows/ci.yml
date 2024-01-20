@@ -39,7 +39,7 @@ jobs:
         os: ["ubuntu-22.04"]
 
     env:
-      OUTPUT_NAME: ekizu-linux${{ matrix.arch }}-${{ matrix.config }}-${{ matrix.gcc-version }}
+      OUTPUT_NAME: ekizu-linux-${{ matrix.arch }}-${{ matrix.config }}-${{ matrix.gcc-version }}
 
     steps:
       - name: Checkout
