@@ -55,7 +55,7 @@ jobs:
           boost_version: 1.81.0
 
       - name: Configure CMake
-        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.config }}
+        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.config }} -Dekizu_BUILD_EXAMPLES=OFF
         env:
           BOOST_ROOT: ${{ steps.install-boost.outputs.BOOST_ROOT }}
           CXX: ${{ matrix.gcc-version }}
@@ -117,11 +117,11 @@ jobs:
 
       - name: Configure CMake (x64)
         if: ${{ matrix.arch == 'x64' }}
-        run: cmake ${{ steps.vcpkg.outputs.vcpkg-cmake-config }} -S . -B build -G "Visual Studio ${{ matrix.vs.version }} ${{ matrix.vs.name }}" -A x64 -T host=x64
+        run: cmake ${{ steps.vcpkg.outputs.vcpkg-cmake-config }} -S . -B build -G "Visual Studio ${{ matrix.vs.version }} ${{ matrix.vs.name }}" -A x64 -T host=x64 -Dekizu_BUILD_EXAMPLES=OFF
 
       - name: Configure CMake (x86)
         if: ${{ matrix.arch == 'x86' }}
-        run: cmake ${{ steps.vcpkg.outputs.vcpkg-cmake-config }} -S . -B build -G "Visual Studio ${{ matrix.vs.version }} ${{ matrix.vs.name }}" -A Win32 -T host=x86
+        run: cmake ${{ steps.vcpkg.outputs.vcpkg-cmake-config }} -S . -B build -G "Visual Studio ${{ matrix.vs.version }} ${{ matrix.vs.name }}" -A Win32 -T host=x86 -Dekizu_BUILD_EXAMPLES=OFF
 
       - name: Build
         run: cmake --build build --config ${{ matrix.config }}
