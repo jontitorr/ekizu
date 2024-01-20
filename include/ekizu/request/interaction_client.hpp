@@ -13,11 +13,11 @@ struct InteractionClient {
 
 	/// https://discord.com/developers/docs/interactions/receiving-and-responding#endpoints
 
-	[[nodiscard]] CreateResponse create_response(
+	[[nodiscard]] EKIZU_EXPORT CreateResponse create_response(
 		Snowflake interaction_id, std::string_view interaction_token,
 		InteractionResponse response) const;
 
-	[[nodiscard]] GetOriginalResponse get_original_response(
+	[[nodiscard]] EKIZU_EXPORT GetOriginalResponse get_original_response(
 		Snowflake interaction_id, std::string_view interaction_token) const;
 
    private:
