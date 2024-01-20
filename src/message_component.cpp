@@ -64,7 +64,22 @@ void to_json(nlohmann::json &j, const ActionRowComponent &c) {
 }
 
 void from_json(const nlohmann::json &j, ActionRowComponent &c) {
-	json_util::detail::deserialize_impl(j, c);
+	if (json_util::not_null_all(j, "type") && j["type"].is_number()) {
+		switch (j["type"].get<ComponentType>()) {
+			case ComponentType::Button: {
+				ekizu::Button b;
+				from_json(j, b);
+				c.emplace<Button>(std::move(b));
+			}
+			case ComponentType::SelectMenu: {
+				ekizu::SelectMenu s;
+				from_json(j, s);
+				c.emplace<SelectMenu>(std::move(s));
+			}
+			default: {
+			}
+		}
+	}
 }
 
 void to_json(nlohmann::json &j, const ActionRow &a) {
@@ -81,6 +96,27 @@ void to_json(nlohmann::json &j, const MessageComponent &c) {
 }
 
 void from_json(const nlohmann::json &j, MessageComponent &c) {
-	json_util::detail::deserialize_impl(j, c);
+	if (json_util::not_null_all(j, "type") && j["type"].is_number()) {
+		switch (j["type"].get<ComponentType>()) {
+			case ComponentType::ActionRow: {
+				ekizu::ActionRow a;
+				from_json(j, a);
+				c.emplace<ActionRow>(std::move(a));
+			}
+			case ComponentType::Button: {
+				ekizu::Button b;
+				from_json(j, b);
+				c.emplace<Button>(std::move(b));
+			}
+			case ComponentType::SelectMenu: {
+				ekizu::SelectMenu s;
+				from_json(j, s);
+				c.emplace<SelectMenu>(std::move(s));
+				break;
+			}
+			default: {
+			}
+		}
+	}
 }
 }  // namespace ekizu
