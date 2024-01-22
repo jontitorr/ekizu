@@ -1,5 +1,5 @@
 #include <boost/url/encode.hpp>
-#include <boost/url/grammar/all_chars.hpp>
+#include <boost/url/rfc/unreserved_chars.hpp>
 #include <ekizu/json_util.hpp>
 #include <ekizu/request/delete_all_reactions_for_emoji.hpp>
 
@@ -24,12 +24,12 @@ DeleteAllReactionsForEmoji::operator net::HttpRequest() const {
 					m_message_id,
 					boost::urls::encode(
 						fmt::format("{}:{}", emoji.name, emoji.id),
-						boost::urls::grammar::all_chars));
+						boost::urls::unreserved_chars));
 			} else if constexpr (std::is_same_v<T, std::string>) {
-				return fmt::format("/channels/{}/messages/{}/reactions/{}",
-								   m_channel_id, m_message_id,
-								   boost::urls::encode(
-									   emoji, boost::urls::grammar::all_chars));
+				return fmt::format(
+					"/channels/{}/messages/{}/reactions/{}", m_channel_id,
+					m_message_id,
+					boost::urls::encode(emoji, boost::urls::unreserved_chars));
 			} else {
 				static_assert(sizeof(T) == 0);
 			}

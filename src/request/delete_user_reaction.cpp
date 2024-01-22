@@ -1,5 +1,5 @@
 #include <boost/url/encode.hpp>
-#include <boost/url/grammar/all_chars.hpp>
+#include <boost/url/rfc/unreserved_chars.hpp>
 #include <ekizu/json_util.hpp>
 #include <ekizu/request/delete_user_reaction.hpp>
 
@@ -26,13 +26,13 @@ DeleteUserReaction::operator net::HttpRequest() const {
 					m_message_id,
 					boost::urls::encode(
 						fmt::format("{}:{}", emoji.name, emoji.id),
-						boost::urls::grammar::all_chars),
+						boost::urls::unreserved_chars),
 					m_user_id);
 			} else if constexpr (std::is_same_v<T, std::string>) {
 				return fmt::format(
 					"/channels/{}/messages/{}/reactions/{}/{}", m_channel_id,
 					m_message_id,
-					boost::urls::encode(emoji, boost::urls::grammar::all_chars),
+					boost::urls::encode(emoji, boost::urls::unreserved_chars),
 					m_user_id);
 			} else {
 				static_assert(sizeof(T) == 0);

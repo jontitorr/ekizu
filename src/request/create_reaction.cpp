@@ -1,5 +1,5 @@
 #include <boost/url/encode.hpp>
-#include <boost/url/grammar/all_chars.hpp>
+#include <boost/url/rfc/unreserved_chars.hpp>
 #include <ekizu/json_util.hpp>
 #include <ekizu/request/create_reaction.hpp>
 
@@ -24,19 +24,22 @@ CreateReaction::operator net::HttpRequest() const {
 					m_message_id,
 					boost::urls::encode(
 						fmt::format("{}:{}", emoji.name, emoji.id),
-						boost::urls::grammar::all_chars));
+						boost::urls::unreserved_chars));
 			} else if constexpr (std::is_same_v<T, std::string>) {
-				return fmt::format("/channels/{}/messages/{}/reactions/{}/@me",
-								   m_channel_id, m_message_id,
-								   boost::urls::encode(
-									   emoji, boost::urls::grammar::all_chars));
+				return fmt::format(
+					"/channels/{}/messages/{}/reactions/{}/@me", m_channel_id,
+					m_message_id,
+					boost::urls::encode(emoji, boost::urls::unreserved_chars));
 			} else {
 				static_assert(sizeof(T) == 0);
 			}
 		},
 		m_emoji);
 
-	return {net::HttpMethod::put, url, 11};
+	net::HttpRequest req{net::HttpMethod::put, url, 11};
+	req.prepare_payload();
+
+	return req;
 }
 
 Result<> CreateReaction::send(const asio::yield_context& yield) const {
