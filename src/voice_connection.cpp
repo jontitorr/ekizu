@@ -432,6 +432,11 @@ Result<> VoiceConnection::opus_sender(const asio::yield_context &yield) {
 
 		auto wait =
 			std::chrono::milliseconds(frame_count / (SAMPLE_RATE / 1000));
+
+		if (now + wait < std::chrono::steady_clock::now()) {
+			now = std::chrono::steady_clock::now();
+		}
+
 		m_send_timer->expires_at(now + wait);
 		now += wait;
 		m_send_timer->async_wait(yield);
