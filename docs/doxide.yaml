@@ -2,6 +2,6 @@ title: ekizu
 description:
 output: docs/api
 files:
-  - "../include/ekizu/**/*.hpp"
+  - "../include/**/*.hpp"
 defines:
   EKIZU_EXPORT: ""
