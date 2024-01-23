@@ -87,5 +87,7 @@ nav:
   - Home: index.md
   - Getting started:
       - Installation: getting-started.md
-      - Creating a Discord Bot: creating-a-discord-bot.md
+      - Creating a Discord Bot:
+          - Creating a Bot Token: creating-a-bot-token.md
+          - Building a Bot: building-a-discord-bot.md
   - API Reference: api/ekizu/index.md
