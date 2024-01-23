@@ -79,7 +79,7 @@ Result<> handle_event(const Event &ev, const HttpClient &http,
 
 > This example makes use of a macro called async_main, which defines a main entrypoint that runs a boost::asio::io_context. It is not mandatory and is optionally included in the `ekizu/async_main.hpp` header.
 
-See [examples](https://github.com/jontitorr/ekizu/tree/dev/examples) for more.
+For more feature-complete examples, see [examples](https://github.com/jontitorr/ekizu/tree/main/examples) or my bot [Saber](https://github.com/jontitorr/saber).
 
 ## Getting Started
 

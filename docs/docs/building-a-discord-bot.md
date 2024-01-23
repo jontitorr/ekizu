@@ -110,7 +110,7 @@ Result<> handle_event(
 }
 ```
 
-For more feature-complete examples, see [examples](https://github.com/jontitorr/ekizu/tree/main/examples).
+For more feature-complete examples, see [examples](https://github.com/jontitorr/ekizu/tree/main/examples) or my bot [Saber](https://github.com/jontitorr/saber).
 
 ## Build the bot
 
