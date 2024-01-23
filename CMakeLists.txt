@@ -141,18 +141,13 @@ else()
     set(SEPARATE_DEPENDENCIES "OpenSSL;SSL;")
 endif()
 
-cpmfindpackage(NAME "fmt" GITHUB_REPOSITORY "fmtlib/fmt" GIT_TAG "13156e5")
+cpmfindpackage(NAME "fmt" GITHUB_REPOSITORY "fmtlib/fmt" GIT_TAG "75f3b1c")
+set(SEPARATE_DEPENDENCIES "${SEPARATE_DEPENDENCIES}fmt;;")
 
-if(fmt_ADDED)
-    install(TARGETS fmt EXPORT ekizuTargets)
-
-    if(WIN32)
-        target_compile_definitions(
-            fmt PUBLIC _SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING
-        )
-    endif()
-else()
-    set(SEPARATE_DEPENDENCIES "${SEPARATE_DEPENDENCIES}fmt;;")
+if(WIN32)
+    target_compile_definitions(
+        ekizu PUBLIC _SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING
+    )
 endif()
 
 cpmaddpackage(
@@ -160,6 +155,8 @@ cpmaddpackage(
 )
 
 cpmaddpackage(NAME Opus GITHUB_REPOSITORY "xiph/opus" GIT_TAG "master")
+set(SEPARATE_DEPENDENCIES "${SEPARATE_DEPENDENCIES}Opus;;")
+
 cpmaddpackage(
     NAME
     Sodium
@@ -178,10 +175,14 @@ set(SEPARATE_DEPENDENCIES
     "${SEPARATE_DEPENDENCIES}Threads;;Boost;coroutine,date_time,filesystem,system,thread,url"
 )
 
-if(${IS_BOOST_LOCAL})
-    target_link_libraries(ekizu PUBLIC Boost::boost)
-else()
-    target_link_libraries(ekizu PUBLIC Boost::asio Boost::beast Boost::outcome)
+if(NOT ${IS_BOOST_LOCAL})
+    add_library(boost INTERFACE)
+    target_link_libraries(
+        boost INTERFACE $<BUILD_INTERFACE:Boost::asio Boost::beast
+                        Boost::outcome> $<INSTALL_INTERFACE:Boost::headers>
+    )
+    add_library(Boost::boost ALIAS boost)
+    install(TARGETS boost EXPORT ekizuTargets)
 endif()
 
 cpmaddpackage(
@@ -229,7 +230,8 @@ endif()
 
 target_link_libraries(
     ekizu
-    PUBLIC certify::core Boost::coroutine Boost::thread fmt::fmt nlohmann_json
+    PUBLIC Boost::boost certify::core Boost::coroutine Boost::thread fmt::fmt
+           nlohmann_json
     PRIVATE Boost::url ZLIB::ZLIB opus sodium
 )
 
