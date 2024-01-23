@@ -1,4 +1,3 @@
-#include <dotenv/dotenv.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 
@@ -33,9 +32,7 @@ Result<> handle_event(Snowflake &bot_id, const Event &ev,
 					  const HttpClient &http, const asio::yield_context &yield);
 
 async_main(const asio::yield_context &yield) {
-	dotenv::init();
-
-	const auto token = dotenv::getenv("DISCORD_TOKEN");
+	const std::string token{std::getenv("DISCORD_TOKEN")};
 
 	if (token.empty()) {
 		get_logger()->error("No token :(");
